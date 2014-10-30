@@ -331,7 +331,7 @@ function prepare_functional_tests_venv {
         sed -i '/pysflib/d' ${SFMANAGER_CLONED_PATH}/requirements.txt
         pip install -r ${SFMANAGER_CLONED_PATH}/requirements.txt
         pip install --upgrade setuptools pbr pycrypto
-        pip install pyOpenSSL ndg-httpsclient pyasn1 nose git-review
+        pip install pyOpenSSL ndg-httpsclient pyasn1 nose git-review pyyaml
         cd ${PYSFLIB_CLONED_PATH}; python setup.py install
         cd ${SFMANAGER_CLONED_PATH}; python setup.py install
     ) > ${ARTIFACTS_DIR}/venv_prepartion.output

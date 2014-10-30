@@ -54,6 +54,7 @@ function fetch_prebuilt {
         gpg --list-sigs ${RELEASE_GPG_FINGERPRINT} &> /dev/null || gpg --keyserver keys.gnupg.net --recv-key ${RELEASE_GPG_FINGERPRINT}
         gpg --verify ${UPSTREAM}/${IMG}.digest || exit -1
     fi
+    cat ${UPSTREAM}/${IMG}.digest
     (cd ${UPSTREAM}; exec sha256sum -c ./${IMG}.digest) || exit -1
 }
 
