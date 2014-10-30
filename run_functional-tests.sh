@@ -24,6 +24,10 @@ source functestslib.sh
 echo "Running functional-tests with this HEAD"
 display_head
 
+echo "Check how much we can allocate memory on this node"
+gcc -xc -<<<'main() {int i;char *ptr;for (i = 1; ; i++) {if (!(ptr=malloc(1024*1024*100))) {perror("malloc");break;} memset(ptr, 0, 1024*1024*100); if (i % 8 == 0) printf("Allocated %04d Mo\n", i*100);}}'&>/dev/null; ./a.out
+rm a.out
+
 function lxc_stop {
     if [ ! ${SF_SKIP_BOOTSTRAP} ]; then
         if [ ! ${DEBUG} ]; then
