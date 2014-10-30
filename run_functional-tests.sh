@@ -25,6 +25,9 @@ REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
 if [ ${TEST_TYPE} == "openstack" ]; then
+    sudo tail -n 32 /var/log/yum.log
+    set -x
+    DISABLE_SETX=0
     if [ ! -n "${OS_AUTH_URL}" ]; then
         echo "Source openrc first"
         exit 1
@@ -42,7 +45,10 @@ display_head
 prepare_artifacts
 checkpoint "Running tests on $(hostname)"
 lxc_stop
-build_image
+
+sudo mkdir -p ${IMAGE_PATH}
+sudo curl -o ${IMAGE_PATH}-${SF_VER}.img.qcow2 ${SWIFT_SF_URL}/softwarefactory-${SF_VER}.img.qcow2
+#build_image
 
 case "${TEST_TYPE}" in
     "functional")
@@ -78,11 +84,24 @@ case "${TEST_TYPE}" in
         run_functional_tests
         ;;
     "openstack")
+        set -x
         heat_stop
         heat_init
         heat_wait
         run_heat_bootstraps
+        set -x
+        cat /etc/hosts
+        sudo ip a l
+        sudo ip route show
+        sudo iptables -L -v -n -t nat
+        sudo iptables -L -v -n
+        echo "=="
+        ping -c 2 sftests.com
         heat_dashboard_wait
+        set -x
+        curl http://sftests.dom
+        curl https://sftests.dom
+        cat /etc/hosts
         run_functional_tests
         ;;
     *)
