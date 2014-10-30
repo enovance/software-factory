@@ -24,6 +24,8 @@ unset https_proxy
 source functestslib.sh
 . role_configrc
 
+set -x
+DISABLE_SETX=0
 REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
@@ -85,6 +87,9 @@ case "${TEST_TYPE}" in
         heat_init
         heat_wait
         run_heat_bootstraps
+        ping -c 2 sftests.com
+        curl -v http://sftests.com
+        curl -v https://sftests.com
         run_functional_tests
         ;;
     *)
