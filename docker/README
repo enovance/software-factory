@@ -1,0 +1,41 @@
+This is a WIP
+
+
+Basic
+~~~~~
+
+* To build jenkins docker role:
+
+cd jenkins; docker build --rm --tag=jenkins .
+
+* Image history
+
+docker history jenkins
+
+* To run jenkins:
+
+INSTANCE_ID=$(docker run -d jenkins)
+
+* To check what is going on:
+
+docker ps
+
+* Inspect a running container (get ip):
+
+docker inspect ${INSTANCE_ID}
+
+* Inspect container sf change:
+
+docker diff ${INSTANCE_ID}
+
+
+
+
+Network
+~~~~~~~
+
+* Make sure host is well configured:
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv4.conf.all.route_localnet=1
+
+
