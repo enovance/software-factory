@@ -21,10 +21,13 @@
 source functestslib.sh
 . role_configrc
 
+set -x
+DISABLE_SETX=0
 REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
 if [ ${TEST_TYPE} == "openstack" ]; then
+    sudo tail -n 100 /var/log/yum.log
     if [ ! -n "${OS_AUTH_URL}" ]; then
         echo "Source openrc first"
         exit 1
@@ -87,6 +90,9 @@ case "${TEST_TYPE}" in
         heat_init
         heat_wait
         run_heat_bootstraps
+        ping -c 2 sftests.com
+        curl -v http://sftests.com
+        curl -v https://sftests.com
         run_functional_tests
         ;;
     *)
