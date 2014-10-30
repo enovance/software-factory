@@ -42,7 +42,18 @@ display_head
 prepare_artifacts
 checkpoint "Running tests on $(hostname)"
 lxc_stop
-build_image
+
+if [ ${TEST_TYPE} == "openstack" ]; then
+    sudo tail -n 32 /var/log/yum.log
+    set -x
+    DISABLE_SETX=0
+    ./image/fetch_subprojects.sh
+    prepare_functional_tests_venv
+    sudo mkdir -p ${IMAGE_PATH}
+    sudo curl -o ${IMAGE_PATH}-${SF_VER}.img.qcow2 ${SWIFT_SF_URL}/softwarefactory-${SF_VER}.img.qcow2
+else
+    build_image
+fi
 
 case "${TEST_TYPE}" in
     "functional")
@@ -78,10 +89,17 @@ case "${TEST_TYPE}" in
         run_functional_tests
         ;;
     "openstack")
+        set -x
         heat_stop
         heat_init
         heat_wait
         run_heat_bootstraps
+        set -x
+        cat /etc/hosts
+        ping -c 2 sftests.com
+        curl -v http://sftests.com
+        curl -v https://sftests.com
+        more sf-bootstrap-data/hiera/* | cat
         run_functional_tests
         ;;
     *)
