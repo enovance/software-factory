@@ -27,6 +27,8 @@ source functestslib.sh
 . role_configrc
 bash ./rpm-test-requirements.sh
 
+# Show debug in tests...
+set -x
 REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
