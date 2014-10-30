@@ -25,6 +25,8 @@ REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
 if [ ${TEST_TYPE} == "openstack" ]; then
+    sudo cat /var/log/yum.log
+    DEBUG=1
     if [ ! -n "${OS_AUTH_URL}" ]; then
         echo "Source openrc first"
         exit 1
@@ -82,7 +84,7 @@ case "${TEST_TYPE}" in
         heat_init
         heat_wait
         run_heat_bootstraps
-        heat_dashboard_wait
+        #heat_dashboard_wait
         run_functional_tests
         ;;
     *)
