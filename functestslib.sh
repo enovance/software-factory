@@ -82,6 +82,7 @@ function heat_init {
     fi
     NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head)
     echo "[+] Starting the stack..."
+    echo "$GLANCE_ID $NET_ID"
     heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P \
         "sf_root_size=5;key_name=id_rsa;domain=tests.dom;image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" \
         sf_stack || fail "Heat stack-create failed"
@@ -126,12 +127,12 @@ function heat_dashboard_wait {
     echo "[+] Waiting for dashboard to be available at http://${SF_HOST}..."
     RETRY=100
     while [ $RETRY -gt 0 ]; do
-        curl http://${SF_HOST} 2> /dev/null | grep -q 'dashboard' && break
+        curl http://${SF_HOST} | grep -q 'dashboard' && break
         sleep 6
         let RETRY--
     done
-    [ $RETRY -eq 0 ] && fail "Instance dashboard is not available..."
-    echo "ok."
+    #[ $RETRY -eq 0 ] && fail "Instance dashboard is not available..."
+    #echo "ok."
     checkpoint "heat-dashboard-wait"
 }
 
@@ -225,6 +226,7 @@ function get_logs {
     ) 2> /dev/null
     sudo chown -R ${USER} ${ARTIFACTS_DIR}
     checkpoint "get_logs"
+    more ${ARTIFACTS_DIR}/* | cat
 }
 
 function host_debug {
@@ -342,8 +344,10 @@ function prepare_functional_tests_venv {
 }
 
 function reset_etc_hosts_dns {
+    echo "/etc/hosts before:"
+    cat /etc/hosts
     (
-        set -x
+#        set -x
         host=$1
         ip=$2
         grep -q " ${host}" /etc/hosts || {
@@ -354,6 +358,8 @@ function reset_etc_hosts_dns {
             sudo sed -i "s/^.* ${host}/${ip} ${host}/" /etc/hosts
         }
     ) &> ${ARTIFACTS_DIR}/etc_hosts.log
+    echo "/etc/hosts after:"
+    cat /etc/hosts
 }
 
 function run_provisioner {
