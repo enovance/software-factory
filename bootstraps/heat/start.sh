@@ -117,6 +117,7 @@ function start_stack {
 }
 
 function delete_stack {
+    heat stack-show ${STACKNAME} || return
     heat stack-delete ${STACKNAME} || true
     waiting_stack_deleted || {
         # Sometime delete failed and needs to be retriggered...
