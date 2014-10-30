@@ -80,6 +80,7 @@ function heat_init {
     fi
     NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head)
     echo "[+] Starting the stack..."
+    echo "$GLANCE_ID $NET_ID"
     heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P \
         "sf_root_size=5;key_name=id_rsa;domain=${SF_HOST};image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" \
         sf_stack || fail "Heat stack-create failed"
