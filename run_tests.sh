@@ -18,6 +18,15 @@ source functestslib.sh
 echo "Running unit-tests with this HEAD"
 display_head
 
+# Show debug in tests...
+set -x
+echo "==================================================================="
+echo "            ZUUL SWIFT UPLOAD ENV DEBUG"
+echo "==================================================================="
+env
+echo "==================================================================="
+
+
 bash ./rpm-test-requirements.sh
 
 echo "$(date) - $(hostname)"

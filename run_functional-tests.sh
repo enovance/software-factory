@@ -36,6 +36,15 @@ REFARCH_FILE=${SF_ARCH:-$(pwd)/config/refarch/allinone.yaml}
 
 SF_TESTS=${SF_TESTS:-tests/functional}
 
+# Show debug in tests...
+export SKIP_GPG=1
+set -x
+echo "==================================================================="
+echo "            ZUUL SWIFT UPLOAD ENV DEBUG"
+echo "==================================================================="
+env
+echo "==================================================================="
+
 if [ ${TEST_TYPE} == "openstack" ] && [ ! -n "${OS_AUTH_URL}" ]; then
     echo "Source openrc first"
     exit 1
