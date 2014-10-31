@@ -106,4 +106,85 @@ class commonservices-apache {
     group  => $httpd_user,
   }
 
+  file {'/var/www/fonts':
+    ensure => directory,
+    recurse => true,
+    mode   => '0644',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    require => File['/var/www/welcome'],
+  }
+
+  file {'/var/www/css':
+    ensure => directory,
+    recurse => true,
+    mode   => '0644',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    require => File['/var/www/welcome'],
+  }
+
+  file {'/var/www/css/font-awesome.min.css':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/css/font-awesome.min.css',
+    require => File['/var/www/welcome/css'],
+  }
+
+  file {'/var/www/index.html':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    content => template('commonservices-apache/index.html'),
+    require => File['/var/www/welcome'],
+  }
+
+  file {'/var/www/fonts/FontAwesome.otf':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/FontAwesome.otf',
+    require => File['/var/www/welcome/fonts'],
+  }
+
+  file {'/var/www/fonts/fontawesome-webfont.eot':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.eot',
+    require => File['/var/www/welcome/fonts'],
+  }
+
+  file {'/var/www/fonts/fontawesome-webfont.svg':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.svg',
+    require => File['/var/www/welcome/fonts'],
+  }
+
+  file {'/var/www/fonts/fontawesome-webfont.ttf':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.ttf',
+    require => File['/var/www/welcome/fonts'],
+  }
+
+  file {'/var/www/fonts/fontawesome-webfont.woff':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.woff',
+    require => File['/var/www/welcome/fonts'],
+  }
+
 }
