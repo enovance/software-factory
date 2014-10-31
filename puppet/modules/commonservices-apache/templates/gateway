@@ -37,6 +37,8 @@
     Alias /jquery.min.js /var/www/jquery.min.js
     Alias /static/ /var/www/static/
     Alias /docs/ /var/www/docs/
+    Alias /login/ /var/www/login.html
+
     ScriptAliasMatch ^/[^(auth)|(managesf)].*$ /var/www/index.py
 
     <Directory /var/www>
