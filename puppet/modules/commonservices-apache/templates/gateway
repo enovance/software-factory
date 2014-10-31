@@ -37,7 +37,10 @@
     Alias /jquery.min.js /var/www/jquery.min.js
     Alias /static/ /var/www/static/
     Alias /docs/ /var/www/docs/
+    Alias /welcome/ /var/www/welcome/
     ScriptAliasMatch ^/[^(auth)|(managesf)].*$ /var/www/index.py
+
+    RedirectMatch ^/$ /welcome/
 
     <Directory /var/www>
         AddHandler cgi-script .py
