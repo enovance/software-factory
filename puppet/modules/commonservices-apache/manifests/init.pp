@@ -66,44 +66,133 @@ class commonservices-apache {
     notify => Service['webserver'],
   }
 
-  file {'/var/www/bootstrap.min.css':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    source  => 'puppet:///modules/commonservices-apache/bootstrap.min.css',
-    notify => Service['webserver'],
-  }
-
-  file {'/var/www/bootstrap.min.js':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    source  => 'puppet:///modules/commonservices-apache/bootstrap.min.js',
-    notify => Service['webserver'],
-  }
-
-  file {'/var/www/jquery.min.js':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    source  => 'puppet:///modules/commonservices-apache/jquery.min.js',
-    notify => Service['webserver'],
-  }
-
-  file { '/var/www/static':
-    ensure  => link,
-    target  => '/srv/lodgeit/lodgeit/lodgeit/static/',
-  }
-
   file {'/var/www/docs':
     ensure => directory,
     recurse => true,
     mode   => '0644',
     owner  => $httpd_user,
     group  => $httpd_user,
+  }
+
+# target  => '/srv/lodgeit/lodgeit/lodgeit/static/',
+
+  file {'/var/www/static':
+    ensure => directory,
+    recurse => true,
+    mode   => '0644',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+  }
+
+  file {'/var/www/static/fonts':
+    ensure => directory,
+    recurse => true,
+    mode   => '0644',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    require => File['/var/www/static'],
+  }
+
+  file {'/var/www/static/css':
+    ensure => directory,
+    recurse => true,
+    mode   => '0644',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    require => File['/var/www/static'],
+  }
+
+  file {'/var/www/static/js':
+    ensure => directory,
+    recurse => true,
+    mode   => '0644',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    require => File['/var/www/static'],
+  }
+
+  file {'/var/www/static/css/bootstrap.min.css':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/bootstrap.min.css',
+    notify => Service['webserver'],
+    require => File['/var/www/static/css'],
+  }
+
+  file {'/var/www/static/js/bootstrap.min.js':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/bootstrap.min.js',
+    notify => Service['webserver'],
+    require => File['/var/www/static/js'],
+  }
+
+  file {'/var/www/static/js/jquery.min.js':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/jquery.min.js',
+    notify => Service['webserver'],
+    require => File['/var/www/static/js'],
+  }
+
+  file {'/var/www/static/css/font-awesome.min.css':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/css/font-awesome.min.css',
+    require => File['/var/www/static/css'],
+  }
+
+  file {'/var/www/static/fonts/FontAwesome.otf':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/FontAwesome.otf',
+    require => File['/var/www/static/fonts'],
+  }
+
+  file {'/var/www/static/fonts/fontawesome-webfont.eot':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.eot',
+    require => File['/var/www/static/fonts'],
+  }
+
+  file {'/var/www/static/fonts/fontawesome-webfont.svg':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.svg',
+    require => File['/var/www/static/fonts'],
+  }
+
+  file {'/var/www/static/fonts/fontawesome-webfont.ttf':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.ttf',
+    require => File['/var/www/static/fonts'],
+  }
+
+  file {'/var/www/static/fonts/fontawesome-webfont.woff':
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    source  => 'puppet:///modules/commonservices-apache/fonts/fontawesome-webfont.woff',
+    require => File['/var/www/static/fonts'],
   }
 
 }

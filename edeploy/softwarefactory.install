@@ -191,6 +191,10 @@ SUDO_UID=0 SUDO_GID=0 HOME=/root do_chroot $dir sh /var/www/etherpad-lite-1.4.0/
 do_chroot $dir mkdir -p /srv/lodgeit
 do_chroot $dir git clone https://git.openstack.org/openstack-infra/lodgeit /srv/lodgeit/lodgeit --depth 1
 do_chroot $dir bash -c 'cd /srv/lodgeit/lodgeit && git checkout c69f555032'  # latest commit as of 05. May 2014
+# Replace absolute URLs beginning with /static/
+do_chroot $dir sed -i -e 's#/static/#/lodgeit/static/#g' /srv/lodgeit/lodgeit/lodgeit/views/layout.html
+do_chroot $dir sed -i -e 's#/static/#/lodgeit/static/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/advanced.html
+do_chroot $dir sed -i -e 's#/static/#/lodgeit/static/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/pasting.html
 
 # install pysflib
 [ ! -d "$dir/var/www" ] && mkdir $dir/var/www
