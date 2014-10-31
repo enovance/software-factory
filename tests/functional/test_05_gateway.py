@@ -100,7 +100,7 @@ class TestGateway(unittest.TestCase):
     def test_static_dir_for_paste_accessible(self):
         """ Test if static dir for paste is accessible on gateway host
         """
-        url = "http://%s/static/jquery.js" % config.GATEWAY_HOST
+        url = "http://%s/static/lodgeit/jquery.js" % config.GATEWAY_HOST
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
 
