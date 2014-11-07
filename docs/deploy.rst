@@ -78,7 +78,8 @@ scripts will look for the required images.
 
 .. code-block:: bash
 
- $ SF_DIST=CentOS ./fetch_roles.sh
+ $ SF_DIST=CentOS ./fetch_roles.sh bases
+ $ SF_DIST=CentOS ./fetch_roles.sh trees
  $ SF_DIST=CentOS ./build_roles.sh
  $ ls -al /var/lib/sf/roles/install/C7.0-0.9.2/
 
