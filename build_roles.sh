@@ -102,8 +102,10 @@ function build_roles {
 }
 
 prepare_buildenv
-./fetch_roles.sh bases
-echo
+[ -n "$SF_SKIP_FETCHBASES" ] && {
+    ./fetch_roles.sh bases
+    echo
+}
 ./fetch_roles.sh trees
 echo
 [ -n "$VIRT" ] && {
