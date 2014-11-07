@@ -78,7 +78,8 @@ scripts will look for the required images.
 
 .. code-block:: bash
 
- $ SF_DIST=CentOS ./fetch_roles.sh
+ $ SF_DIST=CentOS ./fetch_roles.sh bases
+ $ SF_DIST=CentOS ./fetch_roles.sh trees
  $ SF_DIST=CentOS ./build_roles.sh
  $ ls -al /var/lib/sf/roles/install/C7.0-0.9.2/
 
@@ -221,6 +222,8 @@ To look at the error messages you can perform the following command:
 
 Failures can also occur during puppet agents runs. You can have a look to all
 puppet logs on the puppetmaster node in /var/log/sf-bootstrap.log.
+
+.. _lxcdeploy:
 
 How to deploy SF within LXC
 ---------------------------
