@@ -69,8 +69,13 @@ function build_role {
             sudo touch ${INST}/${ROLE_NAME}.done
             echo ${ROLE_MD5} | sudo tee ${ROLE_FILE}.md5
             if [ -n "$VIRT" ]; then
-                echo "Copy qcow2 image ..."
-                sudo cp ${UPSTREAM_FILE}.img.qcow2 ${INST}/ || true
+                echo "Copy prebuilt qcow2 image ..."
+                if [ -f ${UPSTREAM_FILE}.img.qcow2 ]; then
+                    sudo cp ${UPSTREAM_FILE}.img.qcow2 ${INST}/
+                else
+                    echo "Prebuilt qcow2 image ${UPSTREAM_FILE}.img.qcow2 is not available upstream ! so build it."
+                    build_img ${ROLE_FILE} ${INST}/${ROLE_NAME} $IMG_CFG
+                fi
             fi
         else
             echo "Upstream ${ROLE_NAME} is NOT similar. I rebuild."
