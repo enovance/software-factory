@@ -9,6 +9,7 @@ domain: tests.dom
 admin_name: user1
 admin_mail: user1@example.com
 admin_password: userpass
+admin_password_hashed: edeabe2629e9408882ae43b273316ca7#08fc52162d32b6e21684100d366cb0ac534af5a365f6a9eae1bca21a4a600d376e0660b6e83612fe940b62c92a5ee6a126ed058da5cfe45bb80448b0666a2e7d
 
 # If you envisage to authenticate users using an LDAP directory
 # please provide the following details or leave it blank.
