@@ -32,6 +32,7 @@ from pecan.rest import RestController
 
 from cauth.model import db
 from cauth.controllers import userdetails
+from cauth import adminsettings
 
 LOGOUT_MSG = "You have been successfully logged " \
              "out of all the Software factory services."
@@ -276,7 +277,12 @@ class GithubController(object):
 
 
 class LoginController(RestController):
-    def check_valid_user_ldap(self, username, password):
+    def check_valid_user(self, username, password):
+        if username == adminsettings.username:
+            salt, _, salted_pw = adminsettings.password.partition('#')
+            if salted_pw == hashlib.sha512(password + salt).hexdigest():
+                return adminsettings.mail, adminsettings.lastname
+
         l = conf.auth['ldap']
         if l['host'] == 'ldap://ldap.tests.dom':
             conn = dummy_ldap()
@@ -313,7 +319,7 @@ class LoginController(RestController):
         if 'username' in kwargs and 'password' in kwargs:
             username = kwargs['username']
             password = kwargs['password']
-            valid_user = self.check_valid_user_ldap(username, password)
+            valid_user = self.check_valid_user(username, password)
             if not valid_user:
                 logger.error(
                     'Client requests authentication via LDAP with' +
