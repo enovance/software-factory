@@ -265,7 +265,7 @@ class TestLoginController(TestCase):
 
     def test_check_valid_user_ldap(self):
         lc = root.LoginController()
-        ret = lc.check_valid_user_ldap('user1', 'userpass')
+        ret = lc.check_valid_user('user1', 'userpass')
         self.assertIn('user1@example.com', ret)
         self.assertIn('Demo user1', ret)
         ret = lc.check_valid_user_ldap('user1', 'badpass')
