@@ -44,6 +44,8 @@ done
 # Jenkins jobs are not updated by gearman plugin
 # TODO: Find a way to just restart the gearman plugin
 service jenkins restart
+service httpd restart
+
 
 # Zuul
 # concat of layout.yaml and projects.yaml to /etc/zuul/layout.yaml
