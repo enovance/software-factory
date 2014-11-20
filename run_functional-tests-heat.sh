@@ -36,6 +36,9 @@ display_head
 
 set -x
 
+uuid=$(date +%s | sha256sum | base64 | head -c 5)
+export STACKNAME=sf_${uuid}
+
 function get_ip {
     while true; do
         p=`nova list | grep puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed "s/ //g"`
