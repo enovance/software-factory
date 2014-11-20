@@ -36,6 +36,9 @@ display_head
 
 set -x
 
+uuid=$(date +%s | sha256sum | base64 | head -c 5)
+export STACKNAME=sf_${uuid}
+
 function get_ip {
     while true; do
         p=`nova list | grep puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed "s/ //g"`
@@ -76,9 +79,9 @@ build_imgs
 checkpoint "build_roles"
 heat_start
 checkpoint "heat_start"
-waiting_stack_created
+waiting_stack_created $STACKNAME
 checkpoint "wait_heat_stack"
-run_tests 60
+run_tests 15
 checkpoint "run_tests"
 DISABLE_SETX=1
 checkpoint "end_tests"
