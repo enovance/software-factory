@@ -36,6 +36,9 @@ display_head
 
 set -x
 
+uuid=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 5 | head -n 1)
+export STACKNAME=sf_${uuid}
+
 function get_ip {
     while true; do
         p=`nova list | grep puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed "s/ //g"`
