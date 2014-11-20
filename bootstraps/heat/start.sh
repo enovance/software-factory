@@ -10,13 +10,14 @@ if [ -n "$FROMUPSTREAM" ]; then
 else
     BUILT_ROLES=$INST
 fi
+STACKNAME=${STACKNAME:-SoftwareFactory}
 SFCONFIGFILE=../sfconfig.yaml
 DOMAIN=$(cat $SFCONFIGFILE | grep "^domain:" | cut -d' ' -f2)
 suffix=$DOMAIN
 
 ### Modify here according to your configuration ###
 # The default public key to use
-key_name="thekey"
+key_name="ftsfkey"
 # flavor is used for managesf
 flavor="m1.small"
 # alt_flavor is used for puppetmaster, mysql, redmine, jenkins, gerrit (prefer flavor with at least 2 vCPUs and 2GB RAM)
@@ -67,18 +68,18 @@ function unregister_images {
 
 function start_stack {
     get_params
-    heat stack-create --template-file sf.yaml -P "$params" SoftwareFactory
+    heat stack-create --template-file sf.yaml -P "$params" $STACKNAME
 }
 
 function delete_stack {
-    heat stack-delete SoftwareFactory
+    heat stack-delete $STACKNAME
 }
 
 function restart_stack {
     set +e
     delete_stack
     while true; do
-        heat stack-list | grep "SoftwareFactory"
+        heat stack-list | grep "$STACKNAME"
         [ "$?" != "0" ] && break
         sleep 2
     done
