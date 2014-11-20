@@ -199,14 +199,15 @@ function pre_fail {
 }
 
 function waiting_stack_created {
+    local stackname=$1
     while true; do
-        heat stack-list | grep -i softwarefactory | grep -i fail
+        heat stack-list | grep -i $stackname | grep -i fail
         [ "$?" -eq "0" ] && {
             echo "Stack creation has failed ..."
             # TODO: get the logs (heat stack-show)
             exit 1
         }
-        heat stack-list | grep -i softwarefactory | grep -i create_complete
+        heat stack-list | grep -i $stackname | grep -i create_complete
         [ "$?" -eq "0" ] && break
         sleep 60
     done
