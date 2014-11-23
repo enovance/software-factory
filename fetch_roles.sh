@@ -20,6 +20,11 @@ set -e
 
 . ./role_configrc
 
+function die {
+    echo "[ERROR]: $1"
+    exit -1
+}
+
 function fetch_base_roles_prebuilt {
     # Fetch edeploy and edeploy-roles (to fetch master EDEPLOY_ROLES_REL)
     echo "Fetch edeploy and edeploy-roles project from github ..."
@@ -78,7 +83,7 @@ function fetch_sf_roles_prebuilt {
     local temp=$(mktemp -d /tmp/edeploy-check-XXXXX)
     for role in install-server-vm softwarefactory; do
         role=${role}-${SF_VER}
-        curl -s -o ${temp}/${role}.md5 ${BASE_URL}/${role}.md5 &> /dev/null || continue
+        curl -s -o ${temp}/${role}.md5 ${BASE_URL}/${role}.md5 &> /dev/null || die "Could not fetch ${BASE_URL}/${role}.md5"
         # Swift does not return 404 but 'Not Found'
         grep -q 'Not Found' ${temp}/${role}.md5 && { echo "${role} does not exist upstream"; continue; }
         diff ${temp}/${role}.md5 ${UPSTREAM}/${role}.md5 &> /dev/null || {
@@ -103,7 +108,7 @@ function fetch_sf_qcow2_roles_prebuilt {
     local temp=$(mktemp -d /tmp/edeploy-check-XXXXX)
     for role in install-server-vm softwarefactory; do
         role=${role}-${SF_VER}.img.qcow2
-        curl -s -o ${temp}/${role}.md5 ${BASE_URL}/${role}.md5 || continue
+        curl -s -o ${temp}/${role}.md5 ${BASE_URL}/${role}.md5 || die "Could not fetch ${BASE_URL}/${role}.md5"
         # Swift does not return 404 but 'Not Found'
         grep -q 'Not Found' ${temp}/${role}.md5 && { echo "${role} does not exist upstream"; continue; }
         diff ${temp}/${role}.md5 ${UPSTREAM}/${role}.md5 &> /dev/null || {
