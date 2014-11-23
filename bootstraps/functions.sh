@@ -23,6 +23,7 @@ ROLES="$ROLES redmine"
 ROLES="$ROLES gerrit"
 ROLES="$ROLES managesf"
 ROLES="$ROLES jenkins"
+ROLES="$ROLES slave"
 
 function getip_from_yaml {
     cat ../hosts.yaml  | grep -A 1 "^  $1" | grep 'ip:' | cut -d: -f2 | sed 's/ *//g'
