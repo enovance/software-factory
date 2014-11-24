@@ -45,31 +45,7 @@ params="$params;slave_root_size=$slave_root_size"
 
 params="$params;jenkins_user_pwd=$jenkins_user_pwd"
 params="$params;sg_admin_cidr=$sg_admin_cidr;sg_user_cidr=$sg_user_cidr"
-params="$params;ext_net_uuid=$ext_net_uuid"
-params="$params;nameserver=$nameserver"
-
-function waiting_stack_deleted {
-    wait_for_statement "heat stack-show ${STACKNAME} &> /dev/null" 1
-}
-
-function wait_for_statement {
-    local STATEMENT=$1
-    local EXPECT_RETURN_CODE=${2-0}
-    local MAX_RETRY=${3-40}
-    local SLEEP_TIME=${4-5}
-    while true; do
-        eval "${STATEMENT}" &> /dev/null
-        if [ "$?" == "${EXPECT_RETURN_CODE}" ]; then
-            break
-        fi
-        sleep ${SLEEP_TIME}
-        let MAX_RETRY=MAX_RETRY-1
-        if [ "${MAX_RETRY}" == 0 ]; then
-            echo "Following statement didn't happen: [$STATEMENT]"
-            return 1
-        fi
-    done
-}
+params="$params;ext_net_uuid=$ext_net_uuid;dns=$dns"
 
 function get_params {
     puppetmaster_image_id=`glance image-show ${STACKNAME}_install-server-vm | grep "^| id" | awk '{print $4}'`
