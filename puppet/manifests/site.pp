@@ -17,6 +17,7 @@ node default inherits base {
 
 node /.*puppetmaster.*/ inherits base {
   include edeploy_server
+  include ntpmaster
 }
 
 node /.*jenkins.*/ inherits base {
@@ -26,11 +27,13 @@ node /.*jenkins.*/ inherits base {
   include zuul
   include cauth_client
   include bup
+  include ntpclient
 }
 
 node /.*redmine.*/ inherits base {
   include redmine
   include cauth_client
+  include ntpclient
 }
 
 node /.*gerrit.*/ inherits base {
@@ -38,12 +41,14 @@ node /.*gerrit.*/ inherits base {
   include gerrit
   include cauth_client
   include bup
+  include ntpclient
 }
 
 node /.*mysql.*/ inherits base {
   include mysql
   include replication
   include bup
+  include ntpclient
 }
 
 node /.*managesf.*/ inherits base {
@@ -54,4 +59,5 @@ node /.*managesf.*/ inherits base {
   include commonservices-socat
   include etherpad
   include lodgeit
+  include ntpclient
 }
