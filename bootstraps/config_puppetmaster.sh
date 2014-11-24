@@ -15,6 +15,7 @@ set -e
 
 FQDN=$(hostname -f)
 
+
 service puppetmaster stop
 case $dist in
     debian)
@@ -86,3 +87,5 @@ case $dist in
 esac
 
 
+# install third party puppet modules
+puppet module install puppetlabs-ntp
