@@ -81,6 +81,9 @@ do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs
 # install requirements for functional tests
 retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tests; pip install -r requirements.txt"
 
+# install third party puppet modules
+retry do_chroot ${dir} puppet module install puppetlabs-ntp --environment=sf
+
 # Cleanup
 clear_packages_cache ${dir}
 # somehow yum left some packages behind...

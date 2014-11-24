@@ -44,6 +44,10 @@ parameters:
     type: string
     description: From Ip range to access user services of SF
     default: 0.0.0.0/0
+  dns:
+    type: string
+    description: nameserver to use
+    default: 8.8.8.8
 
 resources:
   sf_net:
@@ -55,6 +59,8 @@ resources:
       network_id: { get_resource: sf_net }
       cidr: 192.168.0.0/24
       enable_dhcp: true
+      # This does not work as of now, see below for workaround
+      #dns_nameservers: [ { get_param: dns }, ]
 
   ssh_password:
     type: OS::Heat::RandomString
@@ -116,6 +122,10 @@ resources:
          protocol: tcp,
          port_range_min: 1,
          port_range_max: 65535},
+        {remote_ip_prefix: 192.168.0.0/24,
+         protocol: udp,
+         port_range_min: 123,
+         port_range_max: 123},
         {remote_ip_prefix: 192.168.0.0/24,
          protocol: icmp,}
         ]
@@ -256,6 +266,7 @@ resources:
               - HOME=/root/ JUP=JENKINS_USER_PASSWORD TEMP_SSH_PWD=SSHPASS SFSUFFIX=SF_SUFFIX ./bootstrap.sh >> /var/log/sf-bootstrap.log 2>&1
               - echo UseDNS no >> /etc/ssh/sshd_config
               - service ssh reload || service sshd reload
+              - echo "nameserver EXTRA_DNS" >> /etc/resolv.conf
           params:
             jenkins_host: { get_attr: [jenkins_instance, first_address] }
             redmine_host: { get_attr: [redmine_instance, first_address] }
@@ -267,6 +278,7 @@ resources:
             SFCONFIGCONTENT: { get_param: sf_config_content }
             JENKINS_USER_PASSWORD: { get_param: jenkins_user_pwd }
             SSHPASS: {get_attr: [ssh_password, value]}
+            EXTRA_DNS: { get_param: dns }
 
   jenkins_volume:
     type: OS::Cinder::Volume
