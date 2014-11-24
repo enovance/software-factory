@@ -10,7 +10,7 @@ Thanks for asking. Let's find a place for you!
 
 First you should join our communication forums:
 
-* Join us on IRC: You can talk to us directly in the #softwarefactory channel
+* Join us on IRC: You can talk to us directly in the ``#softwarefactory`` channel
   on Freenode.
 * Read the official Software Factory documentation. You can access it there:
   http://softwarefactory.enovance.com/_docs/
@@ -63,8 +63,11 @@ you to run the LXC tests and unittests.
 .. code-block:: bash
 
   $ cd /srv/software-factory
-  $ ./run_tests.sh # unittests
-  $ DEBUG=1 SF_DIST=CentOS ./run_functional-tests.sh # functional tests
+  $ export DEBUG=1                  # verbose output
+  $ export SF_DIST=Ubuntu           # optional setting the target OS
+  $ ./run_tests.sh                  # unit tests
+  $ ./run_functional-tests.sh       # functional tests
+  $ ./run_functional-tests-heat.sh  # functional tests with heat
 
 The functional tests will start LXC containers on the local VM to simulate
 as close as possible a real deployment. Setting the DEBUG environment variable
