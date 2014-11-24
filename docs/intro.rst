@@ -5,11 +5,12 @@ Contents:
 Introduction to Software Factory
 ================================
 
-Software Factory is a collection of existing tools that aim to
-provide a powerful platform to collaborate on software development.
-Software Factory eases the deployment of this platform and adds an
-additional management layer. The deployment target is an
-OpenStack compatible cloud.
+Software Factory is a collection of existing development tools
+that aim to provide a powerful platform to collaborate on
+software development and automate the contribution process.
+Software Factory eases the deployment of this platform and adds
+an additional management layer. Software Factory leverages
+OpenStack tools to help scale.
 
 What is Software Factory
 ------------------------
