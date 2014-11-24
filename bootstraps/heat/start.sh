@@ -28,6 +28,8 @@ ext_net_uuid="6c83db7b-480e-4198-bc69-88df6fd17e55"
 sg_admin_cidr="0.0.0.0/0"
 # Network from ALL SF services are accessible
 sg_user_cidr="0.0.0.0/0"
+# DNS server to use
+dns="8.8.8.8"
 ###################################################
 
 jenkins_user_pwd=$(generate_random_pswd 8)
@@ -37,7 +39,7 @@ params="key_name=$key_name;instance_type=$flavor"
 params="$params;alt_instance_type=$alt_flavor;suffix=$suffix"
 params="$params;jenkins_user_pwd=$jenkins_user_pwd;jenkins_master_url=$jenkins_master_url"
 params="$params;sg_admin_cidr=$sg_admin_cidr;sg_user_cidr=$sg_user_cidr"
-params="$params;ext_net_uuid=$ext_net_uuid"
+params="$params;ext_net_uuid=$ext_net_uuid;dns=$dns"
 
 function get_params {
     puppetmaster_image_id=`glance image-show ${STACKNAME}_install-server-vm | grep "^| id" | awk '{print $4}'`
