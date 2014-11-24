@@ -41,6 +41,7 @@ function get_ip {
 }
 
 if [ -z "$1" ] || [ "$1" == "start" ]; then
+
     sudo rm -rf ${CONFTEMPDIR}
     mkdir -p ${CONFTEMPDIR}
     cp sf-lxc.yaml $CONFTEMPDIR

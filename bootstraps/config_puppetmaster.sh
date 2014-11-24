@@ -8,6 +8,7 @@ set -e
 
 FQDN=$(hostname -f)
 
+
 service puppetmaster stop
 service httpd stop
 

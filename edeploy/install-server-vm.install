@@ -90,4 +90,8 @@ rm -f $dir/var/cache/yum/*/*.sqlite
 # Disable root passwd
 do_chroot $dir passwd -l root
 
+# install third party puppet modules
+do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
+
+
 put_git_mark $dir
