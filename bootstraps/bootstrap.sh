@@ -28,14 +28,14 @@ if [  -f "${BUILD}/bootstrap.done" ]; then
     rm ${BUILD}/bootstrap.done
 fi
 
-# Only create config if not yet done
-if [ ! -e "/etc/puppet/environments/sf" ]; then
-    echo "Preparing Puppet master"
+# Only create site specific if not done yet
+if [ ! -e "${BUILD}/hiera/sfcreds.yaml" ]; then
+    echo "Generate site specifics creds"
     generate_keys
-    generate_hieras
-    prepare_etc_puppet
+    generate_creds_yaml
 else
-    echo "Preparing Puppet master is skipped"
+    echo "Install hieras and manifests in /etc/puppet"
+    prepare_etc_puppet
     cp ${BUILD}/data/service_rsa /root/.ssh/id_rsa
 fi
 
