@@ -41,6 +41,9 @@ function get_ip {
 }
 
 if [ -z "$1" ] || [ "$1" == "start" ]; then
+    # open outbound traffic for containers, so that the puppetmaster can fetch third-party puppet modules.
+    sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
     sudo rm -rf ${CONFTEMPDIR}
     mkdir -p ${CONFTEMPDIR}
     cp sf-lxc.yaml $CONFTEMPDIR

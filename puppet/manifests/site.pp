@@ -10,6 +10,7 @@ node base {
   include edeploy_client
   include postfix
   include monit
+  include ntpservice
 }
 
 node default inherits base {
