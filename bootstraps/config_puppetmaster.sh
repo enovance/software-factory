@@ -8,6 +8,7 @@ set -e
 INITIAL=${INITIAL:-yes}
 FQDN=$(hostname -f)
 
+
 service puppetmaster stop
 service httpd stop
 
