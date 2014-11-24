@@ -10,7 +10,7 @@ Thanks for asking. Let's find a place for you!
 
 First you should join our communication forums:
 
-* Join us on IRC: You can talk to us directly in the #softwarefactory channel
+* Join us on IRC: You can talk to us directly in the ``#softwarefactory`` channel
   on Freenode.
 * Read the official Software Factory documentation. You can access it there:
   http://softwarefactory.enovance.com/_docs/
@@ -37,16 +37,14 @@ a development environment.
  $ cd sfstack
  $ sudo ./sfinstall.sh
 
-The *sfinstall.sh* script will install all the dependencies needed and fetch the
-softwarefactory source code. Note that we also use this project to build our
-Jenkins slaves to run softwarefactory functional tests.
+The *sfinstall.sh* script will install all the dependencies needed and fetch
+the softwarefactory source code. Note that we also use this project to build
+our Jenkins slaves to run softwarefactory functional tests.
 
-After a successful run of *sfinstall.sh* you will find the
-cloned directory of software-factory in /srv. Please jump into it.
-
-Then you can fetch pre-built trees (:ref:`fetchprebuilt`) and follow (:ref:`lxcdeploy`)
-to learn how to start a local softwarefactory, but skip the dependencies
-download instructions as the *sfinstall.sh* script already done that for you.
+After a successful run of *sfinstall.sh* you will find the cloned directory of
+software-factory in /srv. Here you can deploy software-factory. We recommend
+using an LXC deployment to do any form of development. See :ref:`lxcdeploy` on
+how to deploy software-factory within LXC.
 
 How to run the tests locally
 ----------------------------
@@ -63,13 +61,31 @@ you to run the LXC tests and unittests.
 .. code-block:: bash
 
   $ cd /srv/software-factory
-  $ ./run_tests.sh # unittests
-  $ DEBUG=1 ./run_functional-tests.sh # functional tests
+  $ ./run_tests.sh # run unit tests
+  $ DEBUG=1 ./run_functional-tests.sh # run functional tests
 
-The functional tests will start LXC containers on the local VM to simulate
-as close as possible a real deployment. Setting the DEBUG environment variable
-to something tells the script to let the deployment up. If not set the deployment
-will be destroyed (LXC containers will be stopped).
+The functional tests will start LXC containers on the local VM to
+simulate as close as possible a real deployment. Setting the DEBUG
+environment variable to something tells the script to let the
+deployment up. If not set the deployment will be destroyed (LXC
+containers will be stopped).
+
+.. code-block:: bash
+
+  $ ./run_functional-tests.sh          # Run the functional tests *OR*
+  $ DEBUG=1 ./run_functional-tests.sh  # Run the functional tests and keep the instances running after the tests finish
+
+The functional tests will deploy on an active Openstack cloud and run the *Heat*
+specific functional tests against that deployment. The Openstack credentials are
+set in the openrc file. The ``DEBUG`` constant has the same effect as those for
+the LXC functional tests. Please see :ref:`deploy` for instruction on how to
+setup the Openstack for software factory.
+
+.. code-block:: bash
+
+  $ . openrc                                # set the openstack testing credentials
+  $ DEBUG=1 ./run_functional-tests-heat.sh  # functional Heat tests
+
 
 How to develop and/or run a specific functional tests
 -----------------------------------------------------
