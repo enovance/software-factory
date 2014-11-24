@@ -15,6 +15,7 @@ set -e
 
 FQDN=$(hostname -f)
 
+
 service puppetmaster stop
 case $dist in
     debian)
@@ -84,5 +85,3 @@ case $dist in
         systemctl start httpd.service
         ;;
 esac
-
-
