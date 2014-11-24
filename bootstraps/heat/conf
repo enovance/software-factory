@@ -27,3 +27,6 @@ sg_admin_cidr="0.0.0.0/0"
 
 # Network from ALL SF services are accessible
 sg_user_cidr="0.0.0.0/0"
+
+# DNS server to use
+dns="8.8.8.8"

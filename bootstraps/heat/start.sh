@@ -46,7 +46,7 @@ params="$params;slave_root_size=$slave_root_size"
 
 params="$params;jenkins_user_pwd=$jenkins_user_pwd;jenkins_master_url=$jenkins_master_url"
 params="$params;sg_admin_cidr=$sg_admin_cidr;sg_user_cidr=$sg_user_cidr"
-params="$params;ext_net_uuid=$ext_net_uuid"
+params="$params;ext_net_uuid=$ext_net_uuid;dns=$dns"
 
 function get_params {
     puppetmaster_image_id=`glance image-show ${STACKNAME}_install-server-vm | grep "^| id" | awk '{print $4}'`
