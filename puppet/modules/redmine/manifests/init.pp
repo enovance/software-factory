@@ -31,7 +31,7 @@ class redmine ($settings = hiera_hash('redmine', ''),
         $create_db_check_cmd = 'bundle exec rake db:migrate:status'
         $default_data_cmd = 'bundle exec rake redmine:load_default_data --trace'
         $plugin_install_cmd = 'bundle exec rake redmine:plugins:migrate'
-        $redmine_backlog_install_cmd = 'bundle exec rake redmine:backlogs:install RAILS_ENV=production'
+        $redmine_backlog_install_cmd = 'bundle exec rake redmine:backlogs:install RAILS_ENV=production --trace'
 
         file { 'conf_yml':
           path   => '/usr/share/redmine/config/configuration.yml',
