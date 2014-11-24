@@ -6,13 +6,14 @@ Deploy Software Factory
 Software Factory installation introduction
 -----------------------------------------
 
-SF is designed to be installed on an OpenStack Cloud platform that embeds
-Heat and Neutron. The installation is performed using Heat.
+Software Factory (SF) is designed to be installed on an OpenStack Cloud platform
+that embeds Heat and Neutron. The installation is performed using Heat.
 Basically you should just source your .openrc and setup a configuration file
 before starting the start script.
 
-However, to ease improving SF we have developed a way to deploy
-the SF into LXC containers. Please have a look to the section `How to deploy SF within LXC`_
+However, to ease the development of SF we have developed a way to deploy the SF
+into LXC containers. Please have a look to the section `How to deploy SF within
+LXC`_
 
 All the VM images needed by SF must be available locally or remotely.
 The deployment process will take care of uploading those images to Glance.
@@ -260,15 +261,13 @@ puppet logs on the puppetmaster node in /var/log/sf-bootstrap.log.
 How to deploy SF within LXC
 ---------------------------
 
-The LXC deployment is a deployment method that should only be used
-for test deployments. Only the SF deployment method for OpenStack is targeted
-for production.
+The LXC deployment should only be used for testing and development purposes.
 
 This step requires that VM images have been built `Build or retrieve SF VM images`_.
 
 The LXC deployment has been only tested on Ubuntu 14.04 LTS. We advice to
 setup an Ubuntu 14.04 VM somewhere either on OpenStack or VirtualBox or wherever
-you prefer. Please make sure your instance is up-to-date:
+you prefer and make sure it is up-to-date:
 
 .. code-block:: bash
 
@@ -282,7 +281,7 @@ Now install the following dependencies:
 .. code-block:: bash
 
  $ sudo apt-get install linux-image-extra-$(uname -r) git python-augeas bridge-utils curl lxc libmysqlclient-dev \
- libssl-dev swig libldap2-dev libsasl2-dev python-dev python-pip graphviz
+ libssl-dev swig libldap2-dev libsasl2-dev python-dev python-pip graphviz make wget
  $ sudo pip install flake8 bash8
  $ sudo pip install -U tox==1.6.1 virtualenv==1.10.1 Sphinx oslosphinx
 
