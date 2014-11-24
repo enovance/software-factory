@@ -86,4 +86,8 @@ do_chroot $dir bash -c "cd /root/puppet-bootstrapper/tests; pip install -r requi
 # Disable root passwd
 do_chroot $dir passwd -l root
 
+# install third party puppet modules
+do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
+
+
 put_git_mark $dir
