@@ -1,0 +1,50 @@
+---
+- hosts: others
+  tasks:
+  - name: Stop puppet agent
+    command: service puppet stop
+- hosts: puppetmaster
+  vars:
+    upstream_path: /var/lib/sf/roles/upstream
+    install_base: /var/lib/debootstrap/install
+    metadata_base: /var/lib/debootstrap/metadata
+    from_version: C7.0-0.9.2
+    version: C7.0-0.9.3
+    install_path: "{{ install_base }}/{{ version }}"
+    metadata_path: "{{ metadata_base }}/{{ from_version }}"
+    clone_path: /srv/software-factory
+  tasks:
+  - name: Stop puppet agent
+    command: service puppet stop
+  - name: Stop puppet server
+    command: service httpd stop
+  - name: Create target directory {{ install_path }}/install-server-vm
+    command: mkdir -p {{ install_path }}/install-server-vm
+  - name: Create target directory {{ install_path }}/softwarefactory
+    command: mkdir -p {{ install_path }}/softwarefactory
+  - name: Create metadata directory {{ metadata_path }}
+    command: mkdir -p {{ metadata_path }}
+  - name: Deflate install-server-vm archive in {{ install_path }}/install-server-vm
+    command: tar -xzf {{ upstream_path }}/install-server-vm-{{ version }}.edeploy -C {{ install_path }}/install-server-vm
+  - name: Deflate softwarefactory archive in {{ install_path }}/softwarefactory
+    command: tar -xzf {{ upstream_path }}/softwarefactory-{{ version }}.edeploy -C {{ install_path }}/softwarefactory
+  - name: Copy metadata in {{ metadata_base }}
+    shell: cp -LR {{ clone_path }}/edeploy/metadata/{{ from_version }}/* {{ metadata_path }}/
+  - name: Synchronize FS with eDeploy
+    command: edeploy upgrade {{ version }}
+- hosts: others
+  vars:
+    version: C7.0-0.9.3
+  tasks:
+  - name: Synchronize FS with eDeploy
+    command: edeploy upgrade {{ version }}
+- hosts: puppetmaster
+  vars:
+    domain: tests.dom
+  tasks:
+  - name: Restart the puppet master
+    command: service httpd start
+  - name: Restart the bootstrap script
+    shell: INITIAL=no HOME=/root/ SFSUFFIX={{ domain }} ./bootstrap.sh
+    args:
+      chdir: /root/puppet-bootstrapper
