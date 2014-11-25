@@ -121,7 +121,10 @@ prepare_buildenv
     ./fetch_roles.sh bases
     echo
 }
-./fetch_roles.sh trees
+[ -z "$SF_SKIP_FETCHTREES" ] && {
+    ./fetch_roles.sh trees
+    echo
+}
 echo
 [ -n "$VIRT" ] && {
     ./fetch_roles.sh imgs
