@@ -1,0 +1,14 @@
+---
+# Prepare the edeploy server before the upgrade
+- name: Create target directory {{ install_path }}/install-server-vm
+  command: mkdir -p {{ install_path }}/install-server-vm
+- name: Create target directory {{ install_path }}/softwarefactory
+  command: mkdir -p {{ install_path }}/softwarefactory
+- name: Create metadata directory {{ metadata_path }}
+  command: mkdir -p {{ metadata_path }}
+- name: Deflate install-server-vm archive in {{ install_path }}/install-server-vm
+  command: tar -xzf {{ upstream_path }}/install-server-vm-{{ version }}.edeploy -C {{ install_path }}/install-server-vm
+- name: Deflate softwarefactory archive in {{ install_path }}/softwarefactory
+  command: tar -xzf {{ upstream_path }}/softwarefactory-{{ version }}.edeploy -C {{ install_path }}/softwarefactory
+- name: Copy metadata in {{ metadata_base }}
+  shell: cp -LR {{ clone_path }}/edeploy/metadata/{{ from_version }}/* {{ metadata_path }}/
