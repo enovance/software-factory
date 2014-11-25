@@ -6,6 +6,7 @@
 /tmp/
 + /root/
 - /root/puppet-boostrapper/build
+- /root/.ansible
 + /var
 - /var/lib/edeploy/
 - /var/log/
@@ -14,6 +15,7 @@
 - /var/lib/cloud
 - /var/spool/
 - /var/lib/postfix/master.lock
+- /var/lib/sf
 + /home/
 - /root/puppet-bootstrapper/build
 - /root/sfconfig.yaml
@@ -47,3 +49,5 @@
 /etc/systemd/system/multi-user.target.wants
 /etc/sysconfig/network-scripts/ifcfg-eth0
 /etc/puppet/puppet.conf
+/srv/software-factory
+/etc/puppet/environments/production
