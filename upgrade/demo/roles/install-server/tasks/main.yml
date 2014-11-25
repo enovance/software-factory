@@ -1,15 +1,36 @@
 ---
 # file: roles/all/tasks/main.yml
 
+- name: Get source code
+  git: repo=http://softwarefactory.enovance.com/r/p/software-factory.git
+  args:
+    dest: /srv/software-factory
+    version: master
+
 - name: Backup
+  # TODO
   command: echo managesf-cli --host {{ sf_gateway }} --auth {{ sf_username }}:{{ sf_password }} backup
 
-- name: Get install server role
-  command: echo wget http://mirror/{{ version }}-install-server.edeploy
+- name: Get new roles
+  command: /srv/software-factory/fetch_roles.sh trees
+  args:
+    chdir: /srv/software-factory/
 
-- name: Get software-factory role
-  command: echo wget http://mirror/{{ version }}-software-factory.edeploy
+- name: Extract roles
+  command: /srv/software-factory/extract_upstream_roles.sh
+  args:
+    chdir: /srv/software-factory/
+    creates: /var/lib/debootstrap/install/{{ version }}.done
+
+- name: Prepare metadata
+  command: rsync -av /srv/software-factory/edeploy/metadata/ /var/lib/debootstrap/metadata/
+
+- name: Stop puppetserver
+  service: name=httpd state=stopped
+
+- name: Stop puppet agent
+  service: name=puppet state=stopped
 
 - name: Upgrade install server
-  command: echo "edeploy upgrade ..."
+  command:  /usr/sbin/edeploy upgrade {{ version }}
 
