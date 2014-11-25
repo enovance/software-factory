@@ -1,0 +1,9 @@
+---
+- hosts: puppetmaster
+  tasks:
+  - name: Create target directory
+    command: mkdir -p /var/lib/sf/roles/upstream/
+  - name: Copy install-server-vm dev role trees to the puppet master node
+    copy: src=/var/lib/sf/roles/install/C7.0-0.9.2/install-server-vm-C7.0-0.9.2.edeploy dest=/var/lib/sf/roles/upstream/
+  - name: Copy softwarefactory dev role trees to the puppet master node
+    copy: src=/var/lib/sf/roles/install/C7.0-0.9.2/softwarefactory-C7.0-0.9.2.edeploy dest=/var/lib/sf/roles/upstream/
