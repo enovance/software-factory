@@ -141,6 +141,9 @@ you from internet. Indeed, the default behavior of rebuilding is only useful if 
 local changes on the SF edeploy roles. However if you really want to fully rebuild
 please prefix the **build_roles.sh** script call with **SKIP_UPSTREAM=true**.
 
+If you only want to skip downloading of pre-built roles please call
+**build_roles.sh** with **SKIP_FETCHBASES=true SKIP_FETCHTREES=true**.
+
 How to deploy SF on OpenStack
 -----------------------------
 
