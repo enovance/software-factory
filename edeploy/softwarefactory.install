@@ -255,6 +255,9 @@ chmod +x ${dir}/usr/local/jenkins/slave_scripts/gerrit-git-prep.sh
 
 # Cleanup
 clear_packages_cache $dir
+# somehow yum left some packages behind...
+rm -f $dir/var/cache/yum/*/packages/*.rpm
+rm -f $dir/var/cache/yum/*/*.sqlite
 
 # Disable root passwd
 do_chroot $dir passwd -l root
