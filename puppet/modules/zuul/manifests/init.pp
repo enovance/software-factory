@@ -124,6 +124,14 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group   => 'zuul',
     require => [User['zuul'], Group['zuul']],
   }
+  file {'/home/zuul/.ssh/id_rsa':
+    ensure  => present,
+    mode    => '0400',
+    owner   => 'zuul',
+    group   => 'zuul',
+    source  => 'puppet:///modules/zuul/jenkins_rsa',
+    require => File['/home/zuul/.ssh'],
+  }
   exec {'update_gerritip_knownhost':
     command => "/usr/bin/ssh-keyscan -p 29418 $gip >> /home/zuul/.ssh/known_hosts",
     logoutput => true,
