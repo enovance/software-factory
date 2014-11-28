@@ -34,6 +34,7 @@
 
     Alias /static/ /var/www/static/
     Alias /docs/ /var/www/docs/
+    Alias /dashboard/ /var/www/dashboard/
 
     ScriptAliasMatch ^/[^(auth)|(managesf)].*$ /var/www/index.py
 
