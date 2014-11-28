@@ -56,6 +56,7 @@ function generate_sfconfig {
     sed -i "s/^admin_name:.*/admin_name: ${ADMIN_USER}/" /tmp/sf-conf/sfconfig.yaml
     sed -i "s/^admin_password:.*/admin_password: ${ADMIN_PASSWORD}/" /tmp/sf-conf/sfconfig.yaml
     echo "admin_password_hashed: \"${ADMIN_PASSWORD_HASHED}\"" >> /tmp/sf-conf/sfconfig.yaml
+    sed -i "s/^sf_version:.*/sf_version: ${SF_REL}" /tmp/sf-conf/sfconfig.yaml
 }
 
 function getip_from_yaml {
@@ -191,6 +192,7 @@ function prepare_etc_puppet {
     cp /root/hosts.yaml /etc/puppet/hiera/sf
     cp /root/sfconfig.yaml /etc/puppet/hiera/sf
     cp $HIERA/sfcreds.yaml /etc/puppet/hiera/sf
+    echo -e "--\nsf_version: $(edeploy version | cut -d'-' -f2)" > /etc/puppet/hiera/sf/sf_version.yaml
     cp $DATA/service_rsa /etc/puppet/environments/sf/modules/ssh_keys/files/
     cp $DATA/service_rsa /root/.ssh/id_rsa
     cp $DATA/jenkins_rsa /etc/puppet/environments/sf/modules/jenkins/files/

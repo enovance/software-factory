@@ -1,3 +1,6 @@
+# SF Version is replaced by bootstrap
+sf_version: X.Y.Z
+
 # The top domain of your SF deployment. This is an important
 # configuration for SSO. Please be care of setting it correctly. If
 # you envisage to access the SF web UI by sf.dev.tests.dom or sf.test.dom
