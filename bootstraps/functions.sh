@@ -191,6 +191,12 @@ function prepare_etc_puppet {
     cp /root/hosts.yaml /etc/puppet/hiera/sf
     cp /root/sfconfig.yaml /etc/puppet/hiera/sf
     cp $HIERA/sfcreds.yaml /etc/puppet/hiera/sf
+    TMP_VERSION=$(edeploy version)
+    if [ -z "${TMP_VERSION}" ]; then
+        # tmp fix while conf must contain RSERV, and RSERV_PORT
+        TMP_VERSION=$(grep ^VERS= /var/lib/edeploy/conf  | cut -d"=" -f2)
+    fi
+    echo -e "--\nsf_version: $(echo ${TMP_VERSION} | cut -d'-' -f2)" > /etc/puppet/hiera/sf/sf_version.yaml
     cp $DATA/service_rsa /etc/puppet/environments/sf/modules/ssh_keys/files/
     cp $DATA/service_rsa /root/.ssh/id_rsa
     cp $DATA/jenkins_rsa /etc/puppet/environments/sf/modules/jenkins/files/
