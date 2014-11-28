@@ -109,6 +109,11 @@ def get_dev_group_name(prj_name):
     return "%s-dev" % prj_name
 
 
+def get_open_changes():
+    ge = get_client()
+    return ge.get_open_changes()
+
+
 class GerritRepo(object):
     def __init__(self, prj_name):
         # TODO: manage to destroy temp dir/file after usage
