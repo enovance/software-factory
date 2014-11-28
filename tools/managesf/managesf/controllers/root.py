@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
+
 from pecan import expose
 from pecan import abort
 from pecan.rest import RestController
@@ -163,10 +165,9 @@ class ProjectController(RestController):
 
     membership = MembershipController()
 
-    # Get method is mandatory for routing
     @expose()
     def get(self):
-        abort(501)
+        return json.dumps(gerrit.get_projects_by_user())
 
     @expose()
     def put(self, name=None):
