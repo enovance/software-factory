@@ -116,6 +116,11 @@ class RedmineUtils:
         except ResourceNotFoundError:
             return None
 
+    def get_open_issues(self):
+        url = "%s/issues.json?status_id=open" % self.r.url
+        print url
+        return self.r.request('get', url)
+
     def get_issues_by_project(self, name):
         try:
             p = self.r.project.get(name)
