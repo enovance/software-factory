@@ -169,3 +169,13 @@ def user_manages_project(prj_name):
 
 def user_is_administrator():
     return request.remote_user == conf.admin['name']
+
+
+def get_open_issues():
+    rm = get_client()
+    return rm.get_open_issues()
+
+
+def get_projects():
+    rm = get_client()
+    return rm.get_projects()
