@@ -50,31 +50,21 @@
       function updateUrl() {
         try {
           // Get iframe location
-          var curl = document.getElementById("content").contentWindow.location.href;
+          var content_location = document.getElementById("content").contentWindow.location;
           // Prepare new path
-          var nurl = "_".concat(getPath(curl));
+          var content_path = "/_".concat(content_location.pathname + content_location.search);
           // Get the main document location
-          var nmurl = getPath(window.location.href);
+          var window_path = window.location.pathname + window.location.search;
           // Only append the path if not already appended
-          if (nmurl != nurl) {
+          if (content_path != window_path) {
             // Replace the hash char by a pipe to allow the fragment to be
             // sent to web server
-            history.replaceState(null, null, "/".concat(nurl).replace('#', '|'));
+            history.replaceState(null, null, content_path.replace('#', '|'));
           };
         }
         catch (ex) {
         }
         tid = setTimeout(updateUrl, 500);
-      };
-      function getPath(url) {
-        var t = url.split("/")
-        var e = 0;
-        while(e < 3) {
-         t.shift();
-         e++;
-        };
-        var t = t.join('/');
-        return t
       };
     </script>
   </body>
