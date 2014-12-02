@@ -45,10 +45,10 @@ class TestProjectReplication(Base):
     def setUp(self):
         self.un = config.ADMIN_USER
         self.gu = GerritUtils(
-            'http://%s/' % config.GERRIT_HOST,
+            'http://%s/' % config.GATEWAY_HOST,
             auth_cookie=config.USERS[self.un]['auth_cookie'])
         self.gu2 = GerritUtils(
-            'http://%s/' % config.GERRIT_HOST,
+            'http://%s/' % config.GATEWAY_HOST,
             auth_cookie=config.USERS[config.USER_2]['auth_cookie'])
         self.k_idx = self.gu2.add_pubkey(config.USERS[config.USER_2]["pubkey"])
         priv_key_path = set_private_key(config.USERS[self.un]["privkey"])
@@ -183,7 +183,7 @@ class TestProjectReplication(Base):
         gitu = GerritGitUtils(un,
                               priv_key_path,
                               config.USERS[un]['email'])
-        url = "ssh://%s@%s:29418/%s" % (un, config.GERRIT_HOST,
+        url = "ssh://%s@%s:29418/%s" % (un, config.GATEWAY_HOST,
                                         pname)
         clone_dir = gitu.clone(url, pname)
 
