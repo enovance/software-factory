@@ -88,22 +88,23 @@ if [ "$1" == "upgrade" ]; then
         wait_for_bootstrap_done
         # Run basic tests
         run_serverspec
-    )
+    ) || pre_fail "Stable Bootstrap FAILED"
     # Run the provisioner to put some data on the deployed instance
     ./tools/provisioner_checker/run.sh provisioner
     # Put needed data to perform the upgrade on the deployed instance
     # In a real upgrade process this won't be done because next version
     # (The one we want to upgrade is already published)
-    cd tests/roles_provision/
-    sudo ./prepare.sh
-    ansible-playbook -i inventory playbook.yaml
-    cd -
+    (
+        cd tests/roles_provision/
+        sudo ./prepare.sh
+        ansible-playbook -i inventory playbook.yaml
+    ) || pre_fail "Ansible provision playbook FAILED"
     # Start the upgrade
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/upgrade/C7.0-0.9.2/C7.0-0.9.3/; ansible-playbook -i hosts site.yml"
+    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/upgrade/C7.0-0.9.2/C7.0-0.9.3/; ansible-playbook -i hosts site.yml" || pre_fail "Upgrade FAILED"
     # Run basic tests
-    run_serverspec
+    run_serverspec || pre_fail "Serverspec failed"
     # Run the checker to validate provisionned data has not been lost
-    ./tools/provisioner_checker/run.sh checker
+    ./tools/provisioner_checker/run.sh checker || pre_fail "Provision checker failed"
 fi
 
 DISABLE_SETX=1
