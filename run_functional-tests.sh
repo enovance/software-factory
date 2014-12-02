@@ -77,9 +77,11 @@ if [ "$1" == "upgrade" ]; then
         git clone http://softwarefactory.enovance.com/r/software-factory $cloned
         cd $cloned
         # Be sure to checkout the right previous version
-        git checkout 0.9.2
+        git checkout $PREVIOUS_SF_REL
         # Fetch the pre-built images
         ./fetch_roles.sh trees
+        # Trigger a build role in order to deflate roles in the right directory if not done yet
+        ./build_roles.sh
         cd bootstraps/lxc
         # Deploy
         ./start.sh
@@ -99,7 +101,7 @@ if [ "$1" == "upgrade" ]; then
     ansible-playbook -i inventory playbook.yaml
     cd -
     # Start the upgrade
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/upgrade/C7.0-0.9.2/C7.0-0.9.3/; ansible-playbook -i hosts site.yml"
+    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/ && ./upgrade.sh"
     # Run basic tests
     run_serverspec
     # Run the checker to validate provisionned data has not been lost
