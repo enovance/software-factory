@@ -33,7 +33,7 @@ auth=$admin:$admin_http_password
 if [ ! -f '/usr/share/config.init.done' ]; then
     sf-manage --host $gateway --auth-server $gateway --auth $auth create --name config --description "Config repository"
     sf-manage --host $gateway --auth-server $gateway --auth $auth replication_config add --section mysql_config projects config
-    sf-manage --host $gateway --auth-server $gateway --auth $auth replication_config add --section mysql_config url gerrit@$mysqlh:/home/gerrit/site_path/git/\${name}.git
+    sf-manage --host $gateway --auth-server $gateway --auth $auth replication_config add --section mysql_config url gerrit@$gateway:/home/gerrit/site_path/git/\${name}.git
     sf-manage --host $gateway --auth-server $gateway --auth $auth replication_config add --section mysql_config push +refs/heads/*:refs/heads/*
     sf-manage --host $gateway --auth-server $gateway --auth $auth replication_config add --section mysql_config push +refs/tags/*:refs/tags/*
 # wait for 10 seconds so that replication plugin reloading will be finished
