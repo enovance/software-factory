@@ -30,7 +30,8 @@ EDEPLOY_PROJECT=https://github.com/enovance/edeploy.git
 EDEPLOY_ROLES_PROJECT=https://github.com/enovance/edeploy-roles.git
 
 # Edeploy source version
-ED_TAG=master
+ED_TAG=1.6.1
+ED_ROLES_TAG=I.1.2.1
 
 # Qcow2 params
 IMG_CFG=params.virt
@@ -71,7 +72,7 @@ function fetch_edeploy {
         git clone $EDEPLOY_ROLES_PROJECT ${EDEPLOY_ROLES}
     fi
     (cd ${EDEPLOY}; git checkout $ED_TAG; git pull)
-    (cd ${EDEPLOY_ROLES}; git checkout $ED_TAG; git pull)
+    (cd ${EDEPLOY_ROLES}; git checkout $ED_ROLES_TAG; git pull)
     EDEPLOY_ROLES_REL=$(cd ${EDEPLOY_ROLES}; ${MAKE} version)
     echo
 }
