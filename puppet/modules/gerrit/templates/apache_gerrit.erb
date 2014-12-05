@@ -9,7 +9,7 @@
         Allow from all
     </Proxy>
 
-    <LocationMatch "/r/(a|login)">
+    <LocationMatch "^/r(/a|/login|/changes|/)">
       Order Allow,Deny
       Allow from all
 
@@ -19,16 +19,10 @@
       TKTAuthDebug 1
       require valid-user
     </LocationMatch>
+
     RewriteEngine On
     RewriteCond %{REQUEST_URI} ^/r/logout$
-    RewriteCond %{QUERY_STRING} (^.*$)
-    RewriteCond %1 ^$
-    RewriteRule logout <%= @cauth["signout_url"] %>?service=gerrit [R,L,CO=GerritAccount:;:;:0:/r]
-
-    RewriteCond %{REQUEST_URI} ^/r/logout$
-    RewriteCond %{QUERY_STRING} ^services=(.*)$
-    RewriteCond %1 !^$
-    RewriteRule logout <%= @cauth["signout_url"] %>?services=%1 [R,L,CO=GerritAccount:;:;:0:/r]
+    RewriteRule logout <%= @cauth["signout_url"] %> [R,L,CO=GerritAccount:;:;:0:/r]
 
     AllowEncodedSlashes On
     Redirect / /r/
