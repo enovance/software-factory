@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DISABLE_SETX=0
+SF_ROOT=$(dirname $(readlink $0 || echo $0))/../../
 
 export SF_SUFFIX=${SF_SUFFIX:-tests.dom}
 export SKIP_CLEAN_ROLES="y"
