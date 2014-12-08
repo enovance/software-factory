@@ -23,12 +23,13 @@
     source /etc/tenant_openrc
 }
 
-[ -z "$OS_TENANT_ID" ] && {
-    echo "OS_TENANT_ID is empty ... have you sourced an openrc ?"
+[ -z "$HEAT_TENANT" ] && {
+    echo "HEAT_TENANT is empty ... have you sourced an openrc ?"
     exit 1
 }
-echo "Use $OS_TENANT_NAME on $OS_AUTH_URL"
-
+echo "Use $HEAT_TENANT on $OS_AUTH_URL"
+export OS_TENANT_NAME=${HEAT_TENANT}
+unset OS_TENANT_ID
 source functestslib.sh
 
 echo "Running functional-tests with this HEAD"
