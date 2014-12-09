@@ -36,4 +36,10 @@ function install_bup {
     do_chroot $dir bash -c 'cd /opt/bup && ./configure && make && make install'
 }
 
+function disable_selinux {
+    if [ -f "${dir}/etc/selinux/config" ]; then
+        sed -i "s/^SELINUX=.*/SELINUX=disabled/" "${dir}/etc/selinux/config"
+    fi
+}
+
 . ${ORIG}/functions
