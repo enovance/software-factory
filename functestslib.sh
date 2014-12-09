@@ -197,6 +197,7 @@ function pre_fail {
 
 function waiting_stack_created {
     local stackname=$1
+    RETRIES=0
     while true; do
         heat stack-list | grep -i $stackname | grep -i fail
         [ "$?" -eq "0" ] && {
@@ -207,6 +208,8 @@ function waiting_stack_created {
         }
         heat stack-list | grep -i $stackname | grep -i create_complete
         [ "$?" -eq "0" ] && break
+        let RETRIES=RETRIES+1
+        [ "$RETRIES" == "40" ] && exit 1
         sleep 60
     done
 }
