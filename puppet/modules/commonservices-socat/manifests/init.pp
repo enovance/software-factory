@@ -15,6 +15,8 @@
 
 class commonservices-socat {
 
+  requires hosts
+
   package { 'socat':
     ensure => present,
   }
