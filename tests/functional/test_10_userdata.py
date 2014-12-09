@@ -65,13 +65,32 @@ class TestUserdata(Base):
         self.assertEqual(config.USERS[login]['email'], user.mail)
 
     def test_userdata(self):
-        """ Functional tests to verify the user creation
+        """ Functional test to verify the user creation
         """
-        data = {'username': 'user5', 'password': 'userpass', 'back': '/'}
+        data = {'username': 'user5', 'password': 'userpass',
+                'back': 'http%3a%2f%2ftests.dom%2fjenkins%2f'}
         # Trigger a login as user5, this should fetch the userdata
         url = "http://%s/auth/login/" % config.GATEWAY_HOST
-        requests.post(url, data=data, allow_redirects=False)
+        expected_url = "http://{}/jenkins/".format(config.GATEWAY_HOST)
+        response = requests.post(url, data=data)
 
+        self.assertTrue(response.is_redirect)
+        self.assertEqual(expected_url, response.url)
+        # verify if user is created in gerrit and redmine
+        self.verify_userdata_gerrit('user5')
+        self.verify_userdata_redmine('user5')
+
+    def test_login_redirect(self):
+        """ Functional test to verify the user login redirect
+        """
+        data = {'username': 'user5', 'password': 'userpass'}
+        url = "http://{}/_auth/login?back=http%3a%2f%2ftests.dom%2fredmine%2f"
+        url = url.format(config.GATEWAY_HOST)
+        expected_url = "http://{}/redmine/".format(config.GATEWAY_HOST)
+        response = requests.post(url, data=data)
+
+        self.assertTrue(response.is_redirect)
+        self.assertEqual(expected_url, response.url)
         # verify if user is created in gerrit and redmine
         self.verify_userdata_gerrit('user5')
         self.verify_userdata_redmine('user5')
