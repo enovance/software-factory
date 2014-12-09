@@ -17,7 +17,7 @@ suffix=$DOMAIN
 
 ### Modify here according to your configuration ###
 # The default public key to use
-key_name="ftsfkey"
+[ -z "${HEAT_TENANT}" ] && key_name="ftsfkey" || key_name="${HEAT_TENANT}"
 # flavor is used for managesf
 flavor="m1.small"
 # alt_flavor is used for puppetmaster, mysql, redmine, jenkins, gerrit (prefer flavor with at least 2 vCPUs and 2GB RAM)
