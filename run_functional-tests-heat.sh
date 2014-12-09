@@ -36,62 +36,64 @@ set -x
 
 export STACKNAME=SoftwareFactory
 
+function check_keypair {
+    LOCAL_FINGERPRINT=$(ssh-keygen -l -f ~/.ssh/id_rsa | awk '{ print $2 }')
+    NOVA_KEYPAIR=$(nova keypair-list | grep ${HEAT_TENANT} | awk '{ print $4 }')
+
+    if [ -z "${NOVA_KEYPAIR}" ]; then
+        echo "Creating a new keypair for ${HEAT_TENANT}"
+        nova keypair-add --pub-key ~/.ssh/id_rsa.pub ${HEAT_TENANT}
+    elif [ "${NOVA_KEYPAIR}" != "${LOCAL_FINGERPRINT}" ]; then
+        echo "Replacing old keypair for ${HEAT_TENANT}"
+        nova keypair-delete ${HEAT_TENANT}
+        nova keypair-add --pub-key ~/.ssh/id_rsa.pub ${HEAT_TENANT}
+    fi
+}
+
 function get_ip {
-    while true; do
-        p=`nova list | grep ${STACKNAME}-puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed "s/ //g"`
-        [ -n "$p" ] && break
-        sleep 10
-    done
-    echo $p
+    wait_for_statement "nova list | grep ${STACKNAME}-puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed 's/ //g' | grep [0-9]"
+    nova list | grep ${STACKNAME}-puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed "s/ //g"
 }
 
 function waiting_stack_deleted {
-    while true; do
-        heat stack-list | grep -i $STACKNAME | grep -i failed
-        [ "$?" -eq "0" ] && {
-            echo "Stack deletion has failed ..."
-            return 255
-        }
-        heat stack-list | grep -i $STACKNAME
-        [ "$?" != "0" ] && break
-        sleep 60
-    done
+    wait_for_statement "heat stack-show ${STACKNAME} &> /dev/null" 1
 }
 
 function heat_stop {
     if [ ! ${SF_SKIP_BOOTSTRAP} ]; then
         if [ ! ${DEBUG} ]; then
-            cd bootstraps/heat
-            ./start.sh delete_stack
-            waiting_stack_deleted
-            if [ "$?" = "255" ]; then
-                # Retry a deletion call
-                ./start.sh delete_stack
+            heat stack-delete ${STACKNAME}
+            waiting_stack_deleted || {
+                # Sometime delete failed and needs to be retriggered...
+                heat stack-delete ${STACKNAME}
                 waiting_stack_deleted
-            fi
-            cd -
+            }
         fi
     fi
 }
 
 function build_imgs {
     if [ ! ${SF_SKIP_BUILDROLES} ]; then
-        VIRT=1 ./build_roles.sh &> ${ARTIFACTS_DIR}/build_roles.sh.output || pre_fail "Roles building FAILED"
+        VIRT=1 ./build_roles.sh ${ARTIFACTS_DIR} || pre_fail "Roles building FAILED"
     fi
 }
 
 function heat_start {
     if [ ! ${SF_SKIP_BOOTSTRAP} ]; then
-        cd bootstraps/heat
-        ./start.sh full_restart_stack
-        cd -
+        (cd bootstraps/heat; ./start.sh full_restart_stack)
     fi
 }
 
 function glance_delete_images {
-    cd bootstraps/heat
-    ./start.sh delete_images
-    cd -
+    if [ ! ${DEBUG} ]; then
+        (cd bootstraps/heat; ./start.sh delete_images)
+    fi
+}
+
+function check_clean_environment {
+    heat stack-show ${STACKNAME} &> /dev/null && {
+        heat_stop
+    }
 }
 
 set -x
@@ -99,6 +101,8 @@ prepare_artifacts
 checkpoint "$(date) - $(hostname)"
 build_imgs
 checkpoint "build_roles"
+check_keypair
+check_clean_environment
 heat_start
 checkpoint "heat_start"
 waiting_stack_created $STACKNAME
