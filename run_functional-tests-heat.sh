@@ -38,15 +38,19 @@ uuid=$(date +%s | sha256sum | base64 | head -c 5)
 export STACKNAME=sf_${uuid}
 
 function get_ip {
+    RETRIES=0
     while true; do
         p=`nova list | grep ${STACKNAME}-puppetmaster | cut -d'|' -f7  | awk '{print $NF}' | sed "s/ //g"`
         [ -n "$p" ] && break
+        let RETRIES=RETRIES+1
+        [ "$RETRIES" == "40" ] && exit 1
         sleep 10
     done
     echo $p
 }
 
 function waiting_stack_deleted {
+    RETRIES=0
     while true; do
         heat stack-list | grep -i $STACKNAME | grep -i failed
         [ "$?" -eq "0" ] && {
@@ -55,6 +59,8 @@ function waiting_stack_deleted {
         }
         heat stack-list | grep -i $STACKNAME
         [ "$?" != "0" ] && break
+        let RETRIES=RETRIES+1
+        [ "$RETRIES" == "40" ] && exit 1
         sleep 60
     done
 }
@@ -77,7 +83,7 @@ function heat_stop {
 
 function build_imgs {
     if [ ! ${SF_SKIP_BUILDROLES} ]; then
-        VIRT=1 ./build_roles.sh &> ${ARTIFACTS_DIR}/build_roles.sh.output || pre_fail "Roles building FAILED"
+        VIRT=1 ./build_roles.sh ${ARTIFACTS_DIR} || pre_fail "Roles building FAILED"
     fi
 }
 
