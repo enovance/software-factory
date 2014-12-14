@@ -15,4 +15,4 @@ Welcome to software-factory's documentation!
    managesf
    testing
    contribute
-
+   lifecycle
