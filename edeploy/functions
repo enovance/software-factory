@@ -49,4 +49,15 @@ function disable_selinux {
     fi
 }
 
+function retry {
+    # This is a really dumb retry function
+    local max_retries=3
+    local delay=3
+    for i in $(seq $max_retries); do
+        $@ && break
+        echo "The command return $? as error code. Retry (attempt $i) ..."
+        sleep $delay
+    done
+}
+
 . ${ORIG}/functions
