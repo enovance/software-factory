@@ -1,0 +1,94 @@
+# -*- shell-script -*-
+
+# bup
+BUP_URL="https://github.com/bup/bup.git"
+BUP_VERSION=0.26
+
+# puppet
+PUPPET_CODENAME_MAJOR=7
+PUPPET_REPO_VERSION="${PUPPET_CODENAME_MAJOR}-10"
+PUPPET_REPO_URL="http://yum.puppetlabs.com/el/${PUPPET_CODENAME_MAJOR}/products/x86_64/puppetlabs-release-${PUPPET_REPO_VERSION}.noarch.rpm"
+
+# pip
+export PIP_USE_MIRRORS=True
+#PIP_MIRROR_URL=http://your/pip/mirror/here
+#export PIP_EXTRA_INDEX_URL=$PIP_MIRROR_URL
+
+# rubygem
+#RUBY_MIRROR_URL=http://your/rubygems/mirror/here
+#gem source -a $RUBY_MIRROR_URL
+
+# mod_auth_pubtkt
+MOD_AUTH_PUBTKT_VERSION=0.8
+MOD_AUTH_PUBTKT_URL="https://neon1.net/mod_auth_pubtkt/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
+
+# passenger (rubygem)
+PASSENGER_VERSION=4.0
+
+# redmine
+REDMINE_VERSION=2.5.2
+REDMINE_RHEL_URL="http://www.redmine.org/releases/redmine-${REDMINE_VERSION}.tar.gz"
+REDMINE_BACKLOG_URL="git://github.com/backlogs/redmine_backlogs.git"
+REDMINE_HTTP_PLUGIN_URL="git://github.com/kevinfoote/redmine_http_auth.git"
+
+# gerrit
+GERRIT_VERSION=285
+GERRIT_URL="http://os.enocloud.com:8080/v1/AUTH_0e436aacf0854b9abe70aa90f9e0864d/gerrit/gerrit${GERRIT_VERSION}.war"
+MYSQLJAVA_VERSION=5.1.21
+MYSQLJAVA_URL="http://repo2.maven.org/maven2/mysql/mysql-connector-java/${MYSQLJAVA_VERSION}/mysql-connector-java-${MYSQLJAVA_VERSION}.jar"
+BCPROVJAVA_VERSION="jdk15on-149"
+BCPROVJAVA_URL="http://www.bouncycastle.org/download/bcprov-${BCPROVJAVA_VERSION}.jar"
+BCPKIXJAVA_VERSION=$BCPROVJAVA_VERSION
+BCPKIXJAVA_URL="http://www.bouncycastle.org/download/bcpkix-${BCPKIXJAVA_VERSION}.jar"
+
+# bootstrap
+BOOTSTRAP_VERSION=3.2.0
+BOOTSTRAP_URL="https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAP_VERSION}/bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
+
+# jenkins
+export JENKINS_VERSION=1.580-1.1 # LTS
+JENKINS_SWARM_VERSION=1.15
+JENKINS_SWARM_URL="http://maven.jenkins-ci.org/content/repositories/releases/org/jenkins-ci/plugins/swarm-client/${JENKINS_SWARM_VERSION}/swarm-client-${JENKINS_SWARM_VERSION}-jar-with-dependencies.jar"
+
+# etherpad
+ETHERPAD_LITE_VERSION=1.4.0
+ETHERPAD_LITE_URL="https://codeload.github.com/ether/etherpad-lite/tar.gz/${ETHERPAD_LITE_VERSION}"
+
+# font awesome
+FONTAWESOME_VERSION=4.2.0
+FONTAWESOME_URL="http://fortawesome.github.io/Font-Awesome/assets/font-awesome-${FONTAWESOME_VERSION}.zip"
+
+# nodejs
+NODEJS_NPM="https://www.npmjs.com/install.sh"
+NPM_INSTALL=1.4.21
+NPM_MIRROR_URL=http://registry.npmjs.eu/
+
+# JQuery
+JQUERY_VERSION=2.1.1
+JQUERY_URL="http://code.jquery.com/jquery-${JQUERY_VERSION}.min.js"
+JQUERY_VISIBILITY_URL="http://status.openstack.org/jquery-visibility.min.js"
+JQUERY_GRAPHITE_URL="http://status.openstack.org/jquery-graphite.js"
+
+# AngularJS
+ANGULARJS_VERSION=1.2.27
+ANGULARJS_URL="https://ajax.googleapis.com/ajax/libs/angularjs/${ANGULARJS_VERSION}/angular.min.js"
+
+# zuul
+ZUUL_URL="https://github.com/openstack-infra/zuul"
+ZUUL_VERSION=8c81dc3fa9c2dfaf93539641c099b15064357011 # a commit known to work 11/12/2014
+APSCHEDULER_VERSION=2.1.0
+GITPYTHON_VERSION=0.3.2.RC1
+
+# paste (lodgeit)
+PASTE_URL="https://git.openstack.org/openstack-infra/lodgeit"
+PASTE_VERSION=c69f555032 # latest commit as of 05. May 2014
+
+# pbr
+PBR_VERSION=0.8.2
+
+# serverspec and stuff
+RSPEC_CORE_VERSION=2.99.0
+RSPEC_EXPECTATIONS_VERSION=${RSPEC_CORE_VERSION}
+RSPEC_ITS_VERSION=1.0.0
+SPECINFRA_VERSION=1.27.0
+SERVERSPEC_VERSION=1.16.0
