@@ -1,3 +1,5 @@
 + /var/
 + /var/**
 - *
++ /home/gerrit/site_path/lib/
++ /home/gerrit/site_path/plugins/
