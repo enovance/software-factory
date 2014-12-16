@@ -45,6 +45,7 @@ sed -i "s|CLONE_PATH|${clone_path}|" group_vars/all
 ansible-playbook -i hosts site-step1.yml
 echo "Ansible return code is : $?"
 # Ansible package may change during the upgrade (FS rsync) so we do the update in two steps
+read -p "Update suspended, press any key to continue"
 ansible-playbook -i hosts site-step2.yml
 echo "Ansible return code is : $?"
 cd -
