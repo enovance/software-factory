@@ -71,6 +71,42 @@ as close as possible a real deployment. Setting the DEBUG environment variable
 to something tells the script to let the deployment up. If not set the deployment
 will be destroyed (LXC containers will be stopped).
 
+How to develop and/or run a specific functional tests
+-----------------------------------------------------
+
+Functional tests are designed to be ran from the puppetmaster.
+The recommended way to edit/add a new test is to work on it locally and then use this combinaison of rsync/ssh to actually run the test:
+
+.. code-block:: bash
+  $ rsync -av tests/ puppetmaster:puppet-bootstrapper/tests/ && ssh -t puppetmaster nosetests --no-byte-compile -s -v puppet-bootstrapper/tests/functional/
+
+Tips: ::
+
+ * '-s' enable the use of 'import pdb; pdb.set_trace()' within a test
+ * '--no-byte-compile' makes sure no .pyc are ran
+ * you can use file globs to select specifics tests: [...]/tests/functional/*zuul*
+ * in order to have password less ssh and dns configuration, here is a convenient .ssh/config file:
+
+.. code-block:: none
+  Host *
+    StrictHostKeyChecking no
+    User root
+  Host puppetmaster
+    Hostname 192.168.134.49
+  Host mysql
+    Hostname 192.168.134.50
+  Host redmine
+    Hostname 192.168.134.51
+  Host gerrit
+    Hostname 192.168.134.52
+  Host jenkins
+    Hostname 192.168.134.53
+  Host managesf
+    Hostname 192.168.134.54
+  Host slave
+    Hostname 192.168.134.55
+
+
 How to contribute
 -----------------
 
