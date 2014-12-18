@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import time
 
 from pecan import expose
@@ -162,6 +160,20 @@ class MembershipController(RestController):
             return report_unhandled_error(e)
 
 
+class GroupController(RestController):
+
+    def __init__(self):
+        pass
+
+    @expose("json")
+    def get_all(self):
+        return gerrit.get_my_groups()
+
+    @expose("json")
+    def get_one(self, group_id):
+        pass
+
+
 class ProjectController(RestController):
 
     membership = MembershipController()
@@ -181,12 +193,9 @@ class ProjectController(RestController):
             last, values = self.cache.get(token, (None, None))
             if last and last + self.cache_timeout > time.time():
                 return values
+        return {}
 
-    @expose()
-    def get(self):
-        projects = self.get_cache()
-        if projects:
-            return json.dumps(projects)
+    def _reload_cache(self):
         projects = {}
 
         for p in gerrit.get_projects():
@@ -205,7 +214,24 @@ class ProjectController(RestController):
             if prj in projects:
                 projects[prj]['open_reviews'] += 1
         self.set_cache(projects)
-        return json.dumps(projects)
+
+    @expose("json")
+    def get_all(self):
+        projects = self.get_cache()
+        if projects:
+            return projects
+
+        self._reload_cache()
+        return self.get_cache()
+
+    @expose("json")
+    def get_one(self, project_id):
+        projects = self.get_cache()
+        try:
+            return projects[project_id]
+        except KeyError as exp:
+            logger.exception(exp)
+            return abort(400)
 
     @expose()
     def put(self, name=None):
@@ -239,6 +265,7 @@ class ProjectController(RestController):
 
 class RootController(object):
     project = ProjectController()
+    group = GroupController()
     replication = ReplicationController()
     backup = BackupController()
     restore = RestoreController()
