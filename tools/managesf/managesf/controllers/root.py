@@ -181,12 +181,9 @@ class ProjectController(RestController):
             last, values = self.cache.get(token, (None, None))
             if last and last + self.cache_timeout > time.time():
                 return values
+        return {}
 
-    @expose()
-    def get(self):
-        projects = self.get_cache()
-        if projects:
-            return json.dumps(projects)
+    def _reload_cache(self):
         projects = {}
 
         for p in gerrit.get_projects():
@@ -205,7 +202,22 @@ class ProjectController(RestController):
             if prj in projects:
                 projects[prj]['open_reviews'] += 1
         self.set_cache(projects)
-        return json.dumps(projects)
+
+    @expose("json")
+    def get_all(self):
+        projects = self.get_cache()
+        if projects:
+            return projects
+
+        self._reload_cache()
+        return self.get_cache()
+
+    @expose("json")
+    def get_one(self, project_id):
+        projects = self.get_cache()
+        if projects[project_id]:
+            return projects[project_id]
+        return abort(400)
 
     @expose()
     def put(self, name=None):
