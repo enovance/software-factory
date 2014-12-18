@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -32,6 +30,8 @@ class FakeRes:
     id = 1
     name = 'Open'
     firstname = 'user1'
+    lastname = 'TotoMan'
+    login = 'user1'
 
     def __getitem__(self, n):
         return getattr(self, n)
@@ -206,3 +206,11 @@ class TestSFRedmine(TestCase):
         with patch('redmine.managers.ResourceManager.delete',
                    side_effect=raisenotfound):
             self.assertFalse(self.rm.delete_project('p1'))
+
+    def test_get_active_users(self):
+        def my_fake_resource(*args, **kwargs):
+            return [FakeRes()]
+        with patch('redmine.managers.ResourceManager.filter',
+                   new_callable=lambda: my_fake_resource):
+            self.assertEqual([('user1', 'user1 TotoMan'), ],
+                             self.rm.active_users())
