@@ -174,6 +174,13 @@ class GerritUtils:
         except HTTPError as e:
             return self._manage_errors(e)
 
+    def get_my_groups(self):
+        try:
+            return self.g.get('accounts/self/groups')
+        except HTTPError as exp:
+            self._manage_errors(exp)
+            return []
+
     def get_my_groups_id(self):
         try:
             grps = self.g.get('accounts/self/groups')
