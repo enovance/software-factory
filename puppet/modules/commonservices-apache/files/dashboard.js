@@ -91,4 +91,42 @@ function mainController($scope, $http) {
                 $scope.loading = false;
             });
     };
+
+    $scope.select_members = function(group_model) {
+        $scope.errors = false;
+        $scope.loading = true;
+        console.log(group_model);
+	console.log($scope.selected_project);
+	return;
+        $http.put("/manage/project/membership/")
+            .success( function(data) {
+                console.log(data);
+            })
+            .error( function(data) {
+                $scope.errors = data;
+            })
+            .finally( function() {
+                $scope.loading = false;
+            });
+    };
+
+    $scope.deselect_members = function(group_model) {
+        console.log(group_model);
+	console.log($scope);
+	return;
+        $http.delete("/manage/project/membership/")
+            .success( function(data) {
+                console.log(data);
+            })
+            .error( function(data) {
+                $scope.errors(data);
+            })
+            .finally( function() {
+                $scope.loading = false;
+            });
+    };
+
+    $scope.membership_form = function(project_obj) {
+	console.log(project_obj);
+    };
 }
