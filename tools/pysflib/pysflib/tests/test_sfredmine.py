@@ -206,3 +206,9 @@ class TestSFRedmine(TestCase):
         with patch('redmine.managers.ResourceManager.delete',
                    side_effect=raisenotfound):
             self.assertFalse(self.rm.delete_project('p1'))
+
+    def test_get_all_users(self):
+        with patch('redmine.managers.ResourceManager.filter',
+                   new_callable=lambda: my_fake_resource):
+            self.assertEqual([], self.rm.all_users())
+
