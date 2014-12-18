@@ -418,3 +418,8 @@ class TestManageSF(Base):
         self.assertFalse(self.rm.project_exists(pname))
         self.assertFalse(self.gu.group_exists('%s-core' % pname))
         self.projects.remove(pname)
+
+    def test_list_active_members(self):
+        """ Check the list of members as a list of tuples of emails and names
+        """
+        self.assertTrue(self.msu.list_active_members(config.USER_2))
