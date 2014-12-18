@@ -174,3 +174,8 @@ def user_is_administrator():
 def get_open_issues():
     rm = get_client()
     return rm.get_open_issues()
+
+
+def get_active_users():
+    rm = get_client()
+    return rm.active_users()

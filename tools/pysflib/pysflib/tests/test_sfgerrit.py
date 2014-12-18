@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -123,6 +121,141 @@ class TestGerritUtils(TestCase):
                                      {'permissions': {'owner': None}}}}}
             self.assertEqual(self.ge.get_project_owner('p1'), None)
 
+    def test_get_project_groups(self):
+        r1 = {"p1": {"revision": "edd453d18e08640e67a8c9a150cec998ed0ac9aa",
+                    "local": {"GLOBAL_CAPABILITIES": {"permissions": {
+                        "priority": {"rules": {
+                            "15bfcd8a6de1a69c50b30cedcdcc951c15703152": {
+                                "action": "BATCH"}}},
+                        "streamEvents": {"rules": {
+                            "15bfcd8a6de1a69c50b30cedcdcc951c15703152": {
+                                "action": "ALLOW"}}},
+                        "administrateServer": {"rules": {
+                            "53a4f647a89ea57992571187d8025f830625192a": {
+                                "action": "ALLOW"}}}}},
+                    "refs/meta/config": {"permissions": {"submit": {
+                        "rules": {
+                            "53a4f647a89ea57992571187d8025f830625192a": {
+                                "action": "ALLOW"},
+                            "global:Project-Owners": {"action": "ALLOW"}}},
+                    "label-Code-Review": {"label": "Code-Review",
+                                "rules": {
+                                    "53a4f647a89ea57992571187d8025f830625192a":
+                                    {"action": "ALLOW", "min": -2, "max": 2},
+                                    "global:Project-Owners":
+                                    {"action": "ALLOW", "min": -2, "max": 2}}},
+                            "read": {"exclusive": True,
+                                "rules": {
+                                    "53a4f647a89ea57992571187d8025f830625192a":
+                                    {"action": "ALLOW"},
+                                    "global:Project-Owners":
+                                    {"action": "ALLOW"}}},
+                            "push": {
+                                "rules": {
+                                    "53a4f647a89ea57992571187d8025f830625192a":
+                                    {"action": "ALLOW"},
+                                    "global:Project-Owners":
+                                    {"action": "ALLOW"}}}}},
+                    "refs/for/refs/*": {"permissions": {
+                        "pushMerge": {
+                            "rules": {"global:Registered-Users": {
+                                "action": "ALLOW"}}},
+                        "push": {
+                            "rules": {"global:Registered-Users": {
+                                "action": "ALLOW"}}}}},
+                    "refs/tags/*": {"permissions": {
+                        "pushSignedTag": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"},
+                                "global:Project-Owners": {"action": "ALLOW"}}},
+                        "pushTag": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"},
+                                "global:Project-Owners": {"action": "ALLOW"}}}}
+                    },
+                    "refs/heads/*": { "permissions": {
+                        "forgeCommitter": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"},
+                                "global:Project-Owners": {"action": "ALLOW"}}},
+                        "forgeAuthor": {
+                            "rules": {"global:Registered-Users": {
+                                "action": "ALLOW"}}},
+                        "submit": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"},
+                                "global:Project-Owners": {"action": "ALLOW"}}},
+                        "editTopicName": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW", "force": True},
+                                "global:Project-Owners":
+                                {"action": "ALLOW","force": True}}},
+                        "label-Code-Review": {
+                            "label": "Code-Review", "rules": {
+                                "global:Registered-Users": {
+                                    "action": "ALLOW", "min": -1, "max": 1 },
+                                "53a4f647a89ea57992571187d8025f830625192a": {
+                                    "action": "ALLOW", "min": -2, "max": 2 },
+                                "global:Project-Owners": {
+                                    "action": "ALLOW", "min": -2, "max": 2 }}},
+                        "create": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"},
+                                "global:Project-Owners": {"action": "ALLOW"}}},
+                        "push": {
+                            "rules": {
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"},
+                                "global:Project-Owners": {"action": "ALLOW"}}}}
+                    },
+                    "refs/*": { "permissions": {
+                        "read": {
+                            "rules": {
+                                "global:Anonymous-Users": {"action": "ALLOW"},
+                                "53a4f647a89ea57992571187d8025f830625192a":
+                                {"action": "ALLOW"}}}}}
+                    },
+                    "is_owner": True,
+                    "owner_of": ["GLOBAL_CAPABILITIES",
+                                 "refs/meta/config",
+                                 "refs/for/refs/*",
+                                 "refs/tags/*",
+                                 "refs/heads/*",
+                                 "refs/*"],
+                    "can_upload": True,
+                    "can_add": True,
+                    "config_visible": True
+                    },
+            "MyProject": {
+                "revision": "61157ed63e14d261b6dca40650472a9b0bd88474",
+                "inherits_from": {"id": "All-Projects",
+                                  "name": "All-Projects",
+                                  "description": "Access inherited by all"},
+            "local": {},
+            "is_owner": True,
+            "owner_of": ["refs/*"],
+            "can_upload": True,
+            "can_add": True,
+            "config_visible": True
+            }}
+        r2 = 'p1-dev'
+        r3 = 'p1-ptl'
+        with patch('pysflib.sfgerrit.SFGerritRestAPI.get',
+                   side_effect=[r1, r2, r3]):
+            groups = self.ge.get_project_groups('p1')
+            self.assertIn(r2, groups.values())
+            self.assertIn(r3, groups.values())
+
+        with patch('pysflib.sfgerrit.SFGerritRestAPI.get',
+                   side_effect=raise_fake_exc):
+            self.assertFalse(self.ge.get_project_groups('p1'))
+
     def test_get_account(self):
         with patch('pysflib.sfgerrit.SFGerritRestAPI.get') as g:
             g.return_value = 'account'
@@ -130,6 +263,32 @@ class TestGerritUtils(TestCase):
         with patch('pysflib.sfgerrit.SFGerritRestAPI.get',
                    side_effect=raise_fake_exc):
             self.assertFalse(self.ge.get_account('user1'))
+
+    def test_get_my_groups(self):
+        with patch('pysflib.sfgerrit.SFGerritRestAPI.get') as g:
+            g.return_value = {
+                "Administrators": {
+                    "id": "6a1e70e1a88782771a91808c8af9bbb7a9871389",
+                    "url": "#/admin/groups/uuid-6a1e70e1a88782771a91808c",
+                    "options": {},
+                    "description": "Gerrit Site Administrators",
+                    "group_id": 1,
+                    "owner": "Administrators",
+                    "owner_id": "6a1e70e1a88782771a91808c8af9bbb7a9871389"
+                },
+                "Anonymous Users": {
+                    "id": "global%3AAnonymous-Users",
+                    "url": "#/admin/groups/uuid-global%3AAnonymous-Users",
+                    "options": {},
+                    "description": "Any user, signed-in or not",
+                    "group_id": 2,
+                    "owner": "Administrators",
+                    "owner_id": "6a1e70e1a88782771a91808c8af9bbb7a9871389"
+                }}
+            self.assertTrue(self.ge.get_my_groups())
+        with patch('pysflib.sfgerrit.SFGerritRestAPI.get',
+                   side_effect=raise_fake_exc):
+            self.assertFalse(self.ge.get_my_groups_id())
 
     def test_get_my_groups_id(self):
         with patch('pysflib.sfgerrit.SFGerritRestAPI.get') as g:
