@@ -14,7 +14,12 @@ if [ -z "$ZUUL_URL" ]; then
 fi
 
 if [ -z "$GIT_ORIGIN" ] || [ -n "$ZUUL_NEWREV" ]; then
-    GIT_ORIGIN="$GERRIT_SITE/r"
+    echo ${GERRIT_SITE} | grep -q '^http'
+    if [ "$?" == "0" ]; then
+        GIT_ORIGIN="$GERRIT_SITE/r"
+    else
+        GIT_ORIGIN="$GERRIT_SITE"
+    fi
 fi
 
 if [ -z "$ZUUL_REF" ]; then
