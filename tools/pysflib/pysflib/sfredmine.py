@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -233,6 +231,13 @@ class RedmineUtils:
     def delete_project(self, pname):
         try:
             return self.r.project.delete(pname)
+        except ResourceNotFoundError:
+            return None
+
+    def all_users(self):
+        try:
+            return [(x.user.id, ' '.join([x.user.firstname, x.user.name])
+                     for x in self.r.user.filter()]
         except ResourceNotFoundError:
             return None
 
