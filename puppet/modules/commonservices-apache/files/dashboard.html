@@ -38,7 +38,7 @@
                     <th class="text-center">Open Reviews</th>
                     <th class="text-center">Open Bugs</th>
                     <th class="text-right">
-                        <button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#modal_create_project">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_create_project">
                             <span class="glyphicon glyphicon-plus">
                         </button>
                     </th>
@@ -50,7 +50,13 @@
                     <td class="text-center"><a href="/r/#/q/status:open+project:{{ project }},n,z">{{ entry.open_reviews }}</a></td>
                     <td class="text-center"><a href="/_redmine/projects/{{ project }}/issues">{{ entry.open_issues }}</a></td>
                     <td class="text-right">
-                        <button class="btn btn-danger btn-xs" ng-click="deleteProject(project)" ng-if="entry.admin == 1">
+                        <button class="btn btn-primary btn-xs" ng-click="membership_form(project)" 
+				ng-if="entry.admin == 1" data-toggle="modal"
+				data-target="#modal_create_members">
+                            <span class="glyphicon glyphicon-user"></span>
+                        </button>
+                        <button class="btn btn-danger btn-xs" ng-click="deleteProject(project)"
+				ng-if="entry.admin == 1">
                             <span class="glyphicon glyphicon-trash"></span>
                         </button>
                     </td>
@@ -58,23 +64,76 @@
             </tbody>
         </table>
 
-        <div class="modal fade" id="modal_create_project" tabindex="-1" role="dialog" aria-labelledby="modal_create_projectLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form class="form-horizontal" role="form">
 
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">
-                                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-                            </button>
-                            <h4 class="modal-title" id="modal_create_projectLabel">Create new project</h4>
-                        </div>
+      <div class="modal fade" id="modal_create_members" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
 
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="projectname" class="col-sm-2 control-label">Projectname</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="projectname" placeholder="Project name" ng-model="data.name">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+		
+              <h4 class="modal-title">Add Members to project {{ project }} groups</h4>
+            </div>
+
+            <form>
+              <div class="modal-body row">
+                <div class="col-sm-6">
+		  <input type="hidden" id="selected_project" value="" />
+                  <label class="control-label">List of Available Members</label>
+                  <select size=10 multiple="multiple" ng-model="selected_members"
+                          ng-options="x as x.name for x in members_list"
+                          style="width:100%;max-width:90%;"></select>
+                </div>
+                <div class="col-sm-6" ng-repeat="group in groups">
+
+                  <div class="col-sm-1">
+                    <div class="btn-group-vertical" role="group" style="padding-top:25px;">
+                      <button type="button" class="btn btn-primary btn-xs" ng-click="deselect_members(group);">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                      </button>
+                      <button type="button" class="btn btn-primary btn-xs" ng-click="select_members(group);">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-offset-2 col-ms-5">
+                    <label class="control-label">{{group.name}}</label>
+                    <select size=3 multiple="multiple" style="width:100%;max-width:90%;"
+                            ng-model="group.selected" ng-options="x as x.name for x in group.members"
+                            ></select>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary"
+                        ng-click="createMembers()" data-dismiss="modal">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal_create_project" tabindex="-1" role="dialog" aria-labelledby="modal_create_projectLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <form class="form-horizontal" role="form">
+		      
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">
+                              <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                          </button>
+                          <h4 class="modal-title" id="modal_create_projectLabel">Create new project</h4>
+                      </div>
+
+                      <div class="modal-body">
+                          <div class="form-group">
+                              <label for="projectname" class="col-sm-2 control-label">Projectname</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="projectname" placeholder="Project name" ng-model="data.name">
                                 </div>
                             </div>
 
