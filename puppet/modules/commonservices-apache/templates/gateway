@@ -56,4 +56,14 @@
         require valid-user
     </Directory>
 
+    <LocationMatch ^/r/>
+        Order deny,allow
+        Allow from all
+        AuthType mod_auth_pubtkt
+        TKTAuthLoginURL <%= @cauth['signin_url'] %>
+        TKTAuthFakeBasicAuth on
+        TKTAuthDebug 1
+        require valid-user
+    </LocationMatch>
+
 </VirtualHost>
