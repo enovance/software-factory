@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import time
 
 from pecan import expose
@@ -50,7 +48,7 @@ class ReplicationController(RestController):
         value = request.json['value']
         try:
             gerrit.replication_apply_config(section, setting, value)
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
     # 'unset', 'replace-all', 'remove-section'
@@ -60,7 +58,7 @@ class ReplicationController(RestController):
             abort(400)
         try:
             gerrit.replication_apply_config(section, setting)
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
     # 'get-all', 'list'
@@ -72,7 +70,7 @@ class ReplicationController(RestController):
             config = gerrit.replication_get_config(section, setting)
             response.status = 200
             return config
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
     @expose()
@@ -81,7 +79,7 @@ class ReplicationController(RestController):
         inp = request.json if request.content_length else {}
         try:
             gerrit.replication_trigger(inp)
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
 
@@ -92,7 +90,7 @@ class BackupController(RestController):
         filepath = '/tmp/sf_backup.tar.gz'
         try:
             backup.backup_get()
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
         if not os.path.isfile(filepath):
             abort(404)
@@ -103,7 +101,7 @@ class BackupController(RestController):
     def post(self):
         try:
             backup.backup_start()
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
 
@@ -116,7 +114,7 @@ class RestoreController(RestController):
             f.write(request.POST['file'].file.read())
         try:
             backup.backup_restore()
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
 
@@ -140,7 +138,7 @@ class MembershipController(RestController):
             response.status = 201
             return "User %s has been added in group(s): %s for project %s" % \
                 (user, ", ".join(inp['groups']), project)
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
     @expose()
@@ -158,7 +156,7 @@ class MembershipController(RestController):
             else:
                 return "User %s has been deleted from all groups for project %s." % \
                     (user, project)
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
 
@@ -181,12 +179,9 @@ class ProjectController(RestController):
             last, values = self.cache.get(token, (None, None))
             if last and last + self.cache_timeout > time.time():
                 return values
+        return {}
 
-    @expose()
-    def get(self):
-        projects = self.get_cache()
-        if projects:
-            return json.dumps(projects)
+    def _reload_cache(self):
         projects = {}
 
         for p in gerrit.get_projects():
@@ -205,7 +200,24 @@ class ProjectController(RestController):
             if prj in projects:
                 projects[prj]['open_reviews'] += 1
         self.set_cache(projects)
-        return json.dumps(projects)
+
+    @expose("json")
+    def get_all(self):
+        projects = self.get_cache()
+        if projects:
+            return projects
+
+        self._reload_cache()
+        return self.get_cache()
+
+    @expose("json")
+    def get_one(self, project_id):
+        projects = self.get_cache()
+        try:
+            return projects[project_id]
+        except KeyError as exp:
+            logger.exception(exp)
+            return abort(400)
 
     @expose()
     def put(self, name=None):
@@ -219,7 +231,7 @@ class ProjectController(RestController):
             response.status = 201
             self.set_cache(None)
             return "Project %s has been created." % name
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
     @expose()
@@ -233,7 +245,7 @@ class ProjectController(RestController):
             response.status = 200
             self.set_cache(None)
             return "Project %s has been deleted." % name
-        except Exception, e:
+        except Exception as e:
             return report_unhandled_error(e)
 
 
