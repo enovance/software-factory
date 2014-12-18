@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -47,16 +45,19 @@ class FunctionalTest(TestCase):
 
 
 class TestManageSFAppProjectController(FunctionalTest):
-    def test_project_get(self):
+
+    def test_project_get_all(self):
         ctx = [patch('managesf.controllers.gerrit.get_projects'),
                patch('managesf.controllers.gerrit.get_projects_by_user'),
                patch('managesf.controllers.gerrit.get_open_changes'),
-               patch('managesf.controllers.redminec.get_open_issues')]
-        with nested(*ctx) as (gp, gpu, goc, goi):
+               patch('managesf.controllers.redminec.get_open_issues'),
+               patch('managesf.controllers.gerrit.get_project_groups')]
+        with nested(*ctx) as (gp, gpu, goc, goi, gpg):
             gp.return_value = ['p0', 'p1', ]
             gpu.return_value = ['p1', ]
             goc.return_value = [{'project': 'p1'}]
             goi.return_value = {'issues': [{'project': {'name': 'p1'}}]}
+            gpg.return_value = []
             # Cookie is only required for the internal cache
             response = self.app.set_cookie('auth_pubtkt', 'something')
             response = self.app.get('/project/')
@@ -79,6 +80,21 @@ class TestManageSFAppProjectController(FunctionalTest):
                 '{"p0": {"open_issues": 0, "open_reviews": 0, "admin": 0}, ' +
                 '"p1": {"open_issues": 1, "open_reviews": 1, "admin": 1}}',
                 response.body)
+
+    def test_project_get_one(self):
+        ctx = [patch('managesf.controllers.gerrit.get_projects'),
+               patch('managesf.controllers.gerrit.get_projects_by_user'),
+               patch('managesf.controllers.gerrit.get_open_changes'),
+               patch('managesf.controllers.redminec.get_open_issues')]
+        with nested(*ctx) as (gp, gpu, goc, goi):
+            goc.return_value = [{'project': 'p1'}]
+            goi.return_value = {'issues': [{'project': {'name': 'p1'}}]}
+            response = self.app.set_cookie('auth_pubtkt', 'something')
+            response = self.app.get('/project/p1')
+            self.assertEqual(200, response.status_int)
+            self.assertTrue('"open_issues": 1', response.body)
+            self.assertTrue('"admin": 1', response.body)
+            self.assertTrue('"open_reviews": 1', response.body)
 
     def test_project_put(self):
         # Create a project with no name
@@ -197,7 +213,7 @@ class TestManageSFAppMembershipController(FunctionalTest):
         response = self.app.get('/project/membership', status="*")
         self.assertEqual(response.status_int, 501)
 
-    def test_put(self):
+    def test_put_empty_values(self):
         response = self.app.put_json('/project/membership/', {}, status="*")
         self.assertEqual(response.status_int, 400)
         response = self.app.put_json('/project/membership/p1/', {}, status="*")
@@ -205,6 +221,8 @@ class TestManageSFAppMembershipController(FunctionalTest):
         response = self.app.put_json('/project/membership/p1/john', {},
                                      status="*")
         self.assertEqual(response.status_int, 400)
+
+    def test_put(self):
         ctx = [patch('managesf.controllers.gerrit.add_user_to_projectgroups'),
                patch(
                    'managesf.controllers.redminec.add_user_to_projectgroups')]
