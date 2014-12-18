@@ -169,6 +169,18 @@ class ManageSfUtils(Tool):
             cmd = cmd + " --group %s " % group
         self.exe(cmd, self.install_dir)
 
+    def list_active_members(self, user):
+        passwd = config.USERS[user]['password']
+        cmd = self.base_cmd % (user, passwd) + " list_active_users "
+        cmd = shlex.split(cmd)
+        ocwd = os.getcwd()
+        os.chdir(self.install_dir)
+        try:
+            output = subprocess.check_output(cmd)
+        finally:
+            os.chdir(ocwd)
+        return output
+
 
 class GerritGitUtils(Tool):
     def __init__(self, user, priv_key_path, email):
