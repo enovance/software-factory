@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -127,6 +125,31 @@ class TestManageSFAppProjectController(FunctionalTest):
             self.assertEqual(response.body,
                              'Unable to process your request, failed '
                              'with unhandled error (server side): FakeExcMsg')
+
+    def test_get_groups(self):
+        with patch('managesf.controllers.gerrit.get_my_groups') as my_grps:
+            my_grps.return_value = {
+                "Administrators": {
+                    "id": "6a1e70e1a88782771a91808c8af9bbb7a9871389",
+                    "url": "#/admin/groups/uuid-6a1e70e1a88782771a91808c",
+                    "options": {},
+                    "description": "Gerrit Site Administrators",
+                    "group_id": 1,
+                    "owner": "Administrators",
+                    "owner_id": "6a1e70e1a88782771a91808c8af9bbb7a9871389"
+                },
+                "Anonymous Users": {
+                    "id": "global%3AAnonymous-Users",
+                    "url": "#/admin/groups/uuid-global%3AAnonymous-Users",
+                    "options": {},
+                    "description": "Any user, signed-in or not",
+                    "group_id": 2,
+                    "owner": "Administrators",
+                    "owner_id": "6a1e70e1a88782771a91808c8af9bbb7a9871389"
+                }}
+            response = self.app.set_cookie('auth_pubtkt', 'something')
+            response = self.app.get('/group/', status='*')
+            self.assertEqual(200, response.status_int)
 
 
 class TestManageSFAppRestoreController(FunctionalTest):
