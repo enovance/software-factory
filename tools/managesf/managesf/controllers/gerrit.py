@@ -92,6 +92,9 @@ def user_owns_project(prj_name):
     owner = ge.get_project_owner(prj_name)
     return owner in grps
 
+def project_groups(project_name):
+	ge = get_client()
+	return ge.get_project_groups(project_name)
 
 def user_is_administrator():
     ge = get_client()

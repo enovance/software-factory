@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -167,12 +165,37 @@ class GerritUtils:
         except HTTPError as e:
             return self._manage_errors(e)
 
+    def get_project_groups(self, name):
+        try:
+            ret = self.g.get('access/?project=%s' % name)
+            perms = ret[name]['local']['refs/*']['permissions']
+            groups = []
+            for permission in perms.itervalues():
+                groups.extend(permission['rules'].keys())
+                return sorted(set(groups))
+            except HTTPError as e:
+                return self._manage_errors(e)
+
     # Account related API calls #
     def get_account(self, username):
         try:
             return self.g.get('accounts/%s' % username)
         except HTTPError as e:
             return self._manage_errors(e)
+
+    def get_my_groups(self):
+        try:
+            return self.g.get('accounts/self/groups')
+        except HTTPError as exp:
+            self._manage_errors(exp)
+            return []
+
+    def get_all_users(self):
+        try:
+            return self.g.get('accounts')
+        except HTTPError as exp:
+            self._manage_errors(exp)
+            return []
 
     def get_my_groups_id(self):
         try:
