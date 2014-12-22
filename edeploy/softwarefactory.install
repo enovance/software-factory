@@ -182,20 +182,21 @@ do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/advanced.html
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/pasting.html
 
+# clone sf source-code
+[ ! -d "${dir}/srv/sf" ] && git clone ../ ${dir}/srv/sf
+
 # install pysflib
 [ ! -d "${dir}/var/www" ] && mkdir ${dir}/var/www
-cp -r ../tools/pysflib ${dir}/var/www/pysflib
+do_chroot ${dir} ln -sf /srv/sf/tools/pysflib /var/www/pysflib
 retry do_chroot ${dir} bash -c "cd /var/www/pysflib && pip install -r requirements.txt"
-do_chroot ${dir} bash -c "cd /var/www/pysflib && python setup.py install"
+retry do_chroot ${dir} bash -c "cd /var/www/pysflib && python setup.py install"
 
 # Cauth server
-[ ! -d "${dir}/var/www" ] && mkdir ${dir}/var/www
-cp -r ../tools/cauth ${dir}/var/www/cauth
+do_chroot ${dir} ln -sf /srv/sf/tools/cauth /var/www/cauth
 retry do_chroot ${dir} bash -c "cd /var/www/cauth && pip install -r requirements.txt"
 
 # Managesf
-[ ! -d "${dir}/var/www" ] && mkdir ${dir}/var/www
-cp -r ../tools/managesf ${dir}/var/www/managesf
+do_chroot ${dir} ln -sf /srv/sf/tools/managesf /var/www/managesf
 retry do_chroot ${dir} bash -c "cd /var/www/managesf && pip install -r requirements.txt"
 
 # JJB need pbr > 0.8
