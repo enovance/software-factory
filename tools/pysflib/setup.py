@@ -14,35 +14,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+import setuptools
 
+# In python < 2.7.4, a lazy loading of package `pbr` will break
+# setuptools if some other modules registered functions in `atexit`.
+# solution from: http://bugs.python.org/issue15881#msg170215
 try:
     import multiprocessing  # noqa
-except:
+except ImportError:
     pass
 
-from pip.req import parse_requirements
-
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('requirements.txt')
-
-# reqs is a list of requirement
-reqs = [str(ir.req) for ir in install_reqs]
-
-setup(
-    name='pysflib',
-    version='0.1',
-    description='',
-    author='',
-    author_email='',
-    install_requires=reqs,
-    test_suite='nose.collector',
-    zip_safe=False,
-    include_package_data=True,
-    packages=find_packages(exclude=['ez_setup'])
-)
+setuptools.setup(
+    setup_requires=['pbr'],
+    pbr=True)
