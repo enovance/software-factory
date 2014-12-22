@@ -1,7 +1,9 @@
-../pysflib
-pecan
+-e git+https://github.com/morucci/pygerrit.git#egg=pygerrit
 gerritlib
-python-ldap
-requests>=2.2.1
-nose
 mock
+nose
+pecan
+../pysflib
+python-ldap
+python-redmine
+requests>=2.2.1
