@@ -1,4 +1,4 @@
-../pysflib
+pysflib
 pecan
 gerritlib
 python-ldap
