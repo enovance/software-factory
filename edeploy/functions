@@ -7,6 +7,7 @@ function put_git_mark {
     local dir=$1
     sha=`git rev-parse HEAD`
     echo $sha >> ${dir}/etc/SF_GIT_COMMIT
+    echo 'PROFILE=none' >> ${dir}/var/lib/edeploy/conf
 }
 
 function install_bup {

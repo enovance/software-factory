@@ -1,9 +1,12 @@
-../pysflib
-pecan
+-e git+https://github.com/morucci/pygerrit.git#egg=pygerrit
+httmock
+M2Crypto
 mock
 mockldap
-httmock
-SQLAlchemy
-nose
-M2Crypto
 MySQL-python
+nose
+pecan
+python-redmine
+requests>=2.4.1
+../pysflib
+SQLAlchemy
