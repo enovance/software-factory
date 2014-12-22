@@ -69,9 +69,12 @@ cp -Rv ../serverspec ${dir}/root/puppet-bootstrapper/
 cp -Rv ../bootstraps/*.sh ${dir}/root/puppet-bootstrapper/
 cp -Rv ../bootstraps/sfcreds.yaml ${dir}/root/puppet-bootstrapper/
 
+# clone sf source-code
+[ ! -d "${dir}/srv/sf" ] && git clone ../ ${dir}/srv/sf
+
 # install pysflib
-retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/pysflib; pip install -r requirements.txt"
-do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/pysflib; python setup.py install"
+retry do_chroot ${dir} bash -c "cd /srv/sf/tools/pysflib && pip install -r requirements.txt"
+retry do_chroot ${dir} bash -c "cd /srv/sf/tools/pysflib && python setup.py install"
 
 # install-server-vm embed Jenkins (We dont want to have it here ...)
 # The role Jenkins does not deactivate the jenkins service at startup

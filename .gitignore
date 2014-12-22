@@ -48,3 +48,7 @@ build/
 
 # docs
 docs/_build
+
+# temp fix for pbr
+tools/pysflib/AUTHORS
+tools/pysflib/ChangeLog
