@@ -51,3 +51,4 @@ runcmd:
   - HOME=/root/ JUP=JENKINS_USER_PASSWORD TEMP_SSH_PWD=SSHPASS SFSUFFIX=SF_SUFFIX ./bootstrap.sh >> /var/log/sf-bootstrap.log 2>&1
   - echo UseDNS no >> /etc/ssh/sshd_config
   - service ssh reload || service sshd reload
+  - echo "PROFILE=none" >> /var/log/edeploy/vars
