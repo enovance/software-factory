@@ -52,3 +52,4 @@ runcmd:
   - service ssh reload || service sshd reload
   - systemctl enable swarm.service
   - systemctl start swarm.service
+  - echo "PROFILE=none" >> /var/log/edeploy/vars

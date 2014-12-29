@@ -242,6 +242,7 @@ resources:
               content: SFCONFIGCONTENT
               path: /root/sfconfig.yaml
             runcmd:
+              - echo "PROFILE=none" >> /var/log/edeploy/vars
               - MY_PRIV_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4 | cut -d, -f1`
               - sed -i "s/puppermaster-ip-template/$MY_PRIV_IP/" /root/hosts.yaml
               - echo "127.0.0.1 puppetmaster.SF_SUFFIX puppetmaster" > /etc/hosts
@@ -293,6 +294,7 @@ resources:
             fqdn: jenkins.SF_SUFFIX
             disable_root: 0
             runcmd:
+              - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
               - echo puppetmaster-ip-template puppetmaster.SF_SUFFIX puppet puppetmaster >> /etc/hosts
               - sed -i -e '0,/^$/s/^$/server=puppetmaster.SF_SUFFIX\n/g' /etc/puppet/puppet.conf
@@ -329,6 +331,7 @@ resources:
             fqdn: redmine.SF_SUFFIX
             disable_root: 0
             runcmd:
+              - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
               - echo puppetmaster-ip-template puppetmaster.SF_SUFFIX puppet puppetmaster >> /etc/hosts
               - sed -i -e '0,/^$/s/^$/server=puppetmaster.SF_SUFFIX\n/g' /etc/puppet/puppet.conf
@@ -365,6 +368,7 @@ resources:
             fqdn: gerrit.SF_SUFFIX
             disable_root: 0
             runcmd:
+              - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
               - echo puppetmaster-ip-template puppetmaster.SF_SUFFIX puppet puppetmaster >> /etc/hosts
               - sed -i -e '0,/^$/s/^$/server=puppetmaster.SF_SUFFIX\n/g' /etc/puppet/puppet.conf
@@ -401,6 +405,7 @@ resources:
             fqdn: managesf.SF_SUFFIX
             disable_root: 0
             runcmd:
+              - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
               - echo puppetmaster-ip-template puppetmaster.SF_SUFFIX puppet puppetmaster >> /etc/hosts
               - sed -i -e '0,/^$/s/^$/server=puppetmaster.SF_SUFFIX\n/g' /etc/puppet/puppet.conf
@@ -437,6 +442,7 @@ resources:
             fqdn: mysql.SF_SUFFIX
             disable_root: 0
             runcmd:
+              - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
               - echo puppetmaster-ip-template puppetmaster.SF_SUFFIX puppet puppetmaster >> /etc/hosts
               - sed -i -e '0,/^$/s/^$/server=puppetmaster.SF_SUFFIX\n/g' /etc/puppet/puppet.conf
@@ -511,6 +517,7 @@ resources:
               permissions: '0640'
               path: /etc/sysconfig/swarm
             runcmd:
+             - echo "PROFILE=none" >> /var/log/edeploy/vars
              - echo "127.0.1.1 slave.SF_SUFFIX slave" >> /etc/hosts
              - echo "JENKINS_IP jenkins.SF_SUFFIX jenkins" >> /etc/hosts
              - echo "MANAGESF_IP managesf.SF_SUFFIX SF_SUFFIX" >> /etc/hosts
