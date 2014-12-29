@@ -157,7 +157,7 @@ class GerritUtils:
             return self._manage_errors(e)
 
     def get_projects(self):
-        return self.g.get('projects/?').keys()
+        return sorted(self.g.get('projects/?').keys())
 
     def get_project_owner(self, name):
         try:
