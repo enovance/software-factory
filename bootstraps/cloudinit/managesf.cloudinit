@@ -12,3 +12,4 @@ runcmd:
   - echo NAMESERVER > /etc/resolv.conf
   - echo UseDNS no >> /etc/ssh/sshd_config
   - service ssh reload || service sshd reload
+  - echo "PROFILE=none" >> /var/log/edeploy/vars
