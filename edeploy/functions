@@ -9,6 +9,12 @@ function put_git_mark {
     echo $sha >> ${dir}/etc/SF_GIT_COMMIT
 }
 
+function edeploy_profile {
+    local dir=$1
+    mkdir -p ${dir}/var/log/edeploy
+    echo 'PROFILE=none' >> ${dir}/var/log/edeploy/vars
+}
+
 function install_bup {
     local dir=$1
     if [ -d "${dir}/etc/apt/" ]; then
