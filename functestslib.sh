@@ -267,6 +267,15 @@ function wait_for_bootstrap_done {
 }
 
 function run_serverspec {
+    # Temp check of "edeploy version" output
+    (
+        set +x
+        echo "$(date) ======= Manually checking edeploy version for debug purpose ======="
+        for role in puppetmaster mysql redmine gerrit jenkins managesf slave; do
+            echo -n "${role}: "
+            ssh -o StrictHostKeyChecking=no root@`get_ip $role` "edeploy version || true"
+        done
+    )
     echo "$(date) ======= Starting serverspec tests ========="
     retries=0
     while true; do
