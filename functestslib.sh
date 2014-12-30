@@ -268,6 +268,8 @@ function wait_for_bootstrap_done {
 
 function run_serverspec {
     echo "$(date) ======= Starting serverspec tests ========="
+    # Temp check of "edeploy version" output
+    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "edeploy version || true"
     retries=0
     while true; do
         ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd puppet-bootstrapper/serverspec/; rake spec" 2>&1 | \
