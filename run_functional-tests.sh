@@ -19,6 +19,7 @@
 # Then will run the serverspecs and functional tests
 
 source functestslib.sh
+. role_configrc
 
 echo "Running functional-tests with this HEAD"
 display_head
@@ -78,7 +79,7 @@ if [ "$1" == "upgrade" ]; then
         git clone http://softwarefactory.enovance.com/r/software-factory $cloned
         cd $cloned
         # Be sure to checkout the right previous version
-        git checkout 0.9.2
+        git checkout ${PREVIOUS_SF_REL}
         # Fetch the pre-built images
         ./fetch_roles.sh trees
         # Trigger a build role in order to deflate roles in the right directory if not done yet
