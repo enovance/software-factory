@@ -99,3 +99,5 @@ disable_selinux
 cp C7.0-ids.tables ${dir}/root/ids.tables
 
 put_git_mark ${dir}
+
+# EOF
