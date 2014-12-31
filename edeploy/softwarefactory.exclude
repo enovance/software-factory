@@ -30,6 +30,7 @@
 - /var/www/etherpad-lite-1.4.0/APIKEY.txt
 + /home/
 - /home/gerrit/
++ /home/gerrit/gerrit.war
 - /home/zuul/
 + /usr/share/redmine
 - /usr/share/redmine/config
