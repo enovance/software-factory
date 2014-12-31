@@ -5,6 +5,7 @@
 /run/
 /tmp/
 /root/
++ /root/gerrit_data_source/gerrit.war
 + /var
 - /var/tmp/
 - /var/lib/edeploy/
