@@ -390,7 +390,8 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     require     => [Service['gerrit'], Exec['wait4gerrit'],
                     File['/root/gerrit_data_source/rules.pl'],
                     File['/root/gerrit_data_source/project.config'],
-                    File['/root/gerrit_data_source/ssh_wrapper.sh']],
+                    File['/root/gerrit_data_source/ssh_wrapper.sh'],
+                    File['/home/gerrit/gerrit.war']],
     refreshonly => true,
   }
   exec {'gerrit-init-jenkins':
