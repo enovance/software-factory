@@ -29,7 +29,7 @@ PUPPET_RELEASE=$PUPPET_EL_CODENAME_MAJOR-10
 NPM_INSTALL=1.4.21
 export JENKINS_VERSION=1.580-1.1 # LTS
 PUPPET="http://yum.puppetlabs.com/el/$PUPPET_EL_CODENAME_MAJOR/products/x86_64/puppetlabs-release-$PUPPET_RELEASE.noarch.rpm"
-LASTWAR="http://os.enocloud.com:8080/v1/AUTH_0e436aacf0854b9abe70aa90f9e0864d/gerrit/gerrit285.war"
+LASTWAR="http://os.enocloud.com:8080/v1/AUTH_70aab03f69b549cead3cb5f463174a51/gerrit/gerrit2861.war"
 MYSQLJAVA="http://repo2.maven.org/maven2/mysql/mysql-connector-java/5.1.21/mysql-connector-java-5.1.21.jar"
 BCPROVJAVA="http://central.maven.org/maven2/org/bouncycastle/bcprov-jdk15on/1.49/bcprov-jdk15on-1.49.jar"
 BCPKIXJAVA="http://central.maven.org/maven2/org/bouncycastle/bcpkix-jdk15on/1.49/bcpkix-jdk15on-1.49.jar"
@@ -105,7 +105,10 @@ esac
 
 # Gerrit
 mkdir ${dir}/root/gerrit_data_source/
-http_fetch $LASTWAR ${dir}/root/gerrit_data_source/gerrit.war
+mkdir ${dir}/home/gerrit/
+mkdir ${dir}/home/gerrit/.ssh/
+chown -R gerrit:gerrit ${dir}/home/gerrit/
+http_fetch $LASTWAR ${dir}/home/gerrit/gerrit.war
 http_fetch $MYSQLJAVA ${dir}/root/gerrit_data_source/mysql-connector-java-5.1.21.jar
 http_fetch $BCPROVJAVA ${dir}/root/gerrit_data_source/bcprov-jdk15on-149.jar
 http_fetch $BCPKIXJAVA ${dir}/root/gerrit_data_source/bcpkix-jdk15on-149.jar

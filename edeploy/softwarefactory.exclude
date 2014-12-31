@@ -4,7 +4,10 @@
 /mnt/
 /run/
 /tmp/
-/root/
++ /root/gerrit_data_source/
++ /root/gerrit_data_source/gerrit.war
+- /root/gerrit_data_source/*
+- /root/*
 + /var
 - /var/tmp/
 - /var/lib/edeploy/
@@ -29,7 +32,8 @@
 - /var/www/etherpad-lite-1.4.0/run.sh
 - /var/www/etherpad-lite-1.4.0/APIKEY.txt
 + /home/
-- /home/gerrit/
++ /home/gerrit/gerrit.war
+- /home/gerrit/site_path/
 - /home/zuul/
 + /usr/share/redmine
 - /usr/share/redmine/config

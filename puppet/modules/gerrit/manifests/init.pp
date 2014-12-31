@@ -229,7 +229,6 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     owner   => 'gerrit',
     group   => 'gerrit',
     mode    => '0644',
-    source  => '/root/gerrit_data_source/gerrit.war',
   }
   file { '/home/gerrit/site_path/etc/mail/RegisterNewEmail.vm':
     ensure  => present,
@@ -358,7 +357,6 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
                   File['/root/gerrit-set-default-acl.sh'],
                   File['/root/gerrit-set-jenkins-user.sh'],
                   Exec['debug-copy-config-just-before-init']],
-    subscribe => File['/home/gerrit/gerrit.war'],
     refreshonly => true,
     logoutput => on_failure,
   }
@@ -390,7 +388,8 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     require     => [Service['gerrit'], Exec['wait4gerrit'],
                     File['/root/gerrit_data_source/rules.pl'],
                     File['/root/gerrit_data_source/project.config'],
-                    File['/root/gerrit_data_source/ssh_wrapper.sh']],
+                    File['/root/gerrit_data_source/ssh_wrapper.sh'],
+                    File['/home/gerrit/gerrit.war']],
     refreshonly => true,
   }
   exec {'gerrit-init-jenkins':
