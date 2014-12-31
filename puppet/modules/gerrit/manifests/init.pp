@@ -372,6 +372,7 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     timeout => 900,
     require => [File['wait4gerrit'],  Service['gerrit']],
     creates => '/tmp/wait4gerrit.done',
+    subscribe   => File['/home/gerrit/gerrit.war'],
   }
 
   # Init default in Gerrit. Require a running gerrit but
