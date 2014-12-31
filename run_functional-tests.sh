@@ -19,6 +19,7 @@
 # Then will run the serverspecs and functional tests
 
 source functestslib.sh
+. role_configrc
 
 echo "Running functional-tests with this HEAD"
 display_head
@@ -71,21 +72,21 @@ if [ "$1" == "backup_restore_tests" ]; then
     run_backup_restore_tests 45 "check" || pre_fail "Backup test: check"
 fi
 if [ "$1" == "upgrade" ]; then
-    # Try to load role_configrc here to SF_REL and SF_PREVIOUS_REL
     cloned=/tmp/software-factory # The place to clone the previous SF version to deploy
     (
         [ -d $cloned ] && rm -Rf $cloned
         git clone http://softwarefactory.enovance.com/r/software-factory $cloned
         cd $cloned
         # Be sure to checkout the right previous version
-        git checkout 0.9.2
+        git checkout ${PREVIOUS_SF_REL}
         # Fetch the pre-built images
         ./fetch_roles.sh trees
         # Trigger a build role in order to deflate roles in the right directory if not done yet
         SF_SKIP_FETCHBASES=1 ./build_roles.sh
         cd bootstraps/lxc
         # Deploy
-        ./start.sh
+        ./start.sh destroy
+        ./start.sh init
         cd ../..
         source functestslib.sh
         wait_for_bootstrap_done
