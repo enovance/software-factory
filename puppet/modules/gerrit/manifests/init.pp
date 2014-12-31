@@ -184,7 +184,9 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     source  => 'puppet:///modules/gerrit/download-commands.jar',
     require => File['/home/gerrit/site_path/plugins'],
   }
-  file { '/home/gerrit/site_path/lib/mysql-connector-java.jar':
+  # Version number is required by Gerrit, otherwise Gerrit downloads the file
+  # again
+  file { '/home/gerrit/site_path/lib/mysql-connector-java-5.1.21.jar':
     ensure  => present,
     owner   => 'gerrit',
     group   => 'gerrit',
@@ -345,7 +347,7 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
                   File['/home/gerrit/site_path/plugins/gravatar.jar'],
                   File['/home/gerrit/site_path/plugins/delete-project.jar'],
                   File['/home/gerrit/site_path/plugins/reviewersbyblame-2.8.1.jar'],
-                  File['/home/gerrit/site_path/lib/mysql-connector-java.jar'],
+                  File['/home/gerrit/site_path/lib/mysql-connector-java-5.1.21.jar'],
                   File['/home/gerrit/site_path/lib/bcprov.jar'],
                   File['/home/gerrit/site_path/lib/bcpkix.jar'],
                   File['/home/gerrit/site_path/plugins/download-commands.jar'],
