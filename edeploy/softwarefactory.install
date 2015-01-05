@@ -235,3 +235,5 @@ do_chroot ${dir} passwd -l root
 disable_selinux
 
 put_git_mark ${dir}
+
+# EOF
