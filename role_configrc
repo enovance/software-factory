@@ -24,7 +24,6 @@ SWIFT_SF_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/edeploy-roles"
 # Url where latest doc is stored
 SWIFT_DOCS_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/sfdocs"
 
-
 # Edeploy and Edeploy-roles project
 EDEPLOY_PROJECT=https://github.com/enovance/edeploy.git
 EDEPLOY_ROLES_PROJECT=https://github.com/enovance/edeploy-roles.git
