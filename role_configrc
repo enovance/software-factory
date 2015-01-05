@@ -30,7 +30,7 @@ EDEPLOY_PROJECT=https://github.com/enovance/edeploy.git
 EDEPLOY_ROLES_PROJECT=https://github.com/enovance/edeploy-roles.git
 
 # Edeploy source version
-ED_TAG=master
+ED_TAG=f01698b2
 ED_ROLES_TAG=master
 
 # Qcow2 params
