@@ -62,7 +62,7 @@ case "$(package_tool)" in
      install_packages ${dir} $PUPPET
      add_epel_repository $DIST
 
-     install_packages ${dir} "puppet monit postfix git python-pip vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz"
+     install_packages ${dir} "puppet monit postfix git python-pip vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz python-docutils"
      DEVEL_PKGS="openldap-devel zlib-devel libcurl-devel openssl-devel httpd-devel apr-devel apr-util-devel mariadb-devel gcc-c++ ruby-devel ImageMagick-devel gcc cpp python-devel libxml2-devel libxslt-devel"
 
      install_packages ${dir} ${DEVEL_PKGS}
@@ -146,8 +146,7 @@ http_fetch $ANGULARJS ${dir}/var/www/static/js/angular.min.js
 
 # zuul
 retry do_chroot ${dir} git clone https://github.com/openstack-infra/zuul /srv/zuul
-do_chroot ${dir} bash -c "cd /srv/zuul && git checkout -b working 8c81dc3fa9c2dfaf93539641c099b15064357011" # a commit known to work 11/12/2014
-# Install dependencies first
+do_chroot ${dir} bash -c "cd /srv/zuul && git checkout -b working a190f3ba610f81fdbafc832a37e60b9b2dc15c3e" # a commit known to work 01/10/2015
 retry do_chroot ${dir} pip install -U setuptools
 retry do_chroot ${dir} pip install docutils
 retry do_chroot ${dir} bash -c "cd /srv/zuul && pip install -U -r requirements.txt"
