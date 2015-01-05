@@ -18,8 +18,19 @@ class postfix ($settings = hiera_hash('postfix', '')) {
 
   $provider = "systemd"
 
+  group { 'postfix':
+    ensure => present,
+  }
+
+  user { 'postfix':
+    ensure  => present,
+    gid     => 'postfix',
+    require => Group['postfix'],
+  }
+
   package { 'postfix':
     ensure => 'installed',
+    require => [User['postfix'], Group['postfix']],
   }
 
   exec { '/etc/mailname':
