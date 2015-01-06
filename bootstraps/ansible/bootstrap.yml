@@ -1,0 +1,26 @@
+---
+- hosts: puppetmaster
+  remote_user: root
+  gather_facts: no
+
+  tasks:
+    - name: Test puppet agent
+      command: puppet agent --test --environment sf
+    - name: Start puppet service
+      service: name=puppet state=started
+
+- hosts: puppet_hosts
+  remote_user: root
+  gather_facts: no
+
+  tasks:
+    - name: Stop puppet service
+      service: name=puppet state=stopped
+    - name: Set puppetmaster ip
+      replace: dest=/etc/hosts regexp='puppetmaster-ip-template' replace='{{puppetmaster_ip}}' backup=yes
+    - name: Copy known_hosts file
+      copy: src=/root/.ssh/known_hosts dest=/root/.ssh/known_hosts
+    - name: Test puppet agent
+      command: puppet agent --test --environment sf
+    - name: Start puppet service
+      service: name=puppet state=started sleep=1600

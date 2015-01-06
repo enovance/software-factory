@@ -62,6 +62,20 @@ function getip_from_yaml {
     cat ../hosts.yaml  | grep -A 1 "^  $1" | grep 'ip:' | cut -d: -f2 | sed 's/ *//g'
 }
 
+function ansible_bootstrap {
+    if [ ! -d ansible/group_vars ]; then
+        mkdir ansible/group_vars
+        echo "puppetmaster_ip: $(getip_from_yaml puppetmaster)" > ansible/group_vars/all
+        echo "[puppetmaster]" > ${BUILD}/hosts
+        getip_from_yaml puppetmaster >> ${BUILD}/hosts
+        echo "[puppet_hosts]" >> ${BUILD}/hosts
+        for role in ${PUPPETIZED_ROLES}; do
+            getip_from_yaml ${role} >> ${BUILD}/hosts
+        done
+    fi
+    ansible-playbook -i ${BUILD}/hosts ansible/bootstrap.yml
+}
+
 function generate_random_pswd {
     # The sed character replacement makes the base64-string URL safe; for example required by lodgeit
     echo `dd if=/dev/urandom bs=1 count=$1 2>/dev/null | base64 -w $1 | head -n1 | sed -e 's#/#_#g;s#\+#_#g'`
@@ -120,16 +134,6 @@ function generate_creds_yaml {
     sed -i "s#LODGEIT_SESSION_KEY#${LODGEIT_SESSION_KEY}#" ${OUTPUT}/sfcreds.yaml
 }
 
-function wait_all_nodes {
-
-    local port=22
-    for role in $ROLES; do
-        ip=$(getip_from_yaml $role)
-        echo $role $ip
-        scan_and_configure_knownhosts "$role" $ip $port
-    done
-}
-
 function scan_and_configure_knownhosts {
     local fqdn=$1.${SF_SUFFIX}
     local hostname=$1
@@ -161,7 +165,7 @@ function scan_and_configure_knownhosts {
 
         let RETRIES=RETRIES+1
         [ "$RETRIES" == "40" ] && break
-        echo "  [E] ssh-keyscan on $fqdn:$port failed, will retry in 5 seconds (attempt $RETRIES/40)"
+        echo "  [E] ssh-keyscan on $fqdn:$port failed, will retry in 10 seconds (attempt $RETRIES/40)"
         sleep 10
     done
 }
@@ -173,12 +177,25 @@ function generate_keys {
     # connect on other node as root
     ssh-keygen -N '' -f ${OUTPUT}/service_rsa
     cp ${OUTPUT}/service_rsa /root/.ssh/id_rsa
+    cp ${OUTPUT}/service_rsa.pub /root/.ssh/id_rsa.pub
     ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa
     ssh-keygen -N '' -f ${OUTPUT}/gerrit_service_rsa
     ssh-keygen -N '' -f ${OUTPUT}/gerrit_admin_rsa
     # generating keys for cauth
     openssl genrsa -out ${OUTPUT}/privkey.pem 1024
     openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
+}
+
+function install_master_ssh_key {
+    for role in ${ROLES}; do
+        scan_and_configure_knownhosts "$role" $ip $port
+        local retries=20
+        while [ $retries -gt 0 ]; do
+            ssh-copy-id $(getip_from_yaml ${role}) && break
+            let retries=retries-1
+        done
+        [ $retries = 0 ] && exit -1
+    done
 }
 
 function prepare_etc_puppet {
@@ -208,55 +225,4 @@ function prepare_etc_puppet {
     chown -R puppet:puppet /etc/puppet/environments/sf
     chown -R puppet:puppet /etc/puppet/hiera/sf
     chown -R puppet:puppet /var/lib/puppet
-}
-
-function run_puppet_agent {
-    # Puppet agent will return code 2 on success...
-    # We create a sub-process () and convert the error
-    puppet agent --test --environment sf || (
-        [ "$?" == 2 ] && exit 0
-        echo "========================================="
-        echo "FAIL: Puppet agent failed on puppetmaster"
-        echo "========================================="
-        exit 1
-    )
-    service puppet start
-}
-
-function run_puppet_agent_stop {
-    # Be sure puppet agent is stopped
-    local ssh_port=22
-    for role in ${PUPPETIZED_ROLES}; do
-        $SSHPASS ssh -p$ssh_port root@${role}.${SF_SUFFIX} "service puppet stop"
-    done
-}
-
-function trigger_puppet_apply {
-    local puppetmaster_ip=$(getip_from_yaml puppetmaster)
-    local ssh_port=22
-    for role in ${PUPPETIZED_ROLES}; do
-        echo " [+] ${role}"
-        $SSHPASS ssh -p$ssh_port root@${role}.${SF_SUFFIX} sed -i "s/puppetmaster-ip-template/$puppetmaster_ip/" /etc/hosts
-        $SSHPASS scp $HOME/.ssh/known_hosts root@${role}.${SF_SUFFIX}:/root/.ssh/
-        # The Puppet run will deactivate the temporary root password
-        # Puppet agent will return code 2 on success...
-        # We create a sub-process () and convert the error
-        $SSHPASS ssh -p$ssh_port root@${role}.${SF_SUFFIX} "puppet agent --test --environment sf" || (
-            [ "$?" == 2 ] && exit 0
-            echo "======================================"
-            echo "FAIL: Puppet agent failed for ${role}"
-            echo "======================================"
-            exit 1
-        )
-        # Run another time. Should take only a few seconds per node if nothing needs to be changed
-        #ssh -p$ssh_port root@${role}.${SF_SUFFIX} "puppet agent --test --environment sf || true"
-    done
-}
-
-function run_puppet_agent_start {
-    # Start puppet agent at the end of the bootstrap
-    local ssh_port=22
-    for role in ${PUPPETIZED_ROLES}; do
-        ssh -p$ssh_port root@${role}.${SF_SUFFIX} "sleep 2700; service puppet start" &
-    done
 }
