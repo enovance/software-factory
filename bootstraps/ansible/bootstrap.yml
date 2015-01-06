@@ -1,0 +1,29 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+
+  tasks:
+    - name: Local puppet agent
+      command: puppet agent --test --environment sf
+      register: puppet_result
+      failed_when: "puppet_result.rc != 2"
+    - name: Start puppet service
+      service: name=puppet state=started
+
+- hosts: all
+  remote_user: root
+  gather_facts: no
+
+  tasks:
+    - name: Stop puppet service
+      service: name=puppet state=stopped
+    - name: Set puppetmaster ip
+      replace: dest=/etc/hosts regexp='puppetmaster-ip-template' replace='{{puppetmaster_ip}}' backup=yes
+    - name: Copy known_hosts file
+      copy: src=/root/.ssh/known_hosts dest=/root/.ssh/known_hosts
+    - name: Manual puppet agent
+      command: puppet agent --test --environment sf
+      register: puppet_result
+      failed_when: "puppet_result.rc != 2"
+    - name: Start puppet service
+      service: name=puppet state=started sleep=1600
