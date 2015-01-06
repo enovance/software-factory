@@ -1,5 +1,0 @@
-ssh_keys:
-  ssh_root_service:
-    user: root
-    type: rsa
-    key: "%{hiera('creds_service_pub_key')}"

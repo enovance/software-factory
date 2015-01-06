@@ -22,8 +22,6 @@ class ssh_keys ($keys = hiera_hash("ssh_keys")) {
     mode    => '0755',
   }
 
-  create_resources('ssh_authorized_key', $keys)
-
   file { '/root/.ssh/id_rsa':
     ensure  => present,
     owner   => 'root',

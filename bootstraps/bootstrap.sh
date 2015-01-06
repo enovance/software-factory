@@ -33,19 +33,12 @@ if [ ! -e "${BUILD}/hiera/sfcreds.yaml" ]; then
     echo "Generate site specifics creds"
     generate_keys
     generate_creds_yaml
+    install_master_ssh_key
 fi
 
 # Move site specific file to puppet/modules/*/files/
 prepare_etc_puppet
-# Wait for all node SSH service to be up
-wait_all_nodes
-# Start a run locally and start the puppet agent service
-run_puppet_agent
-# Force a stop of puppet agent on each roles
-run_puppet_agent_stop
-# Start a run on each node and start the puppet agent service
-trigger_puppet_apply
-# Force a start of puppet agent on each roles after a delay that let us run func tests smoosly
-run_puppet_agent_start
+# Run the bootstrap ansible playbook
+ansible_bootstrap
 # Set a witness file that tell the bootstraping is done
 echo 0 > ${BUILD}/bootstrap.done
