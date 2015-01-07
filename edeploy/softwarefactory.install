@@ -79,7 +79,7 @@ case "$(package_tool)" in
      mkdir -p ${dir}/var/www/html
      mkdir -p ${dir}/var/log/httpd
      HOME=/root retry do_chroot ${dir} gem install passenger bundler
-     HOME=/root do_chroot ${dir} passenger-install-apache2-module -a
+     HOME=/root retry do_chroot ${dir} passenger-install-apache2-module -a
      do_chroot ${dir} bash -c "ln -s \$(find /usr/local/share/gems/gems/passenger-4.0.* -maxdepth 0) /usr/lib/passenger"
      # Install Redmine
      http_fetch $REDMINE_RHEL ${dir}/usr/share/redmine.tar.gz
@@ -96,7 +96,7 @@ production:
   password: ""
   encoding: utf8
 EOF
-     HOME=/root do_chroot ${dir} bash -c "cd /usr/share/redmine && bundle install --retry $BUNDLE_RETRIES"
+     HOME=/root retry do_chroot ${dir} bash -c "cd /usr/share/redmine && bundle install --retry $BUNDLE_RETRIES"
      retry do_chroot ${dir} pip install python-dateutil
      ;;
   *)
@@ -120,8 +120,8 @@ retry do_chroot ${dir} git clone git://github.com/backlogs/redmine_backlogs.git 
 cd ${dir}/usr/share/redmine/plugins/redmine_backlogs
 sed -i 's/gem \"holidays\", \"~>1.0.3\"/gem \"holidays\", \"=1.0.6\"/' Gemfile
 cd -
-HOME=/root do_chroot ${dir} bash -c "cd /usr/share/redmine/plugins/redmine_backlogs && bundle install --retry $BUNDLE_RETRIES"
-HOME=/root do_chroot ${dir} bash -c 'cd /usr/share/redmine && bundle update'
+HOME=/root retry do_chroot ${dir} bash -c "cd /usr/share/redmine/plugins/redmine_backlogs && bundle install --retry $BUNDLE_RETRIES"
+HOME=/root retry do_chroot ${dir} bash -c 'cd /usr/share/redmine && bundle update'
 
 # Install Redmine http plugin
 retry do_chroot ${dir} git clone git://github.com/kevinfoote/redmine_http_auth.git /usr/share/redmine/plugins/redmine_http_auth --depth 1

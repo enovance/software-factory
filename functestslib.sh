@@ -176,10 +176,10 @@ function pre_fail {
     echo -e "\n\n\n====== $1 OUTPUT ======\n"
     case $1 in
         "Roles building FAILED")
-            if [ -f "${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log" ]; then
-                F="${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log"
-            elif [ -f "${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log" ]; then
+            if [ -f "${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log" ]; then
                 F="${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log"
+            elif [ -f "${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log" ]; then
+                F="${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log"
             fi
             if [ -f "${F}" ]; then
                 echo ${F}
