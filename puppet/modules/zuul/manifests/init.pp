@@ -109,6 +109,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group  => "root",
     require => File['/usr/share/sf-zuul'],
     content => template('zuul/layout.yaml.erb'),
+    notify => Service['zuul'],
   }
 
   file {'/usr/share/sf-zuul/projects.yaml':
@@ -118,6 +119,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group  => "root",
     require => File['/usr/share/sf-zuul'],
     content => template('zuul/projects.yaml.erb'),
+    notify => Service['zuul'],
   }
 
   file {'/var/log/zuul/':
@@ -159,6 +161,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group   => 'zuul',
     source  => 'puppet:///modules/zuul/jenkins_rsa',
     require => File['/var/lib/zuul/.ssh'],
+    notify => Service['zuul'],
   }
 
   file {'/var/run/zuul/':
@@ -176,6 +179,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group   => 'zuul',
     source  => 'puppet:///modules/zuul/logging.conf',
     require => File['/etc/zuul'],
+    notify => Service['zuul'],
   }
 
   file {'/etc/zuul/gearman-logging.conf':
@@ -185,6 +189,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group   => 'zuul',
     source  => 'puppet:///modules/zuul/gearman-logging.conf',
     require => File['/etc/zuul'],
+    notify => Service['zuul'],
   }
 
   file {'/etc/zuul/merger-logging.conf':
@@ -194,6 +199,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     group   => 'zuul',
     source  => 'puppet:///modules/zuul/merger-logging.conf',
     require => File['/etc/zuul'],
+    notify => Service['zuul'],
   }
 
   file {'/etc/zuul/zuul.conf':
@@ -205,6 +211,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_url'), $h
     require => [File['/etc/zuul/logging.conf'],
                 File['/etc/zuul/gearman-logging.conf'],
                 File['/etc/zuul/merger-logging.conf']],
+    notify => Service['zuul'],
   }
 
   file {'/etc/zuul/layout.yaml':
