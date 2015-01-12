@@ -28,6 +28,7 @@ echo "Use $HEAT_TENANT on $OS_AUTH_URL"
 export OS_TENANT_NAME=${HEAT_TENANT}
 unset OS_TENANT_ID
 export NOVA_KEYNAME=${NOVA_KEYNAME-$HEAT_TENANT}
+export FORMAT=raw
 source functestslib.sh
 
 echo "Running functional-tests with this HEAD"
