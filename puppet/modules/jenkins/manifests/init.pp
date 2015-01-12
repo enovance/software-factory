@@ -149,7 +149,14 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
     source  => 'puppet:///modules/jenkins/org.jenkinsci.main.modules.sshd.SSHD.xml',
     require => User['jenkins'],
   }
+
+  exec { 'stopjenkins':
+    command => 'service jenkins stop',
+    refreshonly => true,
+  }
+
   file {'/var/lib/jenkins/config.xml':
+    before  => Exec['stopjenkins'],
     ensure  => file,
     mode    => '0644',
     owner   => 'jenkins',
