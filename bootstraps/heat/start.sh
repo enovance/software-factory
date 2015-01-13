@@ -24,7 +24,6 @@ suffix=$DOMAIN
 }
 
 jenkins_user_pwd=$(generate_random_pswd 8)
-jenkins_master_url="jenkins.$suffix"
 
 params="key_name=$key_name;suffix=$suffix"
 
@@ -44,7 +43,7 @@ params="$params;redmine_root_size=$redmine_root_size"
 params="$params;jenkins_root_size=$jenkins_root_size"
 params="$params;slave_root_size=$slave_root_size"
 
-params="$params;jenkins_user_pwd=$jenkins_user_pwd;jenkins_master_url=$jenkins_master_url"
+params="$params;jenkins_user_pwd=$jenkins_user_pwd"
 params="$params;sg_admin_cidr=$sg_admin_cidr;sg_user_cidr=$sg_user_cidr"
 params="$params;ext_net_uuid=$ext_net_uuid"
 
