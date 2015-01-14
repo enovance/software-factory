@@ -10,6 +10,7 @@ node base {
   include edeploy_client
   include postfix
   include monit
+  include https_cert
 }
 
 node default inherits base {
