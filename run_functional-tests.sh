@@ -115,7 +115,7 @@ if [ "$1" == "upgrade" ]; then
     ) || pre_fail "Ansible provision playbook FAILED"
     checkpoint "sf is ready to be updated"
     # Start the upgrade
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/ && ./upgrade.sh 0.9.4 true" || pre_fail "Upgrade FAILED"
+    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/ && ./upgrade.sh ${SF_REL} true" || pre_fail "Upgrade FAILED"
     checkpoint "upgrade"
     # Run basic tests
     run_serverspec || pre_fail "Serverspec failed"
@@ -123,6 +123,7 @@ if [ "$1" == "upgrade" ]; then
     # Run the checker to validate provisionned data has not been lost
     ./tools/provisioner_checker/run.sh checker || pre_fail "Provisionned data check failed"
     # run functional tests from the puppetmaster
+    sleep 300 # dirty wait for slave swarm to reconnect for function to register
     ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd puppet-bootstrapper && nosetests -sv" || pre_fail "Functional tests FAILED after upgrade"
     checkpoint "check provisioner"
 fi
