@@ -179,6 +179,8 @@ function generate_keys {
     # generating keys for cauth
     openssl genrsa -out ${OUTPUT}/privkey.pem 1024
     openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
+    # Generate self-signed Apache certificate
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=${SF_SUFFIX}" -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt
 }
 
 function prepare_etc_puppet {
@@ -205,6 +207,9 @@ function prepare_etc_puppet {
     cp $DATA/gerrit_admin_rsa /etc/puppet/environments/sf/modules/jjb/files/
     cp $DATA/privkey.pem /etc/puppet/environments/sf/modules/cauth/files/
     cp $DATA/pubkey.pem /etc/puppet/environments/sf/modules/cauth/files/
+    cp $DATA/gateway.key /etc/puppet/environments/sf/modules/commonservices-apache/files/
+    cp $DATA/gateway.crt /etc/puppet/environments/sf/modules/commonservices-apache/files/
+    cp $DATA/gateway.crt /etc/puppet/environments/sf/modules/https_cert/files/
     chown -R puppet:puppet /etc/puppet/environments/sf
     chown -R puppet:puppet /etc/puppet/hiera/sf
     chown -R puppet:puppet /var/lib/puppet

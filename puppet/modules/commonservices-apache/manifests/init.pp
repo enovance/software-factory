@@ -20,14 +20,44 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
   $http = "httpd"
   $httpd_user = "apache"
 
+  file {'gateway_crt':
+    path  => '/etc/httpd/conf.d/gateway.crt',
+    source  => 'puppet:///modules/commonservices-apache/gateway.crt',
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+  }
+
+  file {'gateway_key':
+    path  => '/etc/httpd/conf.d/gateway.key',
+    source  => 'puppet:///modules/commonservices-apache/gateway.key',
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+  }
+
+  file {'gateway_common':
+    path   => '/etc/httpd/conf.d/gateway.common',
+    ensure => file,
+    mode   => '0640',
+    owner  => $httpd_user,
+    group  => $httpd_user,
+    content => template('commonservices-apache/gateway.common'),
+  }
+
   file {'gateway_conf':
     path   => '/etc/httpd/conf.d/gateway.conf',
     ensure => file,
     mode   => '0640',
     owner  => $httpd_user,
     group  => $httpd_user,
-    content => template('commonservices-apache/gateway'),
+    content => template('commonservices-apache/gateway.conf'),
     notify => Service['webserver'],
+    require => [File['gateway_crt'],
+                File['gateway_key'],
+                File['gateway_common']]
   }
 
   file {'/var/www/index.py':
