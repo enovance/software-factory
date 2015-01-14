@@ -131,7 +131,7 @@ do_chroot ${dir} bash -c "cd /srv/zuul && git checkout -b working ${ZUUL_VERSION
 # Install dependencies first
 retry do_chroot ${dir} pip install -U setuptools
 retry do_chroot ${dir} pip install docutils
-retry do_chroot ${dir} bash -c "cd /srv/zuul && pip install -U -r requirements.txt"
+retry do_chroot ${dir} bash -c "cd /srv/zuul && pip install -r requirements.txt"
 retry do_chroot ${dir} pip install APScheduler==${APSCHEDULER_VERSION}
 retry do_chroot ${dir} pip install GitPython==${GITPYTHON_VERSION}
 do_chroot ${dir} bash -c "cd /srv/zuul && python /srv/zuul/setup.py install"
