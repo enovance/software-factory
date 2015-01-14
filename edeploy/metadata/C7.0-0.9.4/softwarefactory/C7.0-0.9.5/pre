@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Saving etherpad API key"
+cp /var/www/etherpad-lite*/APIKEY.txt /tmp/APIKEY.txt

@@ -1,4 +1,9 @@
 ---
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: Reload systemd units
+    command: systemctl daemon-reload
 - hosts: services
   gather_facts: no
   tasks:

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# restore etherpad API key
+mv /tmp/APIKEY.txt /var/www/etherpad-lite/APIKEY.txt
