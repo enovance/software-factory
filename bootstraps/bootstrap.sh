@@ -33,6 +33,7 @@ if [ ! -e "${BUILD}/hiera/sfcreds.yaml" ]; then
     echo "Generate site specifics creds"
     generate_keys
     generate_creds_yaml
+    generate_apache_cert
 fi
 
 # Move site specific file to puppet/modules/*/files/
