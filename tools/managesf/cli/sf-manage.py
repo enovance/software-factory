@@ -16,7 +16,7 @@
 
 import os
 import base64
-import requests as http
+import requests
 import json
 import argparse
 import sys
@@ -177,7 +177,7 @@ def get_cookie():
         return args.cookie
     (username, password) = args.auth.split(':')
     url = 'http://%s/auth/login' % args.auth_server
-    r = http.post(url,
+    r = requests.post(url,
                   params={'username': username,
                           'password': password,
                           'back': '/'},
@@ -194,7 +194,7 @@ headers = {'Authorization': 'Basic ' + base64.b64encode(args.auth)}
 chunk_size = 1024
 if args.command == 'backup_get':
     url = base_url + '/backup'
-    resp = http.get(url, headers=headers,
+    resp = requests.get(url, headers=headers,
                     cookies=dict(auth_pubtkt=get_cookie()))
     if resp.status_code != 200:
         print "backup_get failed with status_code " + str(resp.status_code)
@@ -204,7 +204,7 @@ if args.command == 'backup_get':
             fd.write(chunk)
 elif args.command == 'backup_start':
     url = base_url + '/backup'
-    resp = http.post(url, headers=headers,
+    resp = requests.post(url, headers=headers,
                      cookies=dict(auth_pubtkt=get_cookie()))
 elif args.command == 'restore':
     url = base_url + '/restore'
@@ -213,11 +213,11 @@ elif args.command == 'restore':
         print "file %s not exist" % filename
         sys.exit("error")
     files = {'file': open(filename, 'rb')}
-    resp = http.post(url, headers=headers, files=files,
+    resp = requests.post(url, headers=headers, files=files,
                      cookies=dict(auth_pubtkt=get_cookie()))
 elif args.command == 'delete':
 
-    resp = http.delete(url, headers=headers,
+    resp = requests.delete(url, headers=headers,
                        cookies=dict(auth_pubtkt=get_cookie()))
     print resp.text
     if resp.status_code >= 200 and resp.status_code < 203:
@@ -249,15 +249,15 @@ elif args.command == 'replication_config':
             sys.exit(0)
 
     if args.rep_command in {'add', 'rename-section'}:
-        meth = http.put
+        meth = requests.put
     elif args.rep_command in {'unset-all', 'replace-all', 'remove-section'}:
-        meth = http.delete
+        meth = requests.delete
     elif args.rep_command in {'get-all', 'list'}:
-        meth = http.get
+        meth = requests.get
     resp = meth(url, headers=headers, data=json.dumps(data),
                 cookies=dict(auth_pubtkt=get_cookie()))
     if args.rep_command == 'replace-all':
-        resp = http.put(url, headers=headers, data=json.dumps(data),
+        resp = requests.put(url, headers=headers, data=json.dumps(data),
                         cookies=dict(auth_pubtkt=get_cookie()))
     # These commands need json as output,
     # if server has no valid json it will send {}
@@ -279,7 +279,7 @@ elif args.command == 'trigger_replication':
         info['url'] = args.url
     if getattr(args, 'project'):
         info['project'] = args.project
-    resp = http.post(url, headers=headers, data=json.dumps(info),
+    resp = requests.post(url, headers=headers, data=json.dumps(info),
                      cookies=dict(auth_pubtkt=get_cookie()))
     print resp.text
     if resp.status_code >= 200 and resp.status_code < 203:
@@ -287,13 +287,13 @@ elif args.command == 'trigger_replication':
 elif args.command == 'add_user':
     groups = split_and_strip(args.groups)
     data = json.dumps({'groups': groups})
-    resp = http.put(url, headers=headers, data=data,
+    resp = requests.put(url, headers=headers, data=data,
                     cookies=dict(auth_pubtkt=get_cookie()))
 
     print resp.text
     print resp.status_code
 elif args.command == 'delete_user':
-    resp = http.delete(url, headers=headers,
+    resp = requests.delete(url, headers=headers,
                        cookies=dict(auth_pubtkt=get_cookie()))
     if resp.status_code >= 200 and resp.status_code < 203:
         print "Success"
@@ -321,7 +321,7 @@ elif args.command == 'create':
     if len(info.keys()):
         data = json.dumps(info)
 
-    resp = http.put(url, headers=headers, data=data,
+    resp = requests.put(url, headers=headers, data=data,
                     cookies=dict(auth_pubtkt=get_cookie()))
 
     print resp.text
