@@ -177,7 +177,7 @@ def get_cookie():
                       params={'username': username,
                               'password': password,
                               'back': '/'},
-                      allow_redirects=False)
+                      allow_redirects=True)
     if r.status_code == 401:
         die("Access denied, wrong login or password")
     elif r.status_code != 303:

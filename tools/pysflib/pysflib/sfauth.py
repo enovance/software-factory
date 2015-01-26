@@ -22,5 +22,5 @@ def get_cookie(auth_server, username, password):
     resp = requests.post(url, params={'username': username,
                                       'password': password,
                                       'back': '/'},
-                         allow_redirects=False)
+                         allow_redirects=True)
     return resp.cookies.get('auth_pubtkt', '')
