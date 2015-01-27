@@ -9,7 +9,7 @@ log_config=/etc/zuul/gearman-logging.conf
 server=<%= @settings['gerrit_host'] %>
 # baseurl is only use to fetch git refs on diff url than server.
 # Using baseurl we cannot modify url zuul report to user
-baseurl=http://<%= scope.function_hiera(["top_domain"]) %>/r/
+baseurl=https://<%= scope.function_hiera(["top_domain"]) %>/r/
 user=<%= @settings['gerrit_username'] %>
 sshkey=/var/lib/zuul/.ssh/id_rsa
 
@@ -18,13 +18,13 @@ layout_config=/etc/zuul/layout.yaml
 log_config=/etc/zuul/logging.conf
 pidfile=/var/run/zuul/zuul.pid
 state_dir=/var/lib/zuul
-status_url=http://<%= scope.function_hiera(["zuul_pub_url"]) %>
+status_url=https://<%= scope.function_hiera(["zuul_pub_url"]) %>
 
 [merger]
 git_dir=/var/lib/zuul/git
 ;git_user_email=zuul@example.com
 ;git_user_name=zuul
-zuul_url=http://<%= scope.function_hiera(["top_domain"]) %>/zuul/p
+zuul_url=https://<%= scope.function_hiera(["top_domain"]) %>/zuul/p
 log_config=/etc/zuul/merger-logging.conf
 
 #[swift]
