@@ -18,7 +18,7 @@ import requests
 
 
 def get_cookie(auth_server, username, password):
-    url = "http://%s/auth/login" % auth_server
+    url = "https://%s/auth/login" % auth_server
     resp = requests.post(url, params={'username': username,
                                       'password': password,
                                       'back': '/'},
