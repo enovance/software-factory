@@ -29,9 +29,11 @@ class https_cert () {
 
   # python-requests doesn't use the systems CA database, thus replacing it's own
   # CA list with SF certificate CA
-  exec {'cacert.pem':
-    path    => '/usr/bin/:/bin/:/usr/local/bin',
-    command => 'cat /etc/pki/ca-trust/source/anchors/gateway.crt >> /usr/lib/python2.7/site-packages/requests/cacert.pem',
+  }
+  file { '/usr/lib/python2.7/site-packages/requests/cacert.pem':
+    ensure  => present,
+    mode   => '0644',
+    source  => '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
     require => File['gateway_cert'],
   }
 
