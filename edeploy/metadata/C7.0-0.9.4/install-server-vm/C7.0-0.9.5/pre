@@ -1,3 +1,6 @@
 #!/bin/sh
 
+# Adds new default variable
+echo 'enforce_ssl:' >> /etc/puppet/hiera/sf/sfconfig.yaml
+
 exit 0
