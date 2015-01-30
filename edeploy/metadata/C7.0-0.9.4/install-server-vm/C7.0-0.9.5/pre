@@ -1,3 +1,6 @@
 #!/bin/sh
 
+echo '# Disable anonymous access' >> /etc/puppet/hiera/sf/sfconfig.yaml
+echo 'authenticated_only: false' >> /etc/puppet/hiera/sf/sfconfig.yaml
+
 exit 0
