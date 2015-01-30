@@ -45,3 +45,6 @@ loginpage_custom_footer: ""
 
 # NTP main reference server
 ntp_main_server: pool.ntp.org
+
+# Disable anonymous access
+authenticated_only: true
