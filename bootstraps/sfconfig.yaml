@@ -48,3 +48,8 @@ loginpage_custom_footer: ""
 
 # NTP main reference server
 ntp_main_server: pool.ntp.org
+
+# Add authentication in front off all services. If set to false only
+# zuul/etherpad/paste can be accessed anonymously. Please note that Gerrit,
+# Jenkins and Redmine always require a login.
+authenticated_only: false
