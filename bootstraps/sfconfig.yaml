@@ -24,8 +24,8 @@ sso_cookie_timeout: 43200
 
 # If you envisage to authenticate users wia their Github
 # account please set your APP id and secret. Or leave it blank.
-github_app_id:
-github_app_secret:
+github_app_id: a0dbb9d44226e362bc62
+github_app_secret: 5d1cb4b43e1dee356e817946eef98b696cae123c
 github_allowed_organizations:
 
 # If you prefer to use a SMTP relay
