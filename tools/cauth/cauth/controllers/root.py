@@ -241,7 +241,11 @@ class LoginController(RestController):
                 'back in params.')
             abort(422)
         back = kwargs['back']
+        return self.check_auth(**kwargs)
+
+    def check_auth(self, **kwargs):
         if 'username' in kwargs and 'password' in kwargs:
+            back = kwargs['back']
             username = kwargs['username']
             password = kwargs['password']
             valid_user = self.check_valid_user(username, password)
@@ -271,6 +275,8 @@ class LoginController(RestController):
     def get(self, **kwargs):
         if 'back' not in kwargs:
             kwargs['back'] = '/auth/logout'
+        if 'username' in kwargs and 'password' in kwargs:
+            self.check_auth(**kwargs)
 
         logger.info('Client requests the login page.')
         return dict(back=kwargs["back"], message='')

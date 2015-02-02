@@ -45,6 +45,14 @@
         allow from all
     </Directory>
 
+    # Automatic guest login
+    <LocationMatch "^/">
+        RewriteEngine On
+        RewriteCond %{REQUEST_URI} !.*auth/login.*$ [NC]
+        RewriteCond %{HTTP_COOKIE} !auth_pubtkt=.*$ [NC]
+        RewriteRule ^ <%= @cauth['signin_url'] %>?username=guest&password=guest&back=%2F [L,R]
+    </LocationMatch>
+
     <% if authenticated_only %>
     # Make sure static files, docs and git itself is accessible even if
     # anonymous access is disabled. Git itself is protected by Gerrit
