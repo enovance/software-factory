@@ -71,6 +71,12 @@ auth = {
             "mail": "<%= scope.function_hiera(['admin_mail']) %>",
             "password": "<%= scope.function_hiera(['admin_password_hashed']) %>",
         },
+        "guest": {
+            "lastname": "Guest user",
+            "mail": "guest@none",
+            "password": "$6$vVp2NzI2tWrlfVKz$NAAxkWaF8rdZ2ENHRoX8iYLrhjM8WLi9Yp4eCp/yOPpTDZI3UXGJUnkweFHodT.qxOBMpq9cWlOb1508ufBU31",
+        },
+
 	<% if scope.function_hiera(["top_domain"]) == "tests.dom" %>
             "user2": {
                 "lastname": "Demo user2",

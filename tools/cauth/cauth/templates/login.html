@@ -31,6 +31,15 @@
 
                             <button type="submit" class="btn btn-primary pull-right">Log in<i class="icon-chevron-right icon-white"></i></button>
                         </form>
+
+                        <br /><br />
+                        <form method="post" action="/auth/login/" class="form-signin" target="_top">
+                            <input name="username" type="hidden" value="guest">
+                            <input name="password" type="hidden" value="guest">
+                            <input type="hidden" name="back" value="${back}">
+                            <button type="submit" class="btn btn-default col-md-12">Guest Login</button>
+                        </form>
+
                     </div>
                 </div>
                 <a href='/auth/login/github?back=${back}' target="_top">Login via Github</a>
