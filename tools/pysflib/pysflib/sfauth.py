@@ -15,12 +15,21 @@
 # under the License.
 
 import requests
+from requests.exceptions import ConnectionError
 
 
-def get_cookie(auth_server, username, password):
-    url = "http://%s/auth/login" % auth_server
-    resp = requests.post(url, params={'username': username,
-                                      'password': password,
-                                      'back': '/'},
-                         allow_redirects=False)
+def get_cookie(auth_server, username, password, use_ssl=False, verify=True):
+    if use_ssl:
+        url = "https://%s/auth/login" % auth_server
+        resp = requests.post(url, params={'username': username,
+                                          'password': password,
+                                          'back': '/'},
+                             allow_redirects=False,
+                             verify=verify)
+    else:
+        url = "http://%s/auth/login" % auth_server
+        resp = requests.post(url, params={'username': username,
+                                          'password': password,
+                                          'back': '/'},
+                             allow_redirects=False)
     return resp.cookies.get('auth_pubtkt', '')
