@@ -17,10 +17,11 @@
 import requests
 
 
-def get_cookie(auth_server, username, password):
+def get_cookie(auth_server, username, password, verify=True):
     url = "http://%s/auth/login" % auth_server
     resp = requests.post(url, params={'username': username,
                                       'password': password,
                                       'back': '/'},
-                         allow_redirects=False)
+                         allow_redirects=False,
+                         verify=verify)
     return resp.cookies.get('auth_pubtkt', '')
