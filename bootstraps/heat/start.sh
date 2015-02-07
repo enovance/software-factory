@@ -44,7 +44,6 @@ params="$params;jenkins_root_size=$jenkins_root_size"
 params="$params;slave_root_size=$slave_root_size"
 
 params="$params;jenkins_user_pwd=$jenkins_user_pwd"
-params="$params;sg_admin_cidr=$sg_admin_cidr;sg_user_cidr=$sg_user_cidr"
 params="$params;ext_net_uuid=$ext_net_uuid"
 params="$params;nameservers=$nameservers"
 
@@ -78,6 +77,9 @@ function get_params {
     params="$params;sf_image_id=$sf_image_id"
     sfconfigcontent=`cat $SFCONFIGFILE | base64 -w 0`
     params="$params;sf_config_content=$sfconfigcontent"
+}
+
+function render_template {
 }
 
 function convert_to_raw {
@@ -128,8 +130,8 @@ function delete_images {
 }
 
 function start_stack {
-    get_params
-    heat stack-create --template-file sf.yaml -P "$params" $STACKNAME
+    python simple_renderer.py software-factory.hot.tmpl > software-factory.hot
+    heat stack-create --template-file software-factory.hot -P "$params" $STACKNAME
 }
 
 function delete_stack {
