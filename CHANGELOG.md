@@ -1,6 +1,24 @@
 # Change Log
 
-## 0.9.6 [unreleased]
+## 0.9.7 [unreleased]
+
+## 0.9.6 2015-02-10
+
+### Fixed
+
+- Functional tests now clean old images after a successful run
+- SSL based authentications was not working properly
+
+### Added
+
+- Support for annonymous users
+- Migration library that handle issues trackers, code repositories
+
+### Changed
+
+- Heat stack now support multiple DNS and cidr for security groups
+
+
 
 ## 0.9.5 2015-02-03
 
