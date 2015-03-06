@@ -27,6 +27,12 @@ ORIG=$(cd $(dirname $0); pwd)
 
 update_repositories ${dir}
 
+#################
+# Puppet master #
+#################
+
+$SRC/puppet-master.install $dir $dir $version
+
 case "$(package_tool)" in
     "yum")
         add_epel_repository $DIST

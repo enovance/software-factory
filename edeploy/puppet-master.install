@@ -1,0 +1,204 @@
+#!/bin/bash
+#
+# Copyright (C) 2013-2014 eNovance SAS <licensing@enovance.com>
+#
+# Author: Emilien Macchi <emilien.macchi@enovance.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Puppetmaster node (passenger ready)
+#
+
+src="$1"
+dir="$2"
+version="$3"
+ROLE=puppet-master
+
+ORIG=$(cd $(dirname $0); pwd)
+
+. ${ORIG}/functions
+
+rh_install_passenger () {
+    # Install all dependencies to run Puppet in passenger mode
+    install_packages_disabled $dir puppet-server git augeas ntp httpd puppetdb-terminus python-pip mod_wsgi apr-util-devel apr-devel httpd-devel zlib-devel openssl-devel libcurl-devel gcc-c++ gcc mod_ssl ruby-devel
+
+    # passenger is not packaged in el7, let's install & configure it
+    do_chroot ${dir} gem install rack passenger
+    do_chroot ${dir} passenger-install-apache2-module -a
+    mkdir -p ${dir}/usr/share/puppet/rack/puppetmasterd
+    mkdir -p ${dir}/usr/share/puppet/rack/puppetmasterd/public ${dir}/usr/share/puppet/rack/puppetmasterd/tmp
+    cp ${dir}/usr/share/puppet/ext/rack/config.ru ${dir}/usr/share/puppet/rack/puppetmasterd/
+    do_chroot ${dir} chown puppet:puppet /usr/share/puppet/rack/puppetmasterd/config.ru
+
+    # Bug https://tickets.puppetlabs.com/browse/PUP-1386
+    cat >> ${dir}/usr/share/puppet/rack/puppetmasterd/config.ru <<EOF
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+EOF
+
+    passenger_version=$(do_chroot ${dir} gem list | grep passenger | awk '{print $2}' |sed 's/[)(]//g')
+
+    # do not enable by default as without cert it'll fail
+    cat > ${dir}/etc/httpd/conf.d/puppetmaster.conf.disabled <<EOF
+LoadModule passenger_module /usr/local/share/gems/gems/passenger-${passenger_version}/buildout/apache2/mod_passenger.so
+PassengerRoot /usr/local/share/gems/gems/passenger-${passenger_version}
+PassengerRuby /usr/bin/ruby
+PassengerHighPerformance on
+PassengerMaxPoolSize 12
+PassengerPoolIdleTime 1500
+PassengerStatThrottleRate 120
+Listen 8140
+
+<VirtualHost *:8140>
+        SSLEngine on
+        SSLProtocol             ALL -SSLv2
+        SSLCipherSuite          ALL:!aNULL:!eNULL:!DES:!3DES:!IDEA:!SEED:!DSS:!PSK:!RC4:!MD5:+HIGH:+MEDIUM:!LOW:!SSLv2:!EXP
+        SSLHonorCipherOrder     on
+
+        SSLCertificateFile      /var/lib/puppet/ssl/certs/mycert.pem
+        SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/mycert.pem
+        SSLCertificateChainFile /var/lib/puppet/ssl/certs/ca.pem
+        SSLCACertificateFile    /var/lib/puppet/ssl/certs/ca.pem
+        SSLVerifyClient optional
+        SSLVerifyDepth  1
+        SSLOptions +StdEnvVars +ExportCertData
+        RequestHeader unset X-Forwarded-For
+        RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+        DocumentRoot /usr/share/puppet/rack/puppetmasterd/public/
+        RackBaseURI /
+        <Directory /usr/share/puppet/rack/puppetmasterd/>
+                Options None
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+EOF
+
+}
+
+install_puppet () {
+
+    case "$OS" in
+	"Debian")
+            local repository=$(add_main_repository $DIST)
+	    cat > ${dir}/etc/apt/sources.list.d/$RELEASE-backport.list <<EOF
+deb $repository ${RELEASE}-backports main
+EOF
+            ;;
+	"Ubuntu")
+	    ;;
+    esac
+
+    update_repositories $dir
+
+    case "$OS" in
+	"Debian" | "Ubuntu")
+	    do_chroot ${dir} wget --no-verbose http://apt.puppetlabs.com/puppetlabs-release-$RELEASE.deb
+	    do_chroot ${dir} dpkg -i puppetlabs-release-$RELEASE.deb
+	    do_chroot ${dir} rm puppetlabs-release-$RELEASE.deb
+	    do_chroot ${dir} apt-get update
+	    PACKAGES="puppetmaster puppetmaster-passenger puppet augeas-tools git ntp puppetdb-terminus"
+	    install_packages_disabled $dir $PACKAGES
+	    do_chroot ${dir} a2dissite puppetmaster
+	    ;;
+	"RedHatEnterpriseServer")
+	    add_puppet_repository $DIST
+	    add_epel_repository $DIST
+	    attach_pool_rh_cdn $dir $RHN_CDN_POOL_ID
+	    add_rh_cdn_repo $dir rhel-7-server-optional-rpms
+            rh_install_passenger
+	    remove_epel_repository $DIST
+	    remove_puppet_repository $DIST
+	    ;;
+	"CentOS")
+	    add_puppet_repository $DIST
+	    add_epel_repository $DIST
+            rh_install_passenger
+	    remove_epel_repository $DIST
+	    remove_puppet_repository $DIST
+	    ;;
+	*)
+	    fatal_error "OS ($OS) or Release $(RELEASE) not supported"
+	    ;;
+    esac
+
+    do_chroot ${dir} rm -rf /var/lib/puppet/ssl/* || :
+}
+
+install_puppet
+
+# Puppet Board
+
+mkdir -p $dir/var/www/puppetboard
+
+cat > $dir/var/www/puppetboard/wsgi.py <<EOF
+from __future__ import absolute_import
+import os
+
+# Needed if a settings.py file exists
+os.environ['PUPPETBOARD_SETTINGS'] = '/var/www/puppetboard/settings.py'
+from puppetboard.app import app as application
+EOF
+
+case "$OS" in
+    "Debian" | "Ubuntu")
+        install_packages $dir python-pip libapache2-mod-wsgi
+        do_chroot $dir pip install puppetboard
+        cat > $dir/etc/apache2/sites-available/puppetboard <<EOF
+NameVirtualHost *:82
+Listen 82
+
+<VirtualHost *:82>
+    WSGIDaemonProcess puppetboard user=www-data group=www-data threads=5
+    WSGIScriptAlias / /var/www/puppetboard/wsgi.py
+    ErrorLog /var/log/apache2/puppetboard.error.log
+    CustomLog /var/log/apache2/puppetboard.access.log combined
+
+    Alias /static /usr/local/lib/python2.7/dist-packages/puppetboard/static
+
+    <Directory /usr/local/lib/python2.7/dist-packages/puppetboard>
+        WSGIProcessGroup puppetboard
+        WSGIApplicationGroup %{GLOBAL}
+        Order deny,allow
+        Allow from all
+    </Directory>
+</VirtualHost>
+EOF
+        ;;
+    "CentOS"|"RedHatEnterpriseServer")
+        # TODO FL [Sat Jun  7 17:13:39 2014]
+        # need to find a way to install mod-wsgi and pip
+        cat > $dir/etc/httpd/conf.d/puppetboard <<EOF
+NameVirtualHost *:82
+Listen 82
+
+<VirtualHost *:82>
+    WSGIDaemonProcess puppetboard user=apache group=apache threads=5
+    WSGIScriptAlias / /var/www/puppetboard/wsgi.py
+    ErrorLog /var/log/httpd/puppetboard.error.log
+    CustomLog /var/log/httpd/puppetboard.access.log combined
+
+    Alias /static /usr/lib/python2.6/site-packages/puppetboard/static
+
+    <Directory /usr/lib/python2.6/site-packages/puppetboard>
+        WSGIProcessGroup puppetboard
+        WSGIApplicationGroup %{GLOBAL}
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
+        ;;
+esac
