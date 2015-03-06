@@ -23,12 +23,19 @@ ROLE=install-server-vm
 
 ORIG=$(cd $(dirname $0); pwd)
 
+. ${ORIG}/third_party_tools
 . ${ORIG}/functions
 
 update_repositories ${dir}
 
 case "$(package_tool)" in
     "yum")
+        # Puppet master
+        install_packages ${dir} ${PUPPET_REPO_URL}
+        install_packages ${dir} puppet-server
+        do_chroot ${dir} rm -rf /var/lib/puppet/ssl/* || :
+        remove_packages ${dir} puppetlabs-release-${PUPPET_REPO_VERSION}
+
         add_epel_repository $DIST
         install_packages ${dir} vim-enhanced openldap-devel python-devel postfix gcc bc monit ansible sshpass
         install_bup ${dir}
