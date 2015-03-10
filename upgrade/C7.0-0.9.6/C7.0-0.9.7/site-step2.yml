@@ -18,3 +18,5 @@
   gather_facts: no
   tasks:
   - include: tasks/submitconfigreview.yml
+  - name: Reinit the changed Jenkins service
+    shell: systemctl daemon-reload ; service jenkins restart
