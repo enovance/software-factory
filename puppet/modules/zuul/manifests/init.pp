@@ -31,6 +31,17 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_host'), $
     target  => '/srv/zuul/etc/status/public_html',
   }
 
+  package { $http:
+    ensure => present,
+  }
+
+  service {'webserver':
+    name    => $http,
+    ensure  => running,
+    enable  => 'true',
+    require => Package[$http],
+  }
+
   file {'/etc/httpd/conf.d/zuul.conf':
     ensure => file,
     mode   => '0640',
