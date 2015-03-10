@@ -28,33 +28,4 @@
     </LocationMatch>
 </VirtualHost>
 
-<VirtualHost *:8081>
-    ProxyVia On
-    ProxyRequests Off
 
-    ProxyPass /jenkins/ http://127.0.0.1:8082/jenkins/ nocanon retry=1 acquire=3000 timeout=600 Keepalive=On
-    ProxyPassReverse /jenkins/ http://127.0.0.1:8082/jenkins/
-
-    ProxyPreserveHost On
-    AllowEncodedSlashes NoDecode
-    <Proxy *>
-        Options FollowSymLinks MultiViews
-        AllowOverride All
-        Order allow,deny
-        allow from all
-    </Proxy>
-
-    <LocationMatch "/jenkins/">
-        RequestHeader unset X-Forwarded-User
-        AuthType mod_auth_pubtkt
-        TKTAuthLoginURL /auth/login
-        TKTAuthFakeBasicAuth on
-        TKTAuthDebug 1
-        AuthName "Jenkins"
-        require valid-user
-        RewriteEngine On
-        RewriteCond %{LA-U:REMOTE_USER} (.+)
-        RewriteRule .* - [E=RU:%1,NS]
-        RequestHeader set X-Forwarded-User %{RU}e
-    </LocationMatch>
-</VirtualHost>
