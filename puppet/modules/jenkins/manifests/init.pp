@@ -19,28 +19,7 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
 
   $jenkins_password = $settings['jenkins_password']
 
-  $http = "httpd"
   $provider = "systemd"
-  $httpd_user = "apache"
-  $htpasswd = "/etc/httpd/htpasswd"
-
-  file {'/etc/httpd/conf.d/ports.conf':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    source =>'puppet:///modules/jenkins/ports.conf',
-  }
-
-  file {'/etc/httpd/conf.d/jenkins.conf':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    content => template('jenkins/jenkins.site.erb'),
-    require => File['/etc/httpd/conf.d/ports.conf'],
-    notify => Service['webserver'],
-  }
 
   file {'/etc/init.d/jenkins':
     ensure  => 'absent',
@@ -49,8 +28,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
   file {'/lib/systemd/system/jenkins.service':
     ensure => file,
     mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
     content => template('jenkins/jenkins.service.erb'),
   }
 
@@ -70,15 +47,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
                 File['/var/cache/jenkins'],
                 File['/var/lib/jenkins/config.xml']]
    }
-
-  service {'webserver':
-    name    => $http,
-    ensure  => running,
-    enable  => 'true',
-    require => [Package[$http],
-                File['/etc/httpd/conf.d/jenkins.conf'],
-                File['/etc/httpd/conf.d/ports.conf']]
-  }
 
   user { 'jenkins':
     ensure  => present,
@@ -200,17 +168,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
     command => '/root/wait4jenkins.sh',
     timeout => 900,
     require => [File['wait4jenkins'],  Service['jenkins']],
-  }
-
-  exec {'jenkins_user':
-    command   => "/usr/bin/htpasswd -bc $htpasswd jenkins $jenkins_password",
-    require   => Package[$http],
-    subscribe => Package[$http],
-    creates => $htpasswd,
-  }
-
-  package { $http:
-    ensure => present,
   }
 
   bup::scripts{ 'jenkins_scripts':

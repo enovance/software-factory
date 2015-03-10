@@ -369,7 +369,7 @@ def replication_action(args, base_url, headers):
         resp = requests.post(url, headers=headers, data=json.dumps(info),
                              cookies=dict(auth_pubtkt=get_cookie(args)))
 
-    response(resp)
+    return response(resp)
 
 
 if __name__ == '__main__':

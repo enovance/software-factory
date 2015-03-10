@@ -14,12 +14,15 @@
 # under the License.
 
 class commonservices-apache ($cauth = hiera_hash('cauth', ''),
-                             $authenticated_only = hiera('authenticated_only', false)) {
+                             $authenticated_only = hiera('authenticated_only', false),
+                             $jenkins_settings = hiera_hash('jenkins', '')) {
 
   require hosts
 
   $http = "httpd"
   $httpd_user = "apache"
+  $htpasswd = "/etc/httpd/htpasswd"
+  $jenkins_password = $jenkins_settings['jenkins_password']
 
   file {'gateway_crt':
     path  => '/etc/httpd/conf.d/gateway.crt',
@@ -47,6 +50,13 @@ class commonservices-apache ($cauth = hiera_hash('cauth', ''),
     group  => $httpd_user,
     content => template('commonservices-apache/gateway.common'),
     notify => Service['webserver'],
+  }
+
+  exec {'jenkins_user':
+    command   => "/usr/bin/htpasswd -bc $htpasswd jenkins $jenkins_password",
+    require   => Package[$http],
+    subscribe => Package[$http],
+    creates => $htpasswd,
   }
 
   file {'00-ssl.conf':
