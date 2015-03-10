@@ -2,8 +2,9 @@
 
 RETRIES=0
 while true; do
-    wget --spider http://localhost:8082/jenkins/
-    [ $? -eq 0 ] && break
+    wget --spider http://localhost:8080/jenkins/
+    # Return code 6: -> Unauthenticated
+    [ $? -eq 6 ] && break
     let RETRIES=RETRIES+1
     [ "$RETRIES" == "90" ] && {
         ps afxww
