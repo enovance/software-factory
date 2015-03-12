@@ -491,4 +491,10 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     require => File['/home/gerrit/.ssh'],
   }
 
+  file { '/home/gerrit/site_path/etc/GerritSiteHeader.html':
+    ensure  => present,
+    owner   => 'gerrit',
+    group   => 'gerrit',
+    source  => 'puppet:///modules/gerrit/GerritSiteHeader.html',
+  }
 }

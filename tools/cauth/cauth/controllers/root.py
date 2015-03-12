@@ -39,27 +39,6 @@ LOGOUT_MSG = "You have been successfully logged " \
 logger = logging.getLogger(__name__)
 
 
-def clean_back(value):
-    """Returns an absolute url path that matches the valid path available.
-    """
-    valid_paths = ('/_jenkins/', '/_zuul/', '/_redmine/', '/_etherpad/',
-                   '/_paste/', '/_dashboard/')
-
-    uri = urllib.unquote_plus(value).decode("utf8")
-    parsed = urlparse(uri)
-    path = parsed.path
-    if not path.startswith('/_'):
-        if path[0] == '/':
-            path = '/_' + path[1:]
-        elif path[0] == '_':
-            path = '/' + path
-        else:
-            path = '/_' + path
-    if any(path.startswith(x) for x in valid_paths):
-        return path
-    return '/_r/'
-
-
 def signature(data):
     rsa_priv = RSA.load_key(conf.app['priv_key_path'])
     dgst = hashlib.sha1(data).digest()
@@ -103,7 +82,7 @@ def setup_response(username, back, email=None, lastname=None, keys=None):
                         max_age=conf.app['cookie_period'],
                         overwrite=True)
     response.status_code = 303
-    response.location = clean_back(back)
+    response.location = back
 
 
 class GithubController(object):

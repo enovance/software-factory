@@ -26,7 +26,7 @@ class TestGateway(unittest.TestCase):
         """
         subpaths = ["/r/", "/jenkins/", "/redmine/",
                     "/zuul/", "/etherpad/", "/paste/", "/docs/"]
-        url = "https://%s/" % config.GATEWAY_HOST
+        url = "https://%s/static/js/topmenu.js" % config.GATEWAY_HOST
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         for subpath in subpaths:
