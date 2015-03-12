@@ -162,6 +162,11 @@ do_chroot ${dir} mkdir -p /srv/lodgeit
 retry do_chroot ${dir} git clone ${PASTE_URL} /srv/lodgeit/lodgeit --depth 1
 do_chroot ${dir} bash -c "cd /srv/lodgeit/lodgeit && git checkout ${PASTE_VERSION}"
 
+cat << EOF | patch ${dir}/srv/lodgeit/lodgeit/lodgeit/views/layout.html
+11a12
+>     <script type="text/javascript" src="/static/js/topmenu.js"></script>
+EOF
+
 # Replace absolute URLs beginning with /static/
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/layout.html
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/advanced.html
@@ -202,6 +207,9 @@ ln -sf ${swarm_client} ${dir}/var/lib/jenkins/swarm-client-latest.jar
 # Jenkins Swarm plugin
 mkdir -p ${dir}/var/lib/jenkins/plugins
 http_fetch $JENKINS_SWARM_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_SWARM_PLUGIN_URL)
+
+# Jenkins theme plugin
+http_fetch $JENKINS_THEME_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_THEME_PLUGIN_URL)
 
 
 # install git-review for internal use
