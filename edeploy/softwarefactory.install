@@ -167,6 +167,12 @@ do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/advanced.html
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/pasting.html
 
+# Include topmenu in Paste
+cat << EOF | patch ${dir}/srv/lodgeit/lodgeit/lodgeit/views/layout.html
+11a12
+>     <script type="text/javascript" src="/static/js/topmenu.js"></script>
+EOF
+
 # install pysflib
 [ ! -d "${dir}/var/www" ] && mkdir ${dir}/var/www
 cp -r ../tools/pysflib ${dir}/var/www/pysflib
@@ -202,6 +208,9 @@ ln -sf ${swarm_client} ${dir}/var/lib/jenkins/swarm-client-latest.jar
 # Jenkins Swarm plugin
 mkdir -p ${dir}/var/lib/jenkins/plugins
 http_fetch $JENKINS_SWARM_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_SWARM_PLUGIN_URL)
+
+# Jenkins theme plugin
+http_fetch $JENKINS_THEME_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_THEME_PLUGIN_URL)
 
 
 # install git-review for internal use
