@@ -50,4 +50,11 @@ class lodgeit ($lodgeit = hiera_hash('lodgeit', '')) {
     target  => '/srv/lodgeit/lodgeit/lodgeit/static/',
   }
 
+  file { "/srv/lodgeit/lodgeit/lodgeit/views/layout.html":
+    ensure  => present,
+    mode    => '0755',
+    replace => true,
+    source =>'puppet:///modules/lodgeit/layout.html',
+  }
+
 }
