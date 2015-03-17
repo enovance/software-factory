@@ -30,7 +30,9 @@ import yaml
 
 import logging
 
+
 logging.getLogger("requests").setLevel(logging.WARNING)
+logging.captureWarnings(True)
 
 # Empty job for jenkins
 EMPTY_JOB_XML = """<?xml version='1.0' encoding='UTF-8'?>
@@ -83,7 +85,6 @@ def get_cookie(username, password):
 
 class Base(unittest.TestCase):
     pass
-
 
 class Tool:
     def __init__(self):
