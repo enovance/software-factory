@@ -130,7 +130,7 @@ Some dependencies needs to be installed on your local system to build the images
 .. code-block:: bash
 
  $ sudo apt-get update
- $ sudo apt-get install build-essential debootstrap pigz python-dev python-pip unzip graphviz curl git kpartx
+ $ sudo apt-get install build-essential debootstrap pigz python-dev python-pip unzip graphviz curl git kpartx python-yaml
  $ sudo pip install Sphinx oslosphinx
 
 You need to clone the Software Factory Git repository :
