@@ -420,6 +420,9 @@ def delete_user_from_projectgroups(project, user, group):
             logger.info("[gerrit] User is not dev, core, ptl, admin")
             abort(401)
         dev_mid = ge.get_group_member_id(dev_gid, mail=user)
+        # not found ? try by user
+        if not dev_mid:
+            dev_mid = ge.get_group_member_id(dev_gid, username=user)
         if dev_mid:
             ge.delete_group_member(dev_gid, dev_mid)
 
