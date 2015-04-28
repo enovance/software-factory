@@ -106,10 +106,11 @@ function build_role {
             else
                 ROLE_OUTPUT=/dev/stdout
             fi
-            sudo -H ${MAKE} EDEPLOY_ROLES_PATH=${EDEPLOY_ROLES} PREBUILD_EDR_TARGET=${EDEPLOY_ROLES_REL} ${ROLE_NAME} &> ${ROLE_OUTPUT}
+            echo ${PYSFLIB_REPO}
+            sudo -H  PYSFLIB_REPO=${PYSFLIB_REPO} ${MAKE} EDEPLOY_ROLES_PATH=${EDEPLOY_ROLES} PREBUILD_EDR_TARGET=${EDEPLOY_ROLES_REL} ${ROLE_NAME} &> ${ROLE_OUTPUT}
             echo ${ROLE_MD5} | sudo tee ${ROLE_FILE}.md5
             if [ -n "$VIRT" ]; then
-                echo "Upstream ${ROLE_NAME} is NOT similar ! I rebuild the qcow2 image."
+                echo "Upstream ${ROLE_NAME} is NOT similar !PYSFLIB_REPO I rebuild the qcow2 image."
                 build_img ${ROLE_FILE} ${INST}/${ROLE_NAME} $IMG_CFG
             fi
         fi

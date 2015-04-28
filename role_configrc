@@ -25,6 +25,10 @@ SWIFT_DOCS_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/sfdocs"
 EDEPLOY_PROJECT=https://github.com/enovance/edeploy.git
 EDEPLOY_ROLES_PROJECT=https://github.com/enovance/edeploy-roles.git
 
+# pysflib
+PYSFLIB_REPO=${PYSFLIB_REPO:=https://github.com/enovance/pysflib.git}
+PYSFLIB_COMMIT=${PYSFLIB_COMMIT:=master}
+
 # Edeploy source version
 ED_COMMIT=master
 ED_ROLES_COMMIT=master
@@ -45,7 +49,7 @@ UPSTREAM=${BUILD_DIR}/upstream
 INST=${BUILD_DIR}/install/${SF_VER}
 
 SF_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/softwarefactory.* ./edeploy/third_party_tools"
-SF_DEPS="${SF_DEPS} ./tools/pysflib/ ./tools/cauth/ ./tools/managesf/ ./docs/"
+SF_DEPS="${SF_DEPS} ./tools/cauth/ ./tools/managesf/ ./docs/"
 IS_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/install-server-vm.*"
 IS_DEPS="${IS_DEPS} ./upgrade/ ./puppet/ ./tests/ ./serverspec/ ./tools/ ./bootstraps/*.sh ./bootstraps/sfcreds.yaml"
 
