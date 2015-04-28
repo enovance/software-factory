@@ -188,7 +188,10 @@ EOF
 
 # install pysflib
 [ ! -d "${dir}/var/www" ] && mkdir ${dir}/var/www
-cp -r ../tools/pysflib ${dir}/var/www/pysflib
+PYSFLIB_REPO=${PYSFLIB_REPOSITORY_URL:-https://github.com/enovance/pysflib.git}
+PYSFLIB_COMMIT=${PYSFLIB_VERSION:-master}
+retry do_chroot ${dir} git clone $PYSFLIB_REPO /var/www/pysflib
+#cp -r ../tools/pysflib ${dir}/var/www/pysflib
 retry do_chroot ${dir} bash -c "cd /var/www/pysflib && pip install -r requirements.txt"
 do_chroot ${dir} bash -c "cd /var/www/pysflib && python setup.py install"
 
