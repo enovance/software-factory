@@ -25,6 +25,29 @@ SWIFT_DOCS_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/sfdocs"
 EDEPLOY_PROJECT=https://github.com/enovance/edeploy.git
 EDEPLOY_ROLES_PROJECT=https://github.com/enovance/edeploy-roles.git
 
+
+function latest_tag_or_master {
+    pushd /tmp/ > /dev/null
+    if [ -d testtag ]; then
+        rm -rf testtag/.git
+        rm -rf testtag
+    fi
+    git clone $1 testtag
+    cd testtag
+    git fetch --tags
+    # TODO deactivate the error output if no tag available
+    tagref=$(git rev-list --tags --max-count=1)
+    latestTag=$(git describe --tags ${tagref})
+    popd > /dev/null
+    echo ${latestTag:-master}
+}
+
+# pysflib
+PYSFLIB_REPO=${PYSFLIB_REPO:=https://github.com/enovance/pysflib.git}
+PYSFLIB_LATEST_TAG=$(latest_tag_or_master $PYSFLIB_REPO)
+# default deployment version is latest tag
+PYSFLIB_VERSION=${PYSFLIB_VERSION:=$PYSFLIB_LATEST_TAG}
+
 # Edeploy source version
 ED_COMMIT=master
 ED_ROLES_COMMIT=master
@@ -45,7 +68,7 @@ UPSTREAM=${BUILD_DIR}/upstream
 INST=${BUILD_DIR}/install/${SF_VER}
 
 SF_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/softwarefactory.* ./edeploy/third_party_tools"
-SF_DEPS="${SF_DEPS} ./tools/pysflib/ ./tools/cauth/ ./tools/managesf/ ./docs/"
+SF_DEPS="${SF_DEPS} ./tools/cauth/ ./tools/managesf/ ./docs/"
 IS_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/install-server-vm.*"
 IS_DEPS="${IS_DEPS} ./upgrade/ ./puppet/ ./tests/ ./serverspec/ ./tools/ ./bootstraps/*.sh ./bootstraps/sfcreds.yaml"
 
