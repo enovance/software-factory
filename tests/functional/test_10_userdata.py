@@ -18,6 +18,7 @@ import requests
 
 from utils import Base
 from utils import ManageSfUtils
+from utils import skip
 
 from pysflib.sfredmine import RedmineUtils
 from pysflib.sfgerrit import GerritUtils
@@ -107,6 +108,17 @@ class TestUserdata(Base):
         self.logout()
         response = self.login('toto', 'nopass', '/')
         self.assertEqual(response.status_code, 401)
+
+    def test_create_local_user_and_login(self):
+        try:
+            self.msu.create_user('Flea', 'RHCP', 'flea@slapdabass.com')
+        except NotImplementedError:
+            skip("user management not supported in this version of managesf")
+        self.logout()
+        response = self.login('Flea', 'RHCP',
+                              'http%3a%2f%2ftests.dom%2fredmine%2fprojects')
+        expect_url = "http://{}/redmine/projects".format(config.GATEWAY_HOST)
+        self.assertEqual(expect_url, response.url)
 
     def test_nonmember_backlog_permissions(self):
         """Make sure project non members can see the backlog and add
