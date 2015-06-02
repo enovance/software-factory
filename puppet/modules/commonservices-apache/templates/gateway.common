@@ -84,8 +84,16 @@
     </LocationMatch>
 
      <LocationMatch "/api">
+        AuthType Basic
+        AuthName "Gerrit API"
+        AuthUserFile /var/www/managesf/htpasswd
+        require valid-user
+
         Order Allow,Deny
         Allow from <%= scope.function_hiera(["top_domain"]) %>
+
+        # Grant access based on password authentication or IP address
+        Satisfy any
     </LocationMatch>
 
     <Directory /var/www>
