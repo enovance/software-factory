@@ -1,6 +1,29 @@
 # Change Log
 
-## 1.0.1 [unreleased]
+## 1.0.2 [unreleased]
+
+## 1.0.1 2015-06-03
+
+### Added
+
+- Add option to hide entries in the topmenu
+- Add for support of locally defined users via
+  managesf and cauth
+
+### Fixed
+
+- Add some defaults for the Redmine backlog plugin
+- Prevent 404 when direct access to gitweb
+- Set gerrit and redmine databases charsets to UTF8
+- Fix cookie state_mapping.db path
+- Skip role rebuilding if nothing changed
+
+### Changed
+
+- Managesf, pysflib and cauth has been externalized
+  from software-factory source code
+- Bump zuul version to the most recent one
+  (fd463c84bfb342701061fe383c6d17e7a1bd4786 # 15/05/2015)
 
 ## 1.0.0 2015-04-27
 
