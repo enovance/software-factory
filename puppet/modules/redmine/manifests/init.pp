@@ -150,7 +150,7 @@ class redmine ($settings = hiera_hash('redmine', ''),
     }
 
     exec {'redmine_backlog_install':
-      environment =>  ["labels=false", "story_trackers=Bug", "task_tracker=Task", 'HOME=/root'],
+      environment =>  ["labels=false", "story_trackers=Bug,Story", "task_tracker=Task", 'HOME=/root'],
       command     =>  'bundle exec rake redmine:backlogs:install RAILS_ENV=production',
       cwd         =>  '/usr/share/redmine/',
       path        =>  ['/bin', '/usr/bin', '/usr/local/bin'],
