@@ -47,6 +47,12 @@ case "$(package_tool)" in
 
      install_packages ${dir} ${DEVEL_PKGS}
 
+     # Install a secure platform to get rid of SSL warnings, needs gcc
+     retry do_chroot ${dir} pip install pyopenssl
+     retry do_chroot ${dir} pip install ndg-httpsclient
+     retry do_chroot ${dir} pip install pyasn1
+
+
      # Install SQLAlchemy for paste lodegit (not available in yum)
      # TODO(mhu) manage mirror choice with pip
      retry do_chroot ${dir} pip install SQLAlchemy
