@@ -111,7 +111,7 @@ URL_LIST="$URL_LIST $ZUUL_URL"
 
 # paste (lodgeit)
 PASTE_URL="https://git.openstack.org/openstack-infra/lodgeit"
-PASTE_VERSION=c69f555032 # latest commit as of 05. May 2014
+PASTE_VERSION=c38c5ee66f # latest commit as of 03 Jun 2015
 
 GIT_REPO_LIST="$GIT_REPO_LIST $PASTE_URL"
 
