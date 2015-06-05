@@ -36,6 +36,11 @@ do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs
 # Install the most recent version of PIP at early stage
 retry do_chroot ${dir} pip install -U pip
 
+# Install a secure platform to get rid of SSL warnings
+retry do_chroot ${dir} pip install pyopenssl
+retry do_chroot ${dir} pip install ndg-httpsclient
+retry do_chroot ${dir} pip install pyasn1
+
 case "$(package_tool)" in
   "yum")
      # The puppetlas-release package install repo desc for puppet in yum
