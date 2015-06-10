@@ -32,6 +32,11 @@ function http_fetch {
     # We retry 12 times with 10 seconds delay between retries
     curl --silent --show-error --retry 12 --retry-delay 10 -L -o $local_location $remote_location
     curl_result=$?
+    if [ "$curl_result" -e "18" ]; then
+        echo "Warning! $remote_location is advertising bad content length, retrying with HTTP1.0"
+        curl --silent -0 --show-error --retry 12 --retry-delay 10 -L -o $local_location $remote_location
+        curl_result=$?
+    fi
     if [ "$curl_result" -ne "0" ]; then
         echo "curl failed to fetch $remote_location with error $curl_result"
         exit $curl_result
