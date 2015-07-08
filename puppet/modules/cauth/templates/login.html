@@ -35,7 +35,7 @@
                         </div>
                     % endif
                         <div class="btn-group input-group btn-group-justified" data-toggle="buttons">
-                            <a href='/auth/login/github?back=${back}' class="btn btn-primary" target="_top">
+                            <a href='/auth/login/?back=${back}&method=Github' class="btn btn-primary" target="_top">
                                 <i class="fa fa-lg fa-github"></i>
                                 &nbsp;&nbsp;Log in with Github
                                 <i class="fa fa-sign-in fa-fw"></i>
@@ -60,7 +60,8 @@
                             </div>
 
                             <input type="hidden" name="back" value="${back}">
-
+                            <input type="hidden" name="method" value="Password">
+                            
                             <button type="submit" class="btn btn-primary col-md-12">
                                 Internal Login
                                 <i class="fa fa-sign-in fa-fw"></i>
