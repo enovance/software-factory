@@ -10,9 +10,9 @@ echo "PREPARE SUBPROJECTS DIRECTORIES"
 [ $IN_ZUUL -eq 1 ] && echo "Triggered by Zuul ..."
 
 # Just before a TAG of SF please target to point on tags for deps too
-PYSFLIB_REV=${PYSFLIB_REV:="master"}
-CAUTH_REV=${CAUTH_REV:="master"}
-MANAGESF_REV=${MANAGESF_REV:="master"}
+PYSFLIB_REV=${PYSFLIB_REV:="0.2.0"}
+CAUTH_REV=${CAUTH_REV:="0.4.0"}
+MANAGESF_REV=${MANAGESF_REV:="0.4.0"}
 
 # Default paths to find cloned dependencies
 PYSFLIB_CLONED_PATH=${PYSFLIB_CLONED_PATH:="${PWD}/../deps/pysflib"}
