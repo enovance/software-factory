@@ -103,4 +103,36 @@ class managesf ($gerrit = hiera_hash('gerrit', ''),
     require => File['/var/www/managesf/'],
   }
 
+  file {'/usr/share/httpd/.ssh':
+    ensure  => directory,
+    mode    => '0777',
+    owner   => 'apache',
+    group   => 'apache',
+    require => [User['apache'], Group['apache']],
+  }
+
+  exec {'update_gerritip_knownhost':
+    command => "/usr/bin/ssh-keyscan -p 29418 $gip >> /usr/share/httpd/.ssh/known_hosts",
+    logoutput => true,
+    user => 'apache',
+    require => File['/usr/share/httpd/.ssh'],
+    unless => '/usr/bin/grep "$gip" /usr/share/httpd/.ssh/known_hosts',
+  }
+
+  exec {'update_gerrithost_knownhost':
+    command => "/usr/bin/ssh-keyscan -p 29418 $gh >> /usr/share/httpd/.ssh/known_hosts",
+    logoutput => true,
+    user => 'apache',
+    require => File['/usr/share/httpd/.ssh'],
+    unless => '/usr/bin/grep "$gh" /usr/share/httpd/.ssh/known_hosts',
+  }
+
+  file { '/var/www/managesf/sshconfig':
+    ensure  => directory,
+    owner   => $httpd_user,
+    group   => $httpd_user,
+    mode    => '0640',
+    require => File['/var/www/managesf/'],
+  }
+
 }
