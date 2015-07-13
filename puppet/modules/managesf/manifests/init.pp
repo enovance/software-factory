@@ -103,4 +103,13 @@ class managesf ($gerrit = hiera_hash('gerrit', ''),
     require => File['/var/www/managesf/'],
   }
 
+  file { '/var/www/managesf/gerrit_ssh_key':
+    ensure  => present,
+    owner   => 'gerrit',
+    group   => 'gerrit',
+    mode    => '0600',
+    source  => 'puppet:///modules/gerrit/gerrit_service_rsa',
+    require => File['/var/www/managesf/'],
+  }
+
 }
