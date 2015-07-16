@@ -85,11 +85,13 @@ function generate_creds_yaml {
     MYSQL_ROOT_SECRET=$(generate_random_pswd 8)
     REDMINE_MYSQL_SECRET=$(generate_random_pswd 8)
     GERRIT_MYSQL_SECRET=$(generate_random_pswd 8)
+    NODEPOOL_MYSQL_SECRET=$(generate_random_pswd 8)
     ETHERPAD_MYSQL_SECRET=$(generate_random_pswd 8)
     LODGEIT_MYSQL_SECRET=$(generate_random_pswd 8)
     sed -i "s#MYSQL_ROOT_PWD#${MYSQL_ROOT_SECRET}#" ${OUTPUT}/sfcreds.yaml
     sed -i "s#REDMINE_SQL_PWD#${REDMINE_MYSQL_SECRET}#" ${OUTPUT}/sfcreds.yaml
     sed -i "s#GERRIT_SQL_PWD#${GERRIT_MYSQL_SECRET}#" ${OUTPUT}/sfcreds.yaml
+    sed -i "s#NODEPOOL_SQL_PWD#${NODEPOOL_MYSQL_SECRET}#" ${OUTPUT}/sfcreds.yaml
     sed -i "s#ETHERPAD_SQL_PWD#${ETHERPAD_MYSQL_SECRET}#" ${OUTPUT}/sfcreds.yaml
     sed -i "s#LODGEIT_SQL_PWD#${LODGEIT_MYSQL_SECRET}#" ${OUTPUT}/sfcreds.yaml
     # Default authorized ssh keys on each node

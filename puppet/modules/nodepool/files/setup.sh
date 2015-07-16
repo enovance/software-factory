@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "ssh-dss AAAAB3NzaC1kc3MAAACBAKR5MhCU7pP4O1XEPFM0mrz2O6xLShIW4nrOlSaj+emNFCqB/Dke43DCu1mZC+6MpNJVGa+IcMYQUptTEmYvtXMiVVTIZfOtagDlB8iXfHBAqYfOybAstnusMu39XeAg/lJWdpaiFBYVzMxgdFafdUSQDZtxolog1kbHhati/Nm7AAAAFQCloZ6vE4lN04fUmLlz+6VlQkiazwAAAIEAows4vjtT/5mR2HNBeBqHkY+EgzBtDaAKP7nXThzLwFHC78Xshi84EgbXBlnmclCESCeABamaSE8vMwGXupJsGlZpwVq0twz4sHKAxQhtx9PzYnAT3HaF9poobgVo0G+HFZUvD2NrKkF1iaqInEC+ilAGW2dcFXMGRC9U71WVnrwAAACAUzXPIpLJvxRTzW0JLp5oT2GTqRWvYs7d+USIXnRyj2Jp7pIb/hZ3LxAf6v8n5IqlQ47TtMI0mOi4XlCdT/n4zNJnSzPmopG69HRduv9TIaK7IlLYTZ3JYjF48r4Jt47Ua/cD85pXzNEnT7adW9Zz48yiuUoLmN7lDq+bZcEBb6w= ubuntu@sf" >> /home/fedora/.ssh/authorized_keys
+sudo chown fedora /home/fedora/.ssh/authorized_keys
+
+sudo useradd -m jenkins
+sudo mkdir /home/jenkins/.ssh
+sudo cp /home/fedora/.ssh/authorized_keys /home/jenkins/.ssh/authorized_keys
+sudo chown jenkins /home/jenkins/.ssh
+sudo chown jenkins /home/jenkins/.ssh/authorized_keys
