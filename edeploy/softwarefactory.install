@@ -237,6 +237,8 @@ http_fetch $JENKINS_SWARM_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $
 # Jenkins theme plugin
 http_fetch $JENKINS_THEME_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_THEME_PLUGIN_URL)
 
+# Jenkins ZMQ event plugin
+http_fetch $JENKINS_ZMQ_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_ZMQ_PLUGIN_URL)
 
 # install git-review for internal use
 retry do_chroot ${dir} pip install git-review
