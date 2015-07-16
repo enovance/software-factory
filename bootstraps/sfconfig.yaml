@@ -71,3 +71,13 @@ authenticated_only: false
 topmenu_hide_redmine: false
 topmenu_hide_etherpad: false
 topmenu_hide_paste: false
+
+# Nodepool configuration
+# You need to set the correct OpenStack credentials to enable Nodepool support
+nodepool_os_username: 'username'
+nodepool_os_password: 'secret'
+nodepool_os_project_id: 'tenantname'
+nodepool_os_auth_url: 'http://devstack:35357/v2.0'
+nodepool_os_pool: 'nova'
+nodepool_os_image: 'centos7'
+nodepool_os_image_username: 'centos'
