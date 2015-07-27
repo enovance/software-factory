@@ -225,6 +225,7 @@ function prepare_etc_puppet {
     cp $DATA/service_rsa.pub /root/.ssh/id_rsa.pub
     cp $DATA/jenkins_rsa /etc/puppet/environments/sf/modules/jenkins/files/
     cp $DATA/jenkins_rsa /etc/puppet/environments/sf/modules/zuul/files/
+    [ ! -d /etc/puppet/environments/sf/modules/nodepool/files/ ] && mkdir /etc/puppet/environments/sf/modules/nodepool/files/
     cp $DATA/jenkins_rsa.pub /etc/puppet/environments/sf/modules/nodepool/files/
     cp $DATA/gerrit_admin_rsa /etc/puppet/environments/sf/modules/jenkins/files/
     cp $DATA/gerrit_service_rsa /etc/puppet/environments/sf/modules/gerrit/files/
