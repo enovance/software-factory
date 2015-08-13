@@ -24,7 +24,9 @@ sudo pip install zuul gitdb
 
 # For testing using the local Gerrit instance. Needs to be accessible from the
 # slave nodes, thus a public IP is required
-echo '<%= scope.function_hiera(["public_ip"]) %> <%= scope.function_hiera(["top_domain"]) %>' | sudo tee --append /etc/hosts
+echo '$NODEPOOL_SF_PUBLICIP $NODEPOOL_SF_TOPDOMAIN' | sudo tee --append /etc/hosts
 
 # sync FS, otherwise there are 0-byte sized files from the yum/pip installations
 sudo sync
+
+echo "Base setup done."
