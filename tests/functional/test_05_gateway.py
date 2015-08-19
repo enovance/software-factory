@@ -46,8 +46,8 @@ class TestGateway(Base):
         """ Test if Gerrit is accessible on gateway hosts
         """
 
-        urls = ["https://%s/r/" % config.GATEWAY_HOST,
-                "https://%s/r/#/" % config.GATEWAY_HOST]
+        urls = ["https://%s/r/a" % config.GATEWAY_HOST,
+                "https://%s/r/login" % config.GATEWAY_HOST]
 
         for url in urls:
 
@@ -57,6 +57,14 @@ class TestGateway(Base):
                 url,
                 cookies=dict(
                     auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+            self.assertEqual(resp.status_code, 200)
+            self.assertTrue('<title>Gerrit Code Review</title>' in resp.text)
+
+        urls = ["https://%s/r/" % config.GATEWAY_HOST,
+                "https://%s/r/#/" % config.GATEWAY_HOST]
+
+        for url in urls:
+            resp = requests.get(url)
             self.assertEqual(resp.status_code, 200)
             self.assertTrue('<title>Gerrit Code Review</title>' in resp.text)
 
