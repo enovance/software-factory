@@ -1,15 +1,18 @@
-    <LocationMatch "/r/(?!(.*/(info/refs|git-upload-pack)$))">
-        RewriteEngine On
-        RewriteCond %{REQUEST_URI} ^/r/logout$
-        RewriteCond %{QUERY_STRING} (^.*$)
-        RewriteCond %1 ^$
-        RewriteRule logout <%= @cauth["signout_url"] %>?service=gerrit [R,L,CO=GerritAccount:;:;:0:/r]
+    <LocationMatch "/r/(?!(logout|login))">
+	RewriteEngine On
+	RewriteCond %{HTTP_COOKIE} !^.*GerritAccount.*$ [NC]
+	RewriteCond %{HTTP_COOKIE} ^.*auth_pubtkt.*$ [NC]
+	RewriteRule ^(.*)$ /r/login [R,NC,L]
+    </LocationMatch>
 
-        RewriteCond %{REQUEST_URI} ^/r/logout$
-        RewriteCond %{QUERY_STRING} ^services=(.*)$
-        RewriteCond %1 !^$
-        RewriteRule logout <%= @cauth["signout_url"] %>?services=%1 [R,L,CO=GerritAccount:;:;:0:/r]
+    <LocationMatch "/r/(?!(logout|login))">
+	RewriteEngine On
+	RewriteCond %{HTTP_COOKIE} ^.*GerritAccount.*$ [NC]
+	RewriteCond %{HTTP_COOKIE} !^.*auth_pubtkt.*$ [NC]
+	RewriteRule ^(.*)$ /r/logout [R,NC,L]
+    </LocationMatch>
 
+    <LocationMatch "/r/login">
         Order Allow,Deny
         Allow from all
 
