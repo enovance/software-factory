@@ -46,12 +46,14 @@
 
     <LocationMatch "/jenkins/">
         RequestHeader unset X-Forwarded-User
-        AuthType mod_auth_pubtkt
-        TKTAuthLoginURL /auth/login
-        TKTAuthFakeBasicAuth on
-        TKTAuthDebug 1
-        AuthName "Jenkins"
-        require valid-user
+        <If "%{HTTP_COOKIE} =~ /auth_pubtkt=.*/">
+            AuthType mod_auth_pubtkt
+            TKTAuthLoginURL /auth/login
+            TKTAuthFakeBasicAuth on
+            TKTAuthDebug 1
+            AuthName "Jenkins"
+            require valid-user
+        </If>
         RewriteEngine On
         RewriteCond %{LA-U:REMOTE_USER} (.+)
         RewriteRule .* - [E=RU:%1,NS]
