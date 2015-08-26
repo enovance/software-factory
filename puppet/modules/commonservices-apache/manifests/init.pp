@@ -14,9 +14,12 @@
 # under the License.
 
 class commonservices-apache ($cauth = hiera_hash('cauth', ''),
+                             $jenkins_settings = hiera_hash('jenkins', ''),
                              $authenticated_only = hiera('authenticated_only', false)) {
 
+
   require hosts
+  $htpasswd = "/etc/httpd/htpasswd"
 
   $http = "httpd"
   $httpd_user = "apache"
@@ -153,6 +156,14 @@ class commonservices-apache ($cauth = hiera_hash('cauth', ''),
     mode   => '0640',
     owner  => $httpd_user,
     group  => $httpd_user,
+  }
+
+  $jenkins_password = $jenkins_settings['jenkins_password']
+  exec {'jenkins_user':
+    command   => "/usr/bin/htpasswd -bc $htpasswd jenkins $jenkins_password",
+    require   => Package[$http],
+    subscribe => Package[$http],
+    creates => $htpasswd,
   }
 
 }

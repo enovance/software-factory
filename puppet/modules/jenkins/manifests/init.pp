@@ -24,24 +24,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
   $httpd_user = "apache"
   $htpasswd = "/etc/httpd/htpasswd"
 
-  file {'/etc/httpd/conf.d/ports.conf':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    source =>'puppet:///modules/jenkins/ports.conf',
-  }
-
-  file {'/etc/httpd/conf.d/jenkins.conf':
-    ensure => file,
-    mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
-    content => template('jenkins/jenkins.site.erb'),
-    require => File['/etc/httpd/conf.d/ports.conf'],
-    notify => Service['webserver'],
-  }
-
   file {'/etc/init.d/jenkins':
     ensure  => 'absent',
   }
@@ -49,8 +31,8 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
   file {'/lib/systemd/system/jenkins.service':
     ensure => file,
     mode   => '0640',
-    owner  => $httpd_user,
-    group  => $httpd_user,
+    owner => "jenkins",
+    group => "jenkins",
     content => template('jenkins/jenkins.service.erb'),
   }
 
@@ -75,9 +57,7 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
     name    => $http,
     ensure  => running,
     enable  => 'true',
-    require => [Package[$http],
-                File['/etc/httpd/conf.d/jenkins.conf'],
-                File['/etc/httpd/conf.d/ports.conf']]
+    require => Package[$http]
   }
 
   user { 'jenkins':
@@ -220,13 +200,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
     command => '/root/wait4jenkins.sh',
     timeout => 900,
     require => [File['wait4jenkins'],  Service['jenkins']],
-  }
-
-  exec {'jenkins_user':
-    command   => "/usr/bin/htpasswd -bc $htpasswd jenkins $jenkins_password",
-    require   => Package[$http],
-    subscribe => Package[$http],
-    creates => $htpasswd,
   }
 
   package { $http:

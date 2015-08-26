@@ -8,7 +8,7 @@ export EDEPLOY_ROLES=/var/lib/sf/roles/
 
 MANAGESF_URL=http://managesf.${SF_SUFFIX}
 hostname | grep -q sfstack && JENKINS_IP=$(hostname | sed -e 's/sfstack-[^-]*-//' -e 's/-/./g') || JENKINS_IP=localhost
-JENKINS_URL="http://${JENKINS_IP}:8081/"
+JENKINS_URL="http://managesf.${SF_SUFFIX}/jenkins-api/"
 
 GERRIT_PROJECT=${GERRIT_PROJECT-sf}
 CURRENT_BRANCH=`git branch | sed -n -e 's/^\* \(.*\)/\1/p'`

@@ -45,7 +45,7 @@ describe service('jenkins') do
   it { should be_enabled }
 end
 
-describe port(8080) do
+describe port(8082) do
   it { should be_listening }
 end
 
