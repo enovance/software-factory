@@ -2,8 +2,6 @@
 #
 PREVIOUS_SF_REL=1.0.2
 SF_REL=1.0.3
-DVER=C7.0
-DIST=centos
 
 # Set this variable to 1 if we tag and set it back to 0 the commit after the tag
 TAGGED_RELEASE=0
@@ -14,10 +12,6 @@ CAUTH_PINNED_VERSION=0.5.0
 
 export LC_ALL=C
 
-# Version string
-SF_VER=${DVER}-${SF_REL}
-PREVIOUS_SF_VER=${DVER}-${PREVIOUS_SF_REL}
-
 SWIFT_BASE_URL="https://ca.enocloud.com:8080"
 SWIFT_ACCOUNT="84fb00023c0c445fb8e4ecc514bea76d"
 # Base roles cloud and install-server
@@ -27,64 +21,8 @@ SWIFT_SF_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/edeploy-roles"
 # Url where latest doc is stored
 SWIFT_DOCS_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/sfdocs"
 
-
-# Edeploy and Edeploy-roles project
-EDEPLOY_PROJECT=https://github.com/redhat-cip/edeploy.git
-EDEPLOY_ROLES_PROJECT=https://github.com/redhat-cip/edeploy-roles.git
-
-# Edeploy source version
-ED_COMMIT=master
-ED_ROLES_COMMIT=master
-
-# Qcow2 params
-IMG_CFG=params.virt
-
 # Paths
 WORKSPACE=/var/lib/sf
-CLONES_DIR=$WORKSPACE/git
-BUILD_DIR=$WORKSPACE/roles
-EDEPLOY=$WORKSPACE/git/edeploy/
-EDEPLOY_ROLES=$WORKSPACE/git/edeploy-roles/
+BUILD_DIR=$WORKSPACE/image
 
-CREATE_IMG=${EDEPLOY}/build/create-image.sh
-
-UPSTREAM=${BUILD_DIR}/upstream
-INST=${BUILD_DIR}/install/${SF_VER}
-
-PYSFLIB_CLONED_PATH="${PWD}/../deps/pysflib"
-CAUTH_CLONED_PATH="${PWD}/../deps/cauth"
-MANAGESF_CLONED_PATH="${PWD}/../deps/managesf"
-SUBPROJECTS_DEPS="$PYSFLIB_CLONED_PATH $CAUTH_CLONED_PATH $MANAGESF_CLONED_PATH"
-
-SF_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/softwarefactory.* ./edeploy/third_party_tools ./edeploy/fetch_subprojects.sh"
-SF_DEPS="${SF_DEPS} ./docs/"
-IS_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/install-server-vm.*"
-IS_DEPS="${IS_DEPS} ./upgrade/ ./puppet/ ./tests/ ./serverspec/ ./tools/ ./bootstraps/*.sh ./bootstraps/sfcreds.yaml"
-
-MAKE="make DVER=${DVER} DIST=${DIST} SF_REL=${SF_REL} EDEPLOY_PATH=${EDEPLOY} TOP=${BUILD_DIR}"
-
-function prepare_buildenv {
-    if [ ! -d $WORKSPACE ]; then
-        sudo mkdir -m 0770 $WORKSPACE
-        sudo chown ${USER}:root $WORKSPACE
-    fi
-
-    [ ! -d "$BUILD_DIR" ] && sudo mkdir -p $BUILD_DIR
-    [ ! -d "$UPSTREAM" ] && sudo mkdir -p $UPSTREAM
-    [ ! -d "$CLONES_DIR" ] && sudo mkdir -p $CLONES_DIR
-    sudo chown -R ${USER} ${CLONES_DIR}
-}
-
-function fetch_edeploy {
-    if [ ! -d "${EDEPLOY}" ]; then
-        git clone $EDEPLOY_PROJECT ${EDEPLOY}
-    fi
-    if [ ! -d "${EDEPLOY_ROLES}" ]; then
-        git clone $EDEPLOY_ROLES_PROJECT ${EDEPLOY_ROLES}
-    fi
-    # Make sure the correct tag is checked out
-    (cd ${EDEPLOY}; git checkout master && git pull && git checkout -B $ED_COMMIT $ED_COMMIT)
-    (cd ${EDEPLOY_ROLES}; git checkout master && git pull && git checkout -B $ED_ROLES_COMMIT $ED_ROLES_COMMIT)
-    EDEPLOY_ROLES_REL=$(cd ${EDEPLOY_ROLES}; ${MAKE} version)
-    echo
-}
+SF_IMG=${BUILD_DIR}/software-factory-${SF_REL}

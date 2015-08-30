@@ -40,7 +40,7 @@ class TestUserdata(Base):
             config.REDMINE_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
         self.gu = GerritUtils(
-            'https://%s/' % config.GATEWAY_HOST,
+            'http://%s/' % config.GATEWAY_HOST,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def tearDown(self):
@@ -67,11 +67,11 @@ class TestUserdata(Base):
         self.assertEqual(config.USERS[login]['email'], user.mail)
 
     def logout(self):
-        url = 'https://{}/auth/logout/'.format(config.GATEWAY_HOST)
+        url = 'http://{}/auth/logout/'.format(config.GATEWAY_HOST)
         requests.get(url)
 
     def login(self, username, password, redirect='/'):
-        url = "https://%s/auth/login" % config.GATEWAY_HOST
+        url = "http://%s/auth/login" % config.GATEWAY_HOST
         data = {'username': username,
                 'password': password,
                 'back': redirect}

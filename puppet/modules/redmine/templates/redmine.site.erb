@@ -1,6 +1,7 @@
-NameVirtualHost *:80
+NameVirtualHost *:8090
+Listen 8090
 
-<VirtualHost *:80>
+<VirtualHost *:8090>
   ServerName <%= scope.function_hiera(["api_redmine_host"]) %>
 
   LogLevel warn
@@ -30,7 +31,7 @@ NameVirtualHost *:80
   </Directory>
 </VirtualHost>
 
-<VirtualHost *:80>
+<VirtualHost *:8090>
   ServerName <%= scope.function_hiera(["redmine_host"]) %>
   ServerAlias <%= scope.function_hiera(["top_domain"]) %> *.<%= scope.function_hiera(["top_domain"]) %>
   ServerAdmin webmaster@localhost

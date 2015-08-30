@@ -448,10 +448,12 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     mode    => '0644',
     require => File['/home/gerrit/site_path/etc'],
   }
-  bup::scripts{ 'gerrit_scripts':
-    backup_script => 'gerrit/backup.sh.erb',
-    restore_script => 'gerrit/restore.sh.erb',
-  }
+
+  # TODO: multiple declaration errors
+  #bup::scripts{ 'gerrit_scripts':
+  #  backup_script => 'gerrit/backup.sh.erb',
+  #  restore_script => 'gerrit/restore.sh.erb',
+  #}
 
   # /home/gerrit/.ssh/known_hosts_gerrit should be updated by managesf
   # this triggers a Gerrit restart, which is required to clear the internal

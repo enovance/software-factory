@@ -85,7 +85,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_host'), $
     require => [User['zuul'], Group['zuul']],
   }
 
-  exec {'update_gerritip_knownhost':
+  exec {'zuul_update_gerritip_knownhost':
     command => "/usr/bin/ssh-keyscan -p 29418 $gip >> /home/zuul/.ssh/known_hosts",
     logoutput => true,
     user => 'zuul',
@@ -93,7 +93,7 @@ class zuul ($settings = hiera_hash('jenkins', ''), $gh = hiera('gerrit_host'), $
     unless => '/usr/bin/grep "$gip" /home/zuul/.ssh/known_hosts',
   }
 
-  exec {'update_gerrithost_knownhost':
+  exec {'zuul_update_gerrithost_knownhost':
     command => "/usr/bin/ssh-keyscan -p 29418 $gh >> /home/zuul/.ssh/known_hosts",
     logoutput => true,
     user => 'zuul',

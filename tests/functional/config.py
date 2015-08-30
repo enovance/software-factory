@@ -2,20 +2,25 @@ from os import path
 
 import yaml
 
-sfconfig_filenames = ["../sfconfig.yaml", "/root/sfconfig.yaml"]
+sfconfig_filenames = ["../../build/hiera/sfconfig.yaml", "/root/sfconfig.yaml"]
+sfconfig = None
 for sfconfig_filename in sfconfig_filenames:
     if path.exists(sfconfig_filename):
         with open(sfconfig_filename) as infile:
             sfconfig = yaml.load(infile)
+        break
+
+if sfconfig is None:
+    raise RuntimeError("Can't find build dectory of test env")
 
 # Software Factory source code root directory is the third directory
 # below this file
 SF_ROOT = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
 
 GATEWAY_HOST = sfconfig['domain']
-GATEWAY_URL = 'https://%s/' % GATEWAY_HOST
-JENKINS_URL = 'https://%s/jenkins/' % GATEWAY_HOST
-REDMINE_URL = 'https://%s/redmine/' % GATEWAY_HOST
+GATEWAY_URL = 'http://%s/' % GATEWAY_HOST
+JENKINS_URL = 'http://%s/jenkins/' % GATEWAY_HOST
+REDMINE_URL = 'http://%s/redmine/' % GATEWAY_HOST
 
 GERRIT_USER = 'gerrit'
 GERRIT_SERVICE_PRIV_KEY_PATH = '%s/build/data/gerrit_service_rsa' \

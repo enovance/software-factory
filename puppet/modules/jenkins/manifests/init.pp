@@ -55,10 +55,10 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
   }
 
   file { "/var/cache/jenkins":
-      ensure => directory,
-      owner => "jenkins",
-      group => "jenkins",
-      require => [User['jenkins'], Group['jenkins']],
+    ensure => directory,
+    owner => "jenkins",
+    group => "jenkins",
+    require => [User['jenkins'], Group['jenkins']],
   }
 
   service { 'jenkins':
@@ -70,15 +70,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
                 File['/var/cache/jenkins'],
                 File['/var/lib/jenkins/config.xml']]
    }
-
-  service {'webserver':
-    name    => $http,
-    ensure  => running,
-    enable  => 'true',
-    require => [Package[$http],
-                File['/etc/httpd/conf.d/jenkins.conf'],
-                File['/etc/httpd/conf.d/ports.conf']]
-  }
 
   user { 'jenkins':
     ensure  => present,
@@ -229,12 +220,9 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
     creates => $htpasswd,
   }
 
-  package { $http:
-    ensure => present,
-  }
-
-  bup::scripts{ 'jenkins_scripts':
-    backup_script => 'jenkins/backup.sh.erb',
-    restore_script => 'jenkins/restore.sh.erb',
-  }
+  # TODO: multiple declaration errors
+  #bup::scripts{ 'jenkins_scripts':
+  #  backup_script => 'jenkins/backup.sh.erb',
+  #  restore_script => 'jenkins/restore.sh.erb',
+  #}
 }

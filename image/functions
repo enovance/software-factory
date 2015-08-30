@@ -1,7 +1,4 @@
-# -*- shell-script -*-
-
-ORIG=${SDIR}/build
-SRC=$(cd $(dirname $0); pwd)
+#!/bin/sh
 
 function put_git_mark {
     local dir=$1
@@ -19,7 +16,6 @@ function install_bup {
         # This is only usage on yum based dist
         return
     fi
-    install_packages ${dir} "cpp gcc python-devel pyxattr pylibacl perl-Time-HiRes"
     do_chroot ${dir} mkdir -p /opt/bup
     do_chroot ${dir} git clone ${BUP_URL} /opt/bup/
     do_chroot ${dir} bash -c 'cd /opt/bup && git checkout ${BUP_VERSION}'
@@ -60,4 +56,24 @@ function http_fetch {
     retry _http_fetch "$@"
 }
 
-. ${ORIG}/functions
+function do_umount {
+    if [ ! -z "${dir}" ] && [ "${dir}" != "/" ]; then
+        grep -q "${dir}/proc" /proc/mounts && umount ${dir}/proc || true
+        grep -q "${dir}/dev" /proc/mounts && umount ${dir}/dev   || true
+    fi
+}
+trap do_umount EXIT
+
+function do_chroot {
+    croot=$1
+    shift
+    chroot $croot "${@}"
+}
+
+function install_packages {
+    croot=$1
+    shift
+    yum -y --releasever=7 --installroot=${croot} install "${@}"
+}
+
+

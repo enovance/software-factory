@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
@@ -13,20 +14,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+set -x
+set -e
 
-class ntpserver ($settings = hiera_hash('ntpserver', '')) {
-    case $hostname {
-        'puppetmaster' : {
-            # ntp class can't be found...
-#            class { '::ntp':
-#                    servers => [$settings['reference_server'], ],
-#                    restrict => ['redmine', 'mysql', 'gerrit', 'jenkins', 'slave', 'managesf'],
-#            }
-        }
-        default : {
-#            class { '::ntp':
-#                    servers => ['puppetmaster',  ],
-#            }
-        }
-    }
-}
+. ../../role_configrc
+
+if [ ! -d $SF_IMG ]; then
+    echo "$SF_IMG missing, build or fetch image"
+    exit 1
+fi
+
+# prepare template
+# call heat stack
+exit 0

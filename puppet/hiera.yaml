@@ -1,5 +1,5 @@
 :yaml:
-  :datadir: /etc/puppet/hiera/%{::environment}/
+  :datadir: /etc/puppetsf/hiera/
 :hierarchy:
   - sf_version
   - monit
@@ -7,8 +7,6 @@
   - ssh
   - ssh_gerrit
   - ssh_jenkins
-  - edeploy_client
-  - edeploy_server
   - postfix
   - "%{::clientcert}"
   - bup

@@ -58,30 +58,14 @@ class redmine ($settings = hiera_hash('redmine', ''),
       owner  => $httpd_user,
       group  => $httpd_user,
       content => template('redmine/redmine.site.erb'),
-    }
-
-    service {'webserver':
-      name       => $http,
-      ensure     => running,
-      enable     => true,
-      hasrestart => true,
-      hasstatus  => true,
-      subscribe  => [File['/etc/httpd/conf.d/redmine.conf'],
-                     File['/etc/httpd/conf.modules.d/passenger.conf'],
-                     Exec['redmine_backlog_install'],
-                     Exec['plugin_install'],
-                     Exec['set_url_root']],
-      require => Exec['chown_redmine'],
+      require => File['/etc/httpd/conf.modules.d/passenger.conf'],
+      notify => Service['webserver'],
     }
 
     exec { 'chown_redmine':
       path    => '/usr/bin/:/bin/',
       command => "chown -R $httpd_user:$httpd_user /usr/share/redmine",
       unless  => 'stat -c %U /usr/share/redmine | grep apache'
-    }
-
-    package { $http:
-        ensure => 'installed',
     }
 
     file { '/root/post-conf-in-mysql.sql':

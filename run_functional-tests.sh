@@ -1,144 +1,204 @@
 #!/bin/bash
 
-# Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may
-# not use this file except in compliance with the License. You may obtain
-# a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations
-# under the License.
-
-# This script will build if needed the roles for software-factory
-# Then will start the SF in LXC containers
-# Then will run the serverspecs and functional tests
-
-source functestslib.sh
-. role_configrc
-
-echo "Running functional-tests with this HEAD"
-display_head
-
-# This prevent the bootstrap LXC script to set up IP MASQUERADE
-# during the functional tests
-export IN_FUNC_TESTS=1
-
-function lxc_stop {
-    if [ ! ${SF_SKIP_BOOTSTRAP} ]; then
-        if [ ! ${DEBUG} ]; then
-            (cd bootstraps/lxc; ./start.sh destroy &> ${ARTIFACTS_DIR}/lxc-clean.output)
-        fi
-    fi
-}
-
-function build {
-    if [ ! ${SF_SKIP_BUILDROLES} ]; then
-        clear_mountpoint
-        ./build_roles.sh ${ARTIFACTS_DIR} || pre_fail "Roles building FAILED"
-    fi
-}
-
-function lxc_start {
-    if [ ! ${SF_SKIP_BOOTSTRAP} ]; then
-        clear_mountpoint
-        cd bootstraps/lxc
-        ./start.sh destroy &> ${ARTIFACTS_DIR}/lxc-stop.output
-        ./start.sh init &> ${ARTIFACTS_DIR}/lxc-start.output || pre_fail "LXC bootstrap FAILED"
-        cd -
-    fi
-}
-
-set -x
-prepare_artifacts
-checkpoint "Running tests on $(hostname)"
-(cd bootstraps/lxc; ./start.sh destroy &> ${ARTIFACTS_DIR}/lxc-first-clean.output)
-checkpoint "lxc-first-clean"
-build
-checkpoint "build_roles"
-if [ -z "$1" ]; then
-    # This test is run by default when no argument provided
-    lxc_start
-    checkpoint "lxc-start"
-    run_tests 15
-    checkpoint "run_tests"
+# Make sure this is run under sudo
+if [ -z "$SUDO_COMMAND" ] || [ "$UID" != "0" ]; then
+    exec sudo $0 $*
 fi
-if [ "$1" == "backup_restore_tests" ]; then
-    lxc_start
-    checkpoint "lxc-start"
-    run_backup_restore_tests 45 "provision" || pre_fail "Backup test: provision"
-    lxc_stop
-    lxc_start
-    run_backup_restore_tests 45 "check" || pre_fail "Backup test: check"
+
+. ./role_configrc
+
+CONTAINER_ROOT=/srv/software-factory-${SF_REL}
+CLEAN_CENTOS="${BUILD_DIR}/software-factory-${SF_REL}"
+
+if [ ! -d "${CLEAN_CENTOS}" ]; then
+    echo "Build image"
+    ./build_image.sh
 fi
-if [ "$1" == "upgrade" ]; then
-    cloned=/tmp/software-factory # The place to clone the previous SF version to deploy
-    (
-        [ -d $cloned ] && rm -Rf $cloned
-        git clone http://softwarefactory.enovance.com/r/software-factory $cloned
-        cd $cloned
-        # Be sure to checkout the right previous version
-        git checkout ${PREVIOUS_SF_REL}
-        checkpoint "clone previous version"
-        # Fetch the pre-built images
-        ./fetch_roles.sh trees
-        checkpoint "fetch previous trees"
-        # Trigger a build role in order to deflate roles in the right directory if not done yet
-        SF_SKIP_FETCHBASES=1 ./build_roles.sh
-        checkpoint "extract previous roles"
+
+set -ex
+function checkpoint {
+    set +x
+    echo -e "\n[$(date "+%Y-%m-%d %H:%M:%S")] \033[92m=== $* ===\033[0m"
+    set -x
+}
+
+function container_exec {
+    if [ -z "${CONTAINER_PID}" ]; then
+        echo "CONTAINER_PID is null"
+        exit 1
+    fi
+    nsenter --target ${CONTAINER_PID} -p -m -n -i -u -- $*
+}
+
+function prepare_env {
+    PYSFLIB="/var/lib/sf/pysflib"
+    checkpoint "Install pysflib virtual env to $PYSFLIB"
+    which git || yum install -y git
+    if [ ! -d "${PYSFLIB}" ]; then
+        mkdir -p $(dirname $PYSFLIB) || true
+        git clone http://softwarefactory.enovance.com/r/pysflib $PYSFLIB
+    fi
+    which virtualenv || yum install -y python-virtualenv
+    if [ ! -d "${PYSFLIB}/.venv" ]; then
+        virtualenv ${PYSFLIB}/.venv
         (
-            cd bootstraps/lxc
-            # Deploy
-            ./start.sh destroy
-            ./start.sh init
+            yum install -y gcc openldap-devel
+            cd ${PYSFLIB}
+            . ./.venv/bin/activate
+            pip install --upgrade setuptools
+            pip install -r ${PYSFLIB}/requirements.txt
+            python setup.py install
         )
-        checkpoint "lxc_start previous version"
-        source functestslib.sh
-        wait_for_bootstrap_done
-        checkpoint "bootstrap previous version"
-        # Run basic tests
-        run_serverspec
-        checkpoint "serverspec previous version"
-    ) || pre_fail "Stable Bootstrap FAILED"
-    # Run the provisioner to put some data on the deployed instance
-    ./tools/provisioner_checker/run.sh provisioner
-    checkpoint "provisioner"
-    # Put needed data to perform the upgrade on the deployed instance
-    # In a real upgrade process this won't be done because next version
-    # (The one we want to upgrade is already published)
-    (
-        cd tests/roles_provision/
-        sudo ./prepare.sh
-        checkpoint "new roles are ready to be copied"
-        export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook --private-key=${HOME}/.ssh/id_rsa -i inventory playbook.yaml
-    ) || pre_fail "Ansible provision playbook FAILED"
-    checkpoint "sf is ready to be updated"
-    # Start the upgrade
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd /srv/software-factory/ && ./upgrade.sh ${SF_REL} true" || pre_fail "Upgrade FAILED"
-    checkpoint "upgrade"
-    # Run basic tests
-    run_serverspec || pre_fail "Serverspec failed"
-    checkpoint "serverspec new version"
-    # Run the checker to validate provisionned data has not been lost
-    ./tools/provisioner_checker/run.sh checker || pre_fail "Provisionned data check failed"
-    checkpoint "check provisioner"
-    # run functional tests from the puppetmaster
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` "cd puppet-bootstrapper && nosetests -sv" || pre_fail "Functional tests FAILED after upgrade"
-    checkpoint "functional tests after upgrade"
+    fi
+    MANAGESF="/var/lib/sf/managesf"
+    checkpoint "Install managesf"
+    if [ ! -d "${MANAGESF}" ]; then
+        mkdir -p $(dirname $MANAGESF) || true
+        git clone http://softwarefactory.enovance.com/r/managesf $MANAGESF
+        (
+            cd $MANAGESF
+            . ${PYSFLIB}/.venv/bin/activate
+            pip install --upgrade pycrypto
+            pip install -r ${MANAGESF}/requirements.txt
+            python setup.py install
+        )
+    fi
+}
+
+
+
+function start {
+    # Make sure no nspawn process are running
+    if [ "$(pidof systemd-nspawn)" != "" ]; then
+        echo "Stalling systemd-nspawn process..."
+        exit 1
+    fi
+    [ -d ${CONTAINER_ROOT} ] || mkdir -p ${CONTAINER_ROOT}
+
+
+    checkpoint "Copy fresh install to ${CONTAINER_ROOT}/"
+    rsync -a --delete ${CLEAN_CENTOS}/ ${CONTAINER_ROOT}/
+
+    checkpoint "Start the container with systemd-nspawn -M sfcentos"
+    ip netns add sf
+    ip netns exec sf systemd-nspawn -b -D ${CONTAINER_ROOT}/ -M sfcentos > /dev/null 2> /dev/null &
+    sleep 1
+
+    checkpoint "Wait for systemd container process"
+    NSPAWN_PID=$(pidof systemd-nspawn)
+    set +ex
+    for i in $(seq 42); do
+        CONTAINER_PID=$(ps -o pid --ppid ${NSPAWN_PID} --noheaders | sed 's/ //g')
+        [ -z "${CONTAINER_PID}" ] || break
+        sleep 0.5
+    done
+    set -ex
+
+    checkpoint "Configure network"
+    ip link add sf0 type veth peer name sf1
+    # initiate the host side
+    ip link set sf0 up
+    # initiate the container side
+    ip link set sf1 netns sf up
+
+    # configure network
+    ip addr add 192.168.242.1/30 dev sf0
+    ip netns exec sf ip addr add 192.168.242.2/30 dev sf1
+    ip netns exec sf ip route add default via 192.168.242.1 dev sf1
+
+    # enable routing
+    echo 1 | tee /proc/sys/net/ipv4/ip_forward
+    ext_if=$(ip route get 8.8.8.8 | grep 'dev' | awk '{ print $5 }')
+    iptables -I POSTROUTING -t nat -s 192.168.242.2/32 -o ${ext_if} -j MASQUERADE
+    iptables -I FORWARD -i sf0 -o ${ext_if} -j ACCEPT
+    iptables -I FORWARD -i ${ext_if} -o sf0 -j ACCEPT
+
+    # configure resolv.conf
+    cat /etc/resolv.conf > ${CONTAINER_ROOT}/etc/resolv.conf
+
+    # Check network...
+    checkpoint "Check connectivity"
+    ip netns exec sf ping -c 1 8.8.8.8
+}
+
+function stop {
+    set +e
+    checkpoint "Stop"
+    ip netns delete sf
+    ext_if=$(ip route get 8.8.8.8 | grep 'dev' | awk '{ print $5 }')
+    iptables -D POSTROUTING -t nat -s 192.168.242.2/32 -o ${ext_if} -j MASQUERADE
+    iptables -D FORWARD -i sf0 -o ${ext_if} -j ACCEPT
+    iptables -D FORWARD -i ${ext_if} -o sf0 -j ACCEPT
+    pidof systemd-nspawn && kill -9 $(pidof systemd-nspawn)
+    sleep 0.5
+    pidof systemd-nspawn && kill -9 $(pidof systemd-nspawn)
+    rm -f nohup.out
+    umount ${CONTAINER_ROOT}/proc
+    umount ${CONTAINER_ROOT}/dev
+    umount -R ${CONTAINER_ROOT}
+    umount ${CONTAINER_ROOT}
+    # clean overlay upper
+    #rm -Rf /srv/centos7_overlay/upper/*
+    set -e
+}
+
+if [ "$1" == "stop" ]; then
+    stop
+    exit
 fi
 
-DISABLE_SETX=1
-checkpoint "end_tests"
-get_logs
-checkpoint "get-logs"
-lxc_stop
-checkpoint "lxc-stop"
-publish_artifacts
-checkpoint "publish-artifacts"
-clean_old_cache
-exit 0;
+function install {
+    checkpoint "Run packstack-sf"
+    container_exec /root/packstack-sf/packstack-sf.sh || true
+
+    # spawn a debuging shell
+    [ -z "${DEBUG}" ] || container_exec /bin/bash
+}
+
+function test {
+    set +e
+
+    checkpoint "Configure domain name"
+    grep -q tests.dom /etc/hosts || echo 192.168.242.2 tests.dom | tee -a /etc/hosts
+
+    checkpoint "Test"
+    echo "[+] Check jenkins is running"
+    curl -I 192.168.242.2:8082/ | grep X-Jenkins || TEST_RESULT=1
+
+    echo "[+] Check zuul is listening"
+    ip netns exec sf netstat -nl | grep 4730 || TEST_RESULT=1
+
+    echo "[+] Get packstack generated file"
+    [ -d "build/" ] && rm -Rf build/
+    cp -R /srv/software-factory-1.0.3/root/sf-conf/ build/
+
+    echo "[+] Run functional tests..."
+    (cd tests/functional; . ${PYSFLIB}/.venv/bin/activate; nosetests -sv)
+}
+
+prepare_env
+stop
+start
+install
+
+TEST_RESULT=0
+test
+
+if [ -z "${DEBUG}" ]; then
+    stop
+    # Restore the container root and show modified files
+    [ ! -z "${VERBOSE}" ] && VERBOSE="-v"
+    checkpoint "Clean ${CONTAINER_ROOT}"
+    rsync -a ${VERBOSE} --delete ${CLEAN_CENTOS}/ ${CONTAINER_ROOT}/
+    exit ${TEST_RESULT}
+fi
+
+set +x
+echo "Container is running: ${CONTAINER_ROOT}"
+machinectl status sfcentos
+
+
+echo "Join the container with:"
+echo "nsenter --target ${CONTAINER_PID} -p -m -n -i -u"
+
+exit ${TEST_RESULT}

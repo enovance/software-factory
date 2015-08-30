@@ -59,8 +59,10 @@ class mysql ($settings = hiera_hash('mysql', '')) {
         require     => [Service['mysql'], File['/root/create_databases.sql']],
     }
 
-    bup::scripts{ 'mysql_scripts':
-      backup_script => 'mysql/backup.sh.erb',
-      restore_script => 'mysql/restore.sh.erb',
-    }
+    # TODO: multiple declaration errors
+    #
+    #bup::scripts{ 'mysql_scripts':
+    #  backup_script => 'mysql/backup.sh.erb',
+    #  restore_script => 'mysql/restore.sh.erb',
+    #}
 }
