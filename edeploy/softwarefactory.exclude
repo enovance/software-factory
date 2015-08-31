@@ -66,7 +66,7 @@
 /var/tmp/
 
 # Sf state data
-/root/puppet-bootstrapper/build/
+/root/sf-bootstrap-data/
 /var/spool/
 /var/lib/postfix/master.lock
 /var/lib/zuul/
@@ -99,8 +99,7 @@
 /srv/cauth_keys/
 
 # Sf configuration
-/root/hosts.yaml
-/root/sfconfig.yaml
+/etc/puppet/hiera/sf/hosts.yaml
 /etc/puppet/
 /etc/httpd/conf.d/
 /etc/httpd/conf.modules.d/
