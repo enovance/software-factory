@@ -230,12 +230,12 @@ to finish their work before you can use your SF deployment.
 So once the stack is created you can connect using SSH on
 the puppetmaster node using the root user (your SSH public key has been added to
 the root's authorized_keys file) and wait for the file
-/root/puppet-bootstrapper/build/bootstrap.done to be created.
+/root/sf-bootstrap-data/bootstrap.done to be created.
 
 .. code-block:: bash
 
  $ heat output-show SoftwareFactory puppetmaster_public_address
- $ ssh root@puppetmaster_public_address ls /root/puppet-bootstrapper/build/bootstrap.done
+ $ ssh root@puppetmaster_public_address ls /root/sf-bootstrap-data/bootstrap.done
 
 This file is created once all scripts and puppet agents have finished to apply the
 manifests to configure all SF services.
