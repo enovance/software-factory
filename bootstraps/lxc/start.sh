@@ -17,6 +17,18 @@
 set -x
 set -e
 
+# Sanity check
+if [ ! -f ${HOME}/.ssh/id_rsa ]; then
+    ssh-keygen -f ${HOME}/.ssh/id_rsa -N ''
+fi
+
+BUILD=/var/lib/lxc-conf
+CONFDIR=${BUILD}
+if [ ! -d ${BUILD}/hiera ]; then
+    sudo mkdir -p ${BUILD}/hiera
+    sudo chown -R ${USER} ${BUILD}
+fi
+
 source ../functions.sh
 . ./../../role_configrc
 
@@ -39,7 +51,6 @@ export SF_SUFFIX
 IN_FUNC_TEST=${IN_FUNC_TESTS:-""}
 
 EDEPLOY_LXC=/srv/edeploy-lxc/edeploy-lxc
-CONFDIR=/var/lib/lxc-conf
 
 # Need to be select randomly
 SSHPASS=$(generate_random_pswd 8)
@@ -79,9 +90,6 @@ function setup_iptables {
 }
 
 function init {
-    sudo rm -rf ${CONFDIR}
-    sudo mkdir -p ${CONFDIR}
-    CONFDIR=$CONFDIR sudo -E bash -c 'chown $SUDO_USER:$SUDO_USER ${CONFDIR}'
     cp sf-lxc.yaml $CONFDIR
     cp ../cloudinit/* $CONFDIR
     jenkins_ip=`get_ip jenkins`
