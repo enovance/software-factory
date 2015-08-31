@@ -17,10 +17,14 @@
 set -e
 set -x
 
-source functions.sh
-
 SF_SUFFIX=${SFSUFFIX:-sf.dom}
-BUILD=build
+BUILD=/root/sf-bootstrap-data
+
+for i in hiera ssh_keys certs; do
+    [ -d ${BUILD}/$i ] || mkdir -p ${BUILD}/$i
+done
+
+source functions.sh
 
 # If boostrap.done does not exist, something bad happened, write 1
 trap "[ -f ${BUILD}/bootstrap.done ] || (echo 1 > ${BUILD}/bootstrap.done)" 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
@@ -35,7 +39,7 @@ if [ ! -e "${BUILD}/hiera/sfcreds.yaml" ]; then
     generate_creds_yaml
 fi
 
-if [ ! -e "${BUILD}/data/gateway.key" ]; then
+if [ ! -e "${BUILD}/certs/gateway.key" ]; then
     generate_apache_cert
 fi
 
