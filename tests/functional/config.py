@@ -24,6 +24,7 @@ JENKINS_URL = 'https://%s/jenkins/' % GATEWAY_HOST
 REDMINE_URL = 'https://%s/redmine/' % GATEWAY_HOST
 
 GERRIT_USER = 'gerrit'
+SF_CREDS = '%s/hiera/sfcreds.yaml' % SF_BOOTSTRAP_DATA
 GERRIT_SERVICE_PRIV_KEY_PATH = '%s/ssh_keys/gerrit_service_rsa' \
                                % SF_BOOTSTRAP_DATA
 
