@@ -53,11 +53,12 @@
 /var/tmp/
 
 # Sf state data
-/root/puppet-bootstrapper/build/
+/root/sf-bootstrap-data/
+# remove line below once 1.0.3 is out
+/root/sfconfig.yaml
 
 # Sf configuration
-/root/hosts.yaml
-/root/sfconfig.yaml
+/etc/puppet/hiera/sf/hosts.yaml
 
 # REMOVEME?: Software factory source code
 /srv/software-factory

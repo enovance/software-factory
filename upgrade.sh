@@ -34,9 +34,13 @@ echo "Detected version is $current_version"
 # get the domain from sfconfig.yaml
 DOMAIN=$(egrep "^domain:" /etc/puppet/hiera/sf/sfconfig.yaml | sed 's/domain://' | tr -d ' ')
 
+# remove line below once 1.0.3 is out
+mkdir -p /root/sf-bootstrap-data/hiera/
+cp /root/sfconfig.yaml /root/sf-bootstrap-data/hiera/sfconfig.yaml
+
 # update new default variable
 SRC=/srv/software-factory/bootstraps/sfconfig.yaml
-DST=/root/sfconfig.yaml
+DST=/root/sf-bootstrap-data/hiera/sfconfig.yaml
 if [ ! -f ${SRC} ] || [ ! -f ${DST} ]; then
     echo "Missing configuration file..."
     exit -1
