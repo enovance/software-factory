@@ -30,6 +30,11 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
     require => Exec['gerrit-initial-init'],
   }
 
+  file { '/var/www/git/gitweb.cgi':
+    ensure => file,
+    mode   => '0755',
+  }
+
   group { 'gerrit':
     ensure => present,
   }
