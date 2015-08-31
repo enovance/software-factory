@@ -292,11 +292,51 @@ function run_serverspec {
     done
 }
 
+function prepare_functional_tests_venv {
+    echo "$(date) ======= Prepare functional tests venv ======="
+    if [ ! -d /var/lib/sf/venv ]; then
+        sudo virtualenv /var/lib/sf/venv
+        sudo chown -R ${USER} /var/lib/sf/venv
+    fi
+    (
+        . /var/lib/sf/venv/bin/activate
+        pip install --upgrade setuptools
+        pip install -r ${PYSFLIB_CLONED_PATH}/requirements.txt
+        pip install -r ${CAUTH_CLONED_PATH}/requirements.txt
+        pip install -r ${MANAGESF_CLONED_PATH}/requirements.txt
+        pip install --upgrade pycrypto
+        pip install pyOpenSSL ndg-httpsclient pyasn1 nose
+        cd ${PYSFLIB_CLONED_PATH}; python setup.py install
+        cd ${CAUTH_CLONED_PATH}; python setup.py install
+        cd ${MANAGESF_CLONED_PATH}; python setup.py install
+    ) > ${ARTIFACTS_DIR}/venv_prepartion.output
+    checkpoint "/var/lib/sf/venv/ prep"
+}
+
 function run_functional_tests {
     echo "$(date) ======= Starting functional tests ========="
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` \
-            "cd puppet-bootstrapper; nosetests --with-xunit -v" 2>&1 | tee ${ARTIFACTS_DIR}/functional-tests.output
-    return ${PIPESTATUS[0]}
+    echo "[+] Adds tests.dom to /etc/hosts"
+    grep -q 'tests.dom' /etc/hosts || {
+        echo 192.168.134.54 tests.dom | sudo tee -a /etc/hosts
+    } && sudo sed -i 's/^.*tests.dom/192.168.134.54 tests.dom/' /etc/hosts
+    echo "[+] Set ssh known_hosts"
+    ssh-keygen -f ~/.ssh/known_hosts -R "[tests.dom]:29418"
+    ssh-keygen -f ~/.ssh/known_hosts -R "tests.dom"
+    echo "[+] Fetch bootstrap data"
+    rm -Rf sf-bootstrap-data
+    scp -o StrictHostKeyChecking=no -r root@`get_ip puppetmaster`:sf-bootstrap-data .
+    echo "[+] Fetch tests.dom ssl cert"
+    scp -o StrictHostKeyChecking=no -r root@`get_ip puppetmaster`:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib64/python2.7/site-packages/requests/cacert.pem
+    cp /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem /var/lib/sf/venv/lib/python2.7/site-packages/pip/_vendor/requests/cacert.pem
+    echo "[+] Run tests"
+    sudo rm -Rf /tmp/debug
+    . /var/lib/sf/venv/bin/activate
+    checkpoint "functional tests running..."
+    SF_BOOTSTRAP_DATA=$(pwd)/sf-bootstrap-data nosetests --with-xunit -v tests/functional 2>&1 | tee ${ARTIFACTS_DIR}/functional-tests.output
+    RES=${PIPESTATUS[0]}
+    mv /tmp/debug ${ARTIFACTS_DIR}/functional_tests.debug
+    deactivate
+    return $RES
 }
 
 function run_tests {
