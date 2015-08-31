@@ -192,10 +192,10 @@ function pre_fail {
     echo -e "\n\n\n====== $1 OUTPUT ======\n"
     case $1 in
         "Roles building FAILED")
-            if [ -f "${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log" ]; then
-                F="${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log"
-            elif [ -f "${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log" ]; then
+            if [ -f "${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log" ]; then
                 F="${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log"
+            elif [ -f "${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log" ]; then
+                F="${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log"
             fi
             if [ -f "${F}" ]; then
                 echo ${F}
@@ -274,7 +274,7 @@ function wait_for_bootstrap_done {
         echo "-------------------------";
         # The fail below is more targeted for the HEAT deployment (When the bootstrap script ssh fails to connect to the nodes)
         [ -n "$(echo -n $lastlines | grep 'Permission denied')" ] && return 1
-        RET=$(ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey root@`get_ip puppetmaster` cat puppet-bootstrapper/build/bootstrap.done 2> /dev/null)
+        RET=$(ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey root@`get_ip puppetmaster` cat /root/sf-bootstrap-data/bootstrap.done 2> /dev/null)
         [ ! -z "${RET}" ] && return ${RET}
         let retries=retries+1
         [ "$retries" == "$max_retries" ] && return 1
