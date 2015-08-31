@@ -55,6 +55,7 @@ function lxc_start {
 
 set -x
 prepare_artifacts
+prepare_functional_tests_venv
 checkpoint "Running tests on $(hostname)"
 (cd bootstraps/lxc; ./start.sh destroy &> ${ARTIFACTS_DIR}/lxc-first-clean.output)
 checkpoint "lxc-first-clean"
