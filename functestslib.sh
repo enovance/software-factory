@@ -203,6 +203,9 @@ function pre_fail {
         "LXC bootstrap FAILED")
             tail -n 120 ${ARTIFACTS_DIR}/lxc-start.output
             ;;
+        "Puppet apply tests FAILED")
+            cat ${ARTIFACTS_DIR}/puppet-apply-tests.output
+            ;;
         "Can't SSH")
             more ${ARTIFACTS_DIR}/host_debug*
             ;;
@@ -294,6 +297,18 @@ function run_serverspec {
 
 function run_functional_tests {
     echo "$(date) ======= Starting functional tests ========="
+    echo "$(date) ==> tests puppet apply"
+    scp -o StrictHostKeyChecking=no -r puppet-templates root@`get_ip puppetmaster`:
+    (
+        for site in puppet-templates/*; do
+            echo "== $site =="
+            cat $site
+            ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` puppet apply --environment sf --debug --noop --test $site
+        done
+    ) 2>&1 > ${ARTIFACTS_DIR}/puppet-apply-tests.output
+    grep ^Error ${ARTIFACTS_DIR}/puppet-apply-tests.output && pre_fail "Puppet apply tests FAILED"
+
+    echo "$(date) ==> real functional tests"
     ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` \
             "cd puppet-bootstrapper; nosetests --with-xunit -v" 2>&1 | tee ${ARTIFACTS_DIR}/functional-tests.output
     return ${PIPESTATUS[0]}
