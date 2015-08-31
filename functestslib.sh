@@ -292,11 +292,46 @@ function run_serverspec {
     done
 }
 
+function prepare_functional_tests_venv {
+    if [ ! -d /var/lib/sf/venv ]; then
+        sudo virtualenv /var/lib/sf/venv
+        sudo chown -R ${USER} /var/lib/sf/venv
+    fi
+    (
+        . /var/lib/sf/venv/bin/activate
+        pip install --upgrade setuptools
+        pip install -r ${PYSFLIB_CLONED_PATH}/requirements.txt
+        pip install -r ${CAUTH_CLONED_PATH}/requirements.txt
+        pip install -r ${MANAGESF_CLONED_PATH}/requirements.txt
+        pip install --upgrade pycrypto
+        pip install pyOpenSSL ndg-httpsclient pyasn1
+        pip install nose
+        cd ${PYSFLIB_CLONED_PATH}; python setup.py install
+        cd ${CAUTH_CLONED_PATH}; python setup.py install
+        cd ${MANAGESF_CLONED_PATH}; python setup.py install
+    )
+}
+
 function run_functional_tests {
     echo "$(date) ======= Starting functional tests ========="
-    ssh -o StrictHostKeyChecking=no root@`get_ip puppetmaster` \
-            "cd puppet-bootstrapper; nosetests --with-xunit -v" 2>&1 | tee ${ARTIFACTS_DIR}/functional-tests.output
-    return ${PIPESTATUS[0]}
+    echo "==> Fetch bootstrap data"
+    rm -Rf sf-bootstrap-data
+    scp -o StrictHostKeyChecking=no -r root@`get_ip puppetmaster`:sf-bootstrap-data .
+    # Get tests.dom ssl certificate for https tests
+    scp -o StrictHostKeyChecking=no -r root@`get_ip puppetmaster`:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib64/python2.7/site-packages/requests/cacert.pem
+    # Adds tests.dom to /etc/hosts
+    grep -q 'tests.dom' /etc/hosts || echo 192.168.134.54 tests.dom | sudo tee -a /etc/hosts
+    sudo sed -i 's/^.*tests.dom/192.168.134.54 tests.dom/' /etc/hosts
+    # Adds gerrit pub key to known hosts
+    ssh-keygen -f ~/.ssh/known_hosts -R "[tests.dom]:29418"
+    # Run tests
+    sudo rm -Rf /tmp/debug
+    . /var/lib/sf/venv/bin/activate
+    SF_BOOTSTRAP_DATA=$(pwd)/sf-bootstrap-data nosetests --with-xunit -v tests/functional 2>&1 | tee ${ARTIFACTS_DIR}/functional-tests.output
+    RES=${PIPESTATUS[0]}
+    mv /tmp/debug ${ARTIFACTS_DIR}
+    deactivate
+    return $RES
 }
 
 function run_tests {
