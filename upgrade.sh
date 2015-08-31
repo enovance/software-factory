@@ -36,7 +36,7 @@ DOMAIN=$(egrep "^domain:" /etc/puppet/hiera/sf/sfconfig.yaml | sed 's/domain://'
 
 # update new default variable
 SRC=/srv/software-factory/bootstraps/sfconfig.yaml
-DST=/root/sfconfig.yaml
+DST=/root/sf-bootstrap-data/hiera/sfconfig.yaml
 if [ ! -f ${SRC} ] || [ ! -f ${DST} ]; then
     echo "Missing configuration file..."
     exit -1
