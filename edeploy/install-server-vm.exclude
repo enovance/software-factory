@@ -54,6 +54,7 @@
 
 # Sf state data
 /root/puppet-bootstrapper/build/
+/root/sf-bootstrap-data/
 
 # Sf configuration
 /root/hosts.yaml
