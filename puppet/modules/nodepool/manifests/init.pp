@@ -51,12 +51,12 @@ class nodepool ($settings = hiera_hash('nodepool', '')) {
     group   => 'root',
   }
 
-  file { '/usr/local/bin/sf-nodepool-conf-merger.py':
+  file { '/usr/local/bin/yaml-merger.py':
     ensure => file,
     mode   => '0755',
     owner  => "root",
     group  => "root",
-    source => 'puppet:///modules/nodepool/sf-nodepool-conf-merger.py',
+    source => 'puppet:///modules/jjb/yaml-merger.py',
   }
 
   file { '/usr/share/sf-nodepool/base.sh':
