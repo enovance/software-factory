@@ -59,15 +59,6 @@ class jjb ($settings = hiera_hash('jenkins', ''),
     group   => 'root',
   }
 
-  file {'/usr/share/sf-jjb/yaml-merger.py':
-    ensure => file,
-    mode   => '0755',
-    owner  => "root",
-    group  => "root",
-    require => File['/usr/share/sf-jjb'],
-    source =>'puppet:///modules/jjb/yaml-merger.py'
-  }
-
   file {'/usr/share/sf-jjb/projects.yaml':
     ensure => file,
     mode   => '0640',

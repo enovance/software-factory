@@ -25,24 +25,27 @@ def loadConfig(config_path):
 
     final_data = {}
     for path in paths:
-        data = yaml.load(open(path))
-        # fix include relative paths
-        for include in data.get('includes', []):
-            for key, fn in include.items():
-                if not os.path.isabs(fn):
-                    base = os.path.dirname(os.path.realpath(path))
-                    fn = os.path.join(base, fn)
-                include[key] = os.path.expanduser(fn)
-        # Merge document
-        for key in data:
-            if key in final_data:
-                try:
-                    final_data[key] += data[key]
-                except:
-                    raise v.Invalid("Could not merge '%s' from %s" %
-                                    (key, path))
-            else:
-                final_data[key] = data[key]
+        data_list = yaml.load(open(path))
+        if not isinstance(data_list, list):
+            data_list = [data_list]
+        for data in data_list:
+            # fix include relative paths
+            for include in data.get('includes', []):
+                for key, fn in include.items():
+                    if not os.path.isabs(fn):
+                        base = os.path.dirname(os.path.realpath(path))
+                        fn = os.path.join(base, fn)
+                    include[key] = os.path.expanduser(fn)
+            # Merge document
+            for key in data:
+                if key in final_data:
+                    try:
+                        final_data[key] += data[key]
+                    except:
+                        raise v.Invalid("Could not merge '%s' from %s" %
+                                        (key, path))
+                else:
+                    final_data[key] = data[key]
     return final_data
 
 
@@ -50,7 +53,7 @@ def main(argv):
     if len(argv) != 2 and not os.path.isdir(argv[1]):
         print "usage: %s dir" % argv[0]
     data = loadConfig(argv[1])
-    print yaml.dump(data, indent=4)
+    print yaml.dump(data, indent=4, default_flow_style=False)
 
 if __name__ == "__main__":
     import sys
