@@ -111,8 +111,8 @@ function swift_upload_artifacts {
 
 function publish_artifacts {
     set +x
-    sudo find ${ARTIFACTS_DIR} -type d -exec chmod 550 {} \;
-    sudo find ${ARTIFACTS_DIR} -type f -exec chmod 440 {} \;
+    sudo find ${ARTIFACTS_DIR} -type d -exec chmod 555 {} \;
+    sudo find ${ARTIFACTS_DIR} -type f -exec chmod 444 {} \;
     sudo chown -R $USER:$GROUP ${ARTIFACTS_DIR}
     if [ ${GROUP} = 'www-data' ]; then
         echo "Logs are available here: ${JENKINS_URL}/${ARTIFACTS_RELPATH}"
