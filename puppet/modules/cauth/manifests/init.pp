@@ -21,7 +21,6 @@ class cauth ($cauth = hiera('cauth'), $gerrit = hiera('gerrit')) {
   $theme = hiera('theme')
   $url = hiera('url')
   $network = hiera('network')
-  $privkey_pem = hiera('privkey_pem')
   $admin_password = $auth['admin_password']
   $ldap = $auth['ldap']
   $github = $auth['github']
@@ -84,14 +83,6 @@ class cauth ($cauth = hiera('cauth'), $gerrit = hiera('gerrit')) {
     owner  => 'apache',
     group  => 'apache',
     mode   => '0750',
-  }
-
-  file { '/srv/cauth_keys/privkey.pem':
-    ensure  => file,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0444',
-    content => inline_template('<%= @privkey_pem %>'),
   }
 
   file { '/var/www/cauth/config.py':
