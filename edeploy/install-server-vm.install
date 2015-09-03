@@ -86,33 +86,28 @@ cp -Rv ../puppet/hiera.yaml ${dir}/etc/puppet/
 
 # Install the bootstrap scripts
 mkdir ${dir}/root/puppet-bootstrapper
-cp -Rv ../tests ${dir}/root/puppet-bootstrapper/
-cp -Rv ../tools ${dir}/root/puppet-bootstrapper/
 cp -Rv ../serverspec ${dir}/root/puppet-bootstrapper/
 cp -Rv ../bootstraps/*.sh ${dir}/root/puppet-bootstrapper/
 cp -Rv ../bootstraps/sfcreds.yaml ${dir}/root/puppet-bootstrapper/
 
 # install pysflib. pysflib has been checkouted before on the build node in /tmp
-mkdir -p ${dir}/root/puppet-bootstrapper/tools/pysflib
-cp -Rv ${PYSFLIB_CLONED_PATH}/* ${dir}/root/puppet-bootstrapper/tools/pysflib/
-retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/pysflib; pip install -r requirements.txt"
-do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/pysflib; python setup.py install"
+mkdir -p ${dir}/root/pysflib
+cp -Rv ${PYSFLIB_CLONED_PATH}/* ${dir}/root/pysflib/
+retry do_chroot ${dir} bash -c "cd /root/pysflib; pip install -r requirements.txt"
+do_chroot ${dir} bash -c "cd /root/pysflib; python setup.py install"
 
 # install sfmanager. managesf has been checkouted before on the build node in /tmp
-mkdir -p ${dir}/root/puppet-bootstrapper/tools/managesf
-cp -Rv ${MANAGESF_CLONED_PATH}/* ${dir}/root/puppet-bootstrapper/tools/managesf/
+mkdir -p ${dir}/root/managesf
+cp -Rv ${MANAGESF_CLONED_PATH}/* ${dir}/root/managesf/
 # override pysflib version from requirements
-do_chroot ${dir} sed -i '/pysflib/d' /root/puppet-bootstrapper/tools/managesf/requirements.txt
-retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/managesf; pip install -r requirements.txt"
-do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/managesf; python setup.py install"
+do_chroot ${dir} sed -i '/pysflib/d' /root/managesf/requirements.txt
+retry do_chroot ${dir} bash -c "cd /root/managesf; pip install -r requirements.txt"
+do_chroot ${dir} bash -c "cd /root/managesf; python setup.py install"
 
 # install-server-vm embed Jenkins (We dont want to have it here ...)
 # The role Jenkins does not deactivate the jenkins service at startup
 # https://github.com/redhat-cip/edeploy-roles/issues/80
 do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs rm -f ; done"
-
-# install requirements for functional tests
-retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tests; pip install -r requirements.txt"
 
 # Cleanup
 clear_packages_cache ${dir}

@@ -13,11 +13,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
 import os
 import sys
-
-lib_path = os.path.join(os.environ["SF_ROOT"], "tests/functional")
-sys.path.append(lib_path)
 
 import yaml
 import config
