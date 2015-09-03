@@ -1,0 +1,3 @@
+---
+- seport: ports=8084 proto=tcp setype=http_port_t state=present
+  ignore_errors: yes

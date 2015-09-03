@@ -1,0 +1,9 @@
+---
+- file: path=/srv/cauth_keys state=directory mode=0755
+
+# Install cauth keys
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+- copy: content="{{ pubkey_pem }}" dest="/srv/cauth_keys/pubkey.pem" mode=0444 setype=httpd_sys_content_t
+- copy: content="{{ privkey_pem }}" dest="/srv/cauth_keys/privkey.pem" mode=0440 owner=root group=apache setype=httpd_sys_content_t
+- command: semanage fcontext -a -t httpd_sys_content_t "/srv/cauth_keys(/.*)?"
+  ignore_errors: yes
