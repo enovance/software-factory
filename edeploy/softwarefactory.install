@@ -42,6 +42,11 @@ case "$(package_tool)" in
      install_packages ${dir} ${PUPPET_REPO_URL}
      add_epel_repository $DIST
 
+     # Install passenger
+     install_packages ${dir} "epel-release pygpgme curl"
+     http_fetch https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo ${dir}/etc/yum.repos.d/passenger.repo
+     install_packages ${dir} "mod_passenger"
+
      install_packages ${dir} "puppet monit postfix git vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz ntp openssl mod_ssl"
      DEVEL_PKGS="swig libffi-devel openldap-devel zlib-devel libcurl-devel openssl-devel httpd-devel apr-devel apr-util-devel mariadb-devel gcc-c++ ruby-devel ImageMagick-devel gcc cpp python-devel libxml2-devel libxslt-devel"
 
@@ -62,14 +67,10 @@ case "$(package_tool)" in
      do_chroot ${dir} bash -c "cd /tmp && tar -xvzf mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
      do_chroot ${dir} bash -c "cd /tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION} && ./configure --apxs=/usr/bin/apxs && make && make install"
      do_chroot ${dir} rm -Rf /tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}
-     # Install Passenger for Redmine
      mkdir -p ${dir}/var/www/html
      mkdir -p ${dir}/var/log/httpd
-     HOME=/root do_chroot ${dir} gem install passenger --version ${PASSENGER_VERSION}
-     HOME=/root do_chroot ${dir} gem install bundler
-     HOME=/root do_chroot ${dir} passenger-install-apache2-module -a
-     do_chroot ${dir} bash -c "ln -s \$(find /usr/local/share/gems/gems/passenger-${PASSENGER_VERSION} -maxdepth 0) /usr/lib/passenger"
      # Install Redmine
+     HOME=/root do_chroot ${dir} gem install bundler
      http_fetch $REDMINE_RHEL_URL ${dir}/usr/share/redmine.tar.gz
      do_chroot ${dir} bash -c "cd /usr/share && tar -xzpf redmine.tar.gz && mv redmine-${REDMINE_VERSION} redmine && chown -R root:root redmine"
 
