@@ -166,14 +166,6 @@ class TestProjectReplication(Base):
         # Create new section for this project in replication.config
         self.createConfigSection(self.un, self.pname)
 
-        # Force gerrit to read its known_hosts file. The only
-        # way to do that is by restarting gerrit. The Puppet Gerrit
-        # manifest will restart gerrit if a new entry in known_hosts_gerrit
-        # is discovered.
-        # This may take some time (gerrit in some condition take long
-        # to be fully up)
-        call("ssh root@gerrit puppet agent -t > /dev/null", shell=True)
-
         # Clone the project and submit it for review
         priv_key_path = set_private_key(config.USERS[self.un]["privkey"])
         gitu = GerritGitUtils(self.un,
