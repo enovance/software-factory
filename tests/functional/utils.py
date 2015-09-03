@@ -176,7 +176,7 @@ class ManageSfUtils(Tool):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[new_user]['email']
         cmd = self.base_cmd % (auth_user, passwd)
-        cmd = cmd + " project add_user --name %s " % project
+        cmd = cmd + " membership add --project %s " % project
         cmd = cmd + " --user %s --groups %s" % (umail, groups)
         self.exe(cmd)
 
@@ -184,15 +184,15 @@ class ManageSfUtils(Tool):
                                     project, user, group=None):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[user]['email']
-        cmd = self.base_cmd % (auth_user, passwd) + " project delete_user "
-        cmd = cmd + " --name %s --user %s " % (project, umail)
+        cmd = self.base_cmd % (auth_user, passwd) + " membership remove "
+        cmd = cmd + " --project %s --user %s " % (project, umail)
         if group:
-            cmd = cmd + " --group %s " % group
+            cmd = cmd + " --groups %s " % group
         self.exe(cmd)
 
     def list_active_members(self, user):
         passwd = config.USERS[user]['password']
-        cmd = self.base_cmd % (user, passwd) + " project list_active_users "
+        cmd = self.base_cmd % (user, passwd) + " membership list "
         cmd = shlex.split(cmd)
         try:
             output = subprocess.check_output(cmd)
@@ -203,7 +203,7 @@ class ManageSfUtils(Tool):
     def create_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
         cmd = self.base_cmd % (user, passwd) + \
-            "gerrit_api_htpasswd generate_password"
+            "gerrit generate_password"
         cmd = shlex.split(cmd)
         try:
             output = subprocess.check_output(cmd)
@@ -214,7 +214,7 @@ class ManageSfUtils(Tool):
     def delete_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
         cmd = self.base_cmd % (user, passwd) + \
-            "gerrit_api_htpasswd delete_password"
+            "gerrit delete_password"
         cmd = shlex.split(cmd)
         try:
             output = subprocess.check_output(cmd)
