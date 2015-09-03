@@ -1,0 +1,9 @@
+---
+# Seport fail to relabel existing port, see https://github.com/ansible/ansible-modules-extras/issues/2009
+# seport: ports={{ item }} proto=tcp setype=http_port_t state=present
+#   -  with_items: [8081, 8010]
+- command: semanage port --modify -t http_port_t -p tcp 8081
+  ignore_errors: yes
+# special case for 8010 that is not already defined
+- command: semanage port --add -t http_port_t -p tcp 8010
+  ignore_errors: yes
