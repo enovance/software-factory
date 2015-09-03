@@ -290,6 +290,6 @@ function run_puppet_agent_start {
     # Start puppet agent at the end of the bootstrap
     local ssh_port=22
     for role in ${PUPPETIZED_ROLES}; do
-        ssh -p$ssh_port root@${role}.${SF_SUFFIX} "sleep 2700; service puppet start" &
+        ssh -p$ssh_port root@${role}.${SF_SUFFIX} "service puppet start"
     done
 }
