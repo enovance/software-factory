@@ -59,7 +59,7 @@ SUBPROJECTS_DEPS="$PYSFLIB_CLONED_PATH $CAUTH_CLONED_PATH $MANAGESF_CLONED_PATH"
 SF_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/softwarefactory.* ./edeploy/third_party_tools ./edeploy/fetch_subprojects.sh"
 SF_DEPS="${SF_DEPS} ./docs/"
 IS_DEPS="./role_configrc ./build_roles.sh ./edeploy/functions ./edeploy/install-server-vm.*"
-IS_DEPS="${IS_DEPS} ./upgrade/ ./puppet/ ./tests/ ./serverspec/ ./tools/ ./bootstraps/*.sh ./bootstraps/sfcreds.yaml"
+IS_DEPS="${IS_DEPS} ./upgrade/ ./puppet/ ./serverspec/ ./tools/ ./bootstraps/*.sh ./bootstraps/sfcreds.yaml"
 
 MAKE="make DVER=${DVER} DIST=${DIST} SF_REL=${SF_REL} EDEPLOY_PATH=${EDEPLOY} TOP=${BUILD_DIR}"
 

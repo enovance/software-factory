@@ -17,9 +17,6 @@
 import os
 import sys
 
-lib_path = os.path.join(os.environ["SF_ROOT"], "tests/functional")
-sys.path.append(lib_path)
-
 import yaml
 import config
 
