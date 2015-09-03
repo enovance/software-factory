@@ -1,0 +1,4 @@
+---
+- seport: ports={{ item }} proto=tcp setype=http_port_t state=present
+  with_items: [8000]
+  ignore_errors: yes
