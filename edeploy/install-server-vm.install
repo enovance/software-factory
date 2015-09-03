@@ -126,8 +126,6 @@ rm -Rf ${dir}/var/lib/jenkins/.[!.]*
 # Disable root passwd
 do_chroot ${dir} passwd -l root
 
-disable_selinux
-
 # install third party puppet modules
 retry do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
 

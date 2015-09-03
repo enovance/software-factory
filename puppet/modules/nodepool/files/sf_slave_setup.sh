@@ -3,7 +3,6 @@
 . base.sh
 
 # Prepare slave for SF
-sudo sed -i 's/^.*SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
 git clone http://softwarefactory.enovance.com/r/sfstack
 cd sfstack && sudo ./sfinstall.sh
 sudo mkdir /srv/deps

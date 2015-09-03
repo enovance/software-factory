@@ -67,7 +67,7 @@ function fetch_base_roles_prebuilt {
         [ "$(md5sum $cloud_img | awk '{ print $1 }')" == "$(cat $cloud_img.md5 | awk '{ print $1 }')" ] || die "Image md5 checksum failed"
         echo "Unarchive the cloud base role ..."
         sudo mkdir cloud
-        sudo tar -xzf $cloud_img -C cloud
+        sudo tar --xattrs --selinux -pxzf $cloud_img -C cloud
         sudo touch cloud.done
     }
     [ ! -d install-server ] && {
@@ -75,7 +75,7 @@ function fetch_base_roles_prebuilt {
         [ "$(md5sum $install_server_img | awk '{ print $1 }')" == "$(cat $install_server_img.md5 | awk '{ print $1 }')" ] || die "Image md5 checksum failed"
         echo "Unarchive the install-server base role ..."
         sudo mkdir install-server
-        sudo tar -xzf $install_server_img -C install-server
+        sudo tar --xattrs --selinux -pxzf $install_server_img -C install-server
         sudo touch install-server.done
     }
     cd - > /dev/null
@@ -118,7 +118,7 @@ function deflate_sf_roles_prebuilt {
         fi
         sudo mkdir -p ${EXTRACT_DIR}
         echo "-> ${EXTRACT_DIR} (${UPSTREAM_FILE})"
-        sudo tar -xzf ${UPSTREAM_FILE} -C "${EXTRACT_DIR}"
+        sudo tar --selinux -xzpf ${UPSTREAM_FILE} -C "${EXTRACT_DIR}"
     done
 
 }

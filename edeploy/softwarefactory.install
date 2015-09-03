@@ -272,8 +272,6 @@ do_chroot ${dir} chown -R apache:apache /var/www
 # Disable root passwd
 do_chroot ${dir} passwd -l root
 
-disable_selinux
-
 put_git_mark ${dir}
 
 # EOF
