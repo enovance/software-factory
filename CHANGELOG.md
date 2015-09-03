@@ -1,6 +1,11 @@
 # Change Log
 
-## 1.0.3 [unreleased]
+## 1.0.3 2015-09-03
+
+- Normal user can''t create project anymore
+- Add nodepool support
+- Add Launchpad authentication
+- Minor cleans and fixes
 
 ## 1.0.2 2015-07-12
 
