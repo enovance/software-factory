@@ -172,7 +172,7 @@ class TestProjectReplication(Base):
         # is discovered.
         # This may take some time (gerrit in some condition take long
         # to be fully up)
-        call("ssh root@gerrit puppet agent -t > /dev/null", shell=True)
+        call("ssh root@gerrit.tests.dom puppet agent -t", shell=True)
 
         # Clone the project and submit it for review
         priv_key_path = set_private_key(config.USERS[self.un]["privkey"])
