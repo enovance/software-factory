@@ -1,0 +1,81 @@
+From b3c621ca58d4889a468a42abc77c5648faba4722 Mon Sep 17 00:00:00 2001
+From: Tristan Cacqueray <tdecacqu@redhat.com>
+Date: Sat, 5 Sep 2015 11:18:08 -0400
+Subject: [PATCH] Support non union fs using rsync
+
+Centos7 overlay fs support is not working correctly, this change
+use rsync when no union_fs is configured.
+---
+ edeploy-lxc | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/edeploy-lxc b/edeploy-lxc
+index eb50ef1..32b4ed1 100755
+--- a/edeploy-lxc
++++ b/edeploy-lxc
+@@ -103,10 +103,11 @@ def stop_one(name, upper_rw_dir):
+     if os.path.exists(lxc_dir):
+         print("stopping %s ... " % name)
+         try:
+-            subprocess.call(['umount', os.path.join(lxc_dir, 'rootfs') ])
++            if not subprocess.call(['umount', os.path.join(lxc_dir, 'rootfs') ]):
++                # Remove rootfs tree only if successfully umounted
++                shutil.rmtree(lxc_dir)
+         except:
+             print("Failed to umount %s" % os.path.join(lxc_dir, 'rootfs'))
+-        shutil.rmtree(lxc_dir)
+ 
+     if os.path.exists(upper_rw_dir):
+         shutil.rmtree(upper_rw_dir)
+@@ -248,9 +249,15 @@ def start():
+     for host in conf['hosts']:
+         print("[%s]" % host['name'])
+ 
+-        union_fs = get_union_filesystem(conf)
+-        overlay_dir = os.path.join(get_overlay_dir(conf), host['name'])
+-        upper_rw_dir = os.path.join(overlay_dir, 'upperdir')
++        if "union_fs" in conf["edeploy"]:
++            union_fs = get_union_filesystem(conf)
++            overlay_dir = os.path.join(get_overlay_dir(conf), host['name'])
++            upper_rw_dir = os.path.join(overlay_dir, 'upperdir')
++            os.makedirs(upper_rw_dir)
++        else:
++            union_fs = "rsync"
++            upper_rw_dir = "/unused"
++
+         lxc_dir = "/var/lib/lxc/%s" % host['name']
+         lxc_dir_rootfs = "/var/lib/lxc/%s/rootfs" % host['name']
+         role_dir = os.path.join(conf['edeploy']['dir'], host['role'])
+@@ -258,9 +265,9 @@ def start():
+         if os.path.exists(lxc_dir):
+             stop_one(host['name'], upper_rw_dir)
+ 
+-        os.makedirs(lxc_dir)
+-        os.makedirs(lxc_dir_rootfs)
+-        os.makedirs(upper_rw_dir)
++        if not os.path.isdir(lxc_dir_rootfs):
++            os.makedirs(lxc_dir)
++            os.makedirs(lxc_dir_rootfs)
+ 
+         if union_fs == "aufs":
+             subprocess.call(['mount', '-t', 'aufs', '-o', 'br=%s:%s' % (upper_rw_dir, role_dir), 'none', lxc_dir_rootfs])
+@@ -269,6 +276,8 @@ def start():
+             if not os.path.isdir(work_dir):
+                 os.makedirs(work_dir)
+             subprocess.call(['mount', '-t', 'overlay', '-o', 'upperdir=%s,lowerdir=%s,workdir=%s' % (upper_rw_dir, role_dir, work_dir), 'overlayfs', lxc_dir_rootfs])
++        elif union_fs == "rsync":
++            subprocess.call(["rsync", "-a", "--delete", "%s/" % role_dir, "%s/" % lxc_dir_rootfs])
+         else:
+             raise Exception('Neither aufs nor overlayfs are supported on this system')
+ 
+@@ -278,6 +287,7 @@ def start():
+         setup_ssh_key(conf, host)
+         setup_cloudinit(conf, lxc_dir_rootfs, host)
+ 
++    for host in conf['hosts']:
+         print("    launching")
+         subprocess.call(['lxc-start', '-d', '-L', '/tmp/lxc-%s.log' % host['name'], '-n', host['name'] ])
+ 
+-- 
+2.4.6
+
