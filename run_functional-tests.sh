@@ -76,6 +76,24 @@ if [ "$1" == "backup_restore_tests" ]; then
     lxc_start
     run_backup_restore_tests 45 "check" || pre_fail "Backup test: check"
 fi
+
+# Delete function after 1.0.3 is release
+function deflate_sf_roles_prebuilt {
+    echo "Extract roles to ${INST}"
+    for role in install-server-vm softwarefactory; do
+        EXTRACT_DIR="${INST}/${role}"
+        UPSTREAM_FILE="${UPSTREAM}/${role}-${SF_VER}.edeploy"
+        if [ -d ${EXTRACT_DIR} ]; then
+            echo "${EXTRACT_DIR} already exist..."
+            continue
+        fi
+        sudo mkdir -p ${EXTRACT_DIR}
+        echo "-> ${EXTRACT_DIR} (${UPSTREAM_FILE})"
+        sudo tar -xzf ${UPSTREAM_FILE} -C "${EXTRACT_DIR}"
+    done
+
+}
+
 if [ "$1" == "upgrade" ]; then
     cloned=/tmp/software-factory # The place to clone the previous SF version to deploy
     (
@@ -85,11 +103,12 @@ if [ "$1" == "upgrade" ]; then
         # Be sure to checkout the right previous version
         git checkout ${PREVIOUS_SF_REL}
         checkpoint "clone previous version"
-        # Fetch the pre-built images
+        # Fetch the pre-built images (remove parameter after 1.0.3 release)
         ./fetch_roles.sh trees
         checkpoint "fetch previous trees"
-        # Trigger a build role in order to deflate roles in the right directory if not done yet
-        SF_SKIP_FETCHBASES=1 ./build_roles.sh
+        # Remove deflat after 1.0.3 release
+        . ./role_configrc
+        deflate_sf_roles_prebuilt
         checkpoint "extract previous roles"
         (
             cd bootstraps/lxc
