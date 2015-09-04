@@ -28,6 +28,12 @@ for role in install-server-vm softwarefactory; do
     fi
 done
 
+# Apply centos patch
+grep -q centos /etc/os-release && {
+    (cd /srv/edeploy-lxc; sudo git reset --hard; sudo patch -s -p1) < 0001*.patch || true
+    trap "(cd /srv/edeploy-lxc; sudo git reset --hard)" EXIT
+}
+
 generate_sfconfig
 [ -f ~/sfconfig.local ] && cat ~/sfconfig.local >> $SFCONFIGFILE
 DOMAIN=$(cat $SFCONFIGFILE | grep "^domain:" | cut -d' ' -f2)
@@ -91,6 +97,10 @@ function init {
     sed -i "s#CIPATH#${CONFDIR}#g" ${CONFDIR}/sf-lxc.yaml
     sed -i "s#SSH_PUBKEY#${SSH_PUBKEY}#g" ${CONFDIR}/sf-lxc.yaml
     sed -i "s#ROLES_DIR#${ROLES_DIR}#g" ${CONFDIR}/sf-lxc.yaml
+    grep -q centos /etc/os-release && {
+        sed -i 's/.*overlay_dir:.*//' ${CONFDIR}/sf-lxc.yaml
+        sed -i 's/.*union_fs:.*//' ${CONFDIR}/sf-lxc.yaml
+    }
     # Complete jenkins slave cloudinit
     sed -i "s/JENKINS_USER_PASSWORD/${JENKINS_USER_PASSWORD}/g" ${CONFDIR}/slave.cloudinit
     sed -i "s/JENKINS_IP/${jenkins_ip}/g" ${CONFDIR}/slave.cloudinit
