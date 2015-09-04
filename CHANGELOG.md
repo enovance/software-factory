@@ -1,6 +1,31 @@
 # Change Log
 
-## 1.0.3 [unreleased]
+## 1.0.4 [unreleased]
+
+## 1.0.3 2015-09-07
+
+### Added
+
+- Add binding credentials plugin in Jenkins
+- Add Launchpad Login
+- Add nodepool support
+- Add links to Depends-On changeIDs in gerrit
+- Add tooltips to dashboard links/buttons
+
+### Fixed
+
+- Fix htpasswd dashboard button
+- Harmonize managesf CLI commands
+
+### Removed
+
+- Remove unused gerrit-git-prep.sh script
+
+### Changed
+
+- Allow anonymous access to Gerrit
+- Allow anonymous access to Jenkins
+- Allow anonymous access to Redmine
 
 ## 1.0.2 2015-07-12
 
