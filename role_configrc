@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+
 PREVIOUS_SF_REL=1.0.2
 SF_REL=1.0.3
 DVER=C7.0
