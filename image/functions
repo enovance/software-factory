@@ -1,0 +1,77 @@
+#!/bin/sh
+
+function put_git_mark {
+    local dir=$1
+    sha=`git rev-parse HEAD`
+    echo $sha >> ${dir}/etc/SF_GIT_COMMIT
+}
+
+# bup
+BUP_URL="https://github.com/bup/bup.git"
+BUP_VERSION=0.26
+
+function install_bup {
+    local dir=$1
+    if [ -d "${dir}/etc/apt/" ]; then
+        # This is only usage on yum based dist
+        return
+    fi
+    do_chroot ${dir} mkdir -p /opt/bup
+    do_chroot ${dir} git clone ${BUP_URL} /opt/bup/
+    do_chroot ${dir} bash -c 'cd /opt/bup && git checkout ${BUP_VERSION}'
+    do_chroot ${dir} bash -c 'cd /opt/bup && ./configure && make && make install'
+}
+
+function _http_fetch {
+    local remote_location=$1
+    local local_location=$2
+    # We retry 12 times with 10 seconds delay between retries
+    curl --silent --show-error --retry 12 --retry-delay 10 -L -o $local_location $remote_location
+    curl_result=$?
+    if [ "$curl_result" -ne "0" ]; then
+        echo "curl failed to fetch $remote_location with error $curl_result"
+        exit $curl_result
+    fi
+}
+
+function disable_selinux {
+    if [ -f "${dir}/etc/selinux/config" ]; then
+        sed -i "s/^SELINUX=.*/SELINUX=disabled/" "${dir}/etc/selinux/config"
+    fi
+}
+
+function retry {
+    # This is a really dumb retry function
+    local max_retries=3
+    local delay=3
+    for i in $(seq $max_retries); do
+        "$@" && return 0
+        echo "The command return $? as error code. Retry (attempt $i) ..."
+        sleep $delay
+    done
+    return 1
+}
+
+function http_fetch {
+    retry _http_fetch "$@"
+}
+
+function do_umount {
+    if [ ! -z "${dir}" ] && [ "${dir}" != "/" ]; then
+        grep -q "${dir}/proc" /proc/mounts && umount ${dir}/proc || true
+        grep -q "${dir}/dev" /proc/mounts && umount ${dir}/dev   || true
+    fi
+}
+trap do_umount EXIT
+
+function do_chroot {
+    croot=$1
+    shift
+    chroot $croot "${@}"
+}
+
+function install_packages {
+    croot=$1
+    shift
+    yum -y --releasever=7 --installroot=${croot} install "${@}"
+}
