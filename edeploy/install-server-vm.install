@@ -28,7 +28,77 @@ ORIG=$(cd $(dirname $0); pwd)
 
 update_repositories ${dir}
 
-retry $EDEPLOY_ROLES_PATH/puppet-master.install $dir $dir $version
+install_passenger() {
+    mkdir -p ${dir}/usr/share/puppet/rack/puppetmasterd/public
+    mkdir -p ${dir}/usr/share/puppet/rack/puppetmasterd/tmp
+    cp ${dir}/usr/share/puppet/ext/rack/config.ru ${dir}/usr/share/puppet/rack/puppetmasterd/
+    do_chroot ${dir} chown puppet:puppet /usr/share/puppet/rack/puppetmasterd/config.ru
+
+    # Bug https://tickets.puppetlabs.com/browse/PUP-1386
+    cat >> ${dir}/usr/share/puppet/rack/puppetmasterd/config.ru <<EOF
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+EOF
+    
+    cat > ${dir}/etc/httpd/conf.d/puppetmaster.conf.disabled  <<EOF
+<VirtualHost *:8140>
+        SSLEngine on
+        SSLProtocol             ALL -SSLv2
+        SSLCipherSuite          ALL:!aNULL:!eNULL:!DES:!3DES:!IDEA:!SEED:!DSS:!PSK:!RC4:!MD5:+HIGH:+MEDIUM:!LOW:!SSLv2:!EXP
+        SSLHonorCipherOrder     on
+        SSLCertificateFile      /var/lib/puppet/ssl/certs/mycert.pem
+        SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/mycert.pem
+        SSLCertificateChainFile /var/lib/puppet/ssl/certs/ca.pem
+        SSLCACertificateFile    /var/lib/puppet/ssl/certs/ca.pem
+        SSLVerifyClient optional
+        SSLVerifyDepth  1
+        SSLOptions +StdEnvVars +ExportCertData
+        RequestHeader unset X-Forwarded-For
+        RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+        DocumentRoot /usr/share/puppet/rack/puppetmasterd/public/
+        RackBaseURI /
+        <Directory /usr/share/puppet/rack/puppetmasterd/>
+                Options None
+                AllowOverride None
+                Require all granted
+        </Directory>
+</VirtualHost>
+EOF
+}    
+
+install_edeploy_rsync() {
+    mkdir -p /var/lib/debootstrap/install /var/lib/debootstrap/metadata
+
+    cat > ${dir}/etc/rsyncd.conf << EOF
+uid = root
+gid = root
+
+[install]
+        path = /var/lib/debootstrap/install
+        comment = eDeploy install trees
+
+[metadata]
+        path = /var/lib/debootstrap/metadata
+        comment = eDeploy metadata
+EOF
+}
+
+DEV_PKGS="openssl-devel openldap-devel python-devel libffi-devel gcc"
+PKGS="vim-enhanced openssl postfix bc monit ansible sshpass mod_passenger puppet puppet-server rubygem-rake git python-pip pyxattr pylibacl"
+
+install_packages ${dir} ${PUPPET_REPO_URL}
+add_epel_repository $DIST
+
+http_fetch https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo ${dir}/etc/yum.repos.d/passenger.repo
+
+install_packages ${dir} $DEV_PKGS $PKGS
+
+install_bup ${dir}
+
+install_passenger
+install_edeploy_rsync
 
 # Temporary workaround for http://softwarefactory.enovance.com/redmine/issues/881
 cat >${dir}/etc/puppet/auth.conf<<EOF
@@ -37,19 +107,6 @@ auth any
 allow *
 EOF
 
-
-case "$(package_tool)" in
-    "yum")
-        add_epel_repository $DIST
-        install_packages ${dir} vim-enhanced openldap-devel python-devel postfix gcc libffi-devel bc monit ansible sshpass
-        install_bup ${dir}
-        remove_epel_repository $DIST
-        ;;
-    *)
-        fatal_error "Unsupported package_tool: $(package_tool)"
-        ;;
-esac
-
 # serverspec and stuff
 RSPEC_CORE_VERSION=2.99.0
 RSPEC_EXPECTATIONS_VERSION=${RSPEC_CORE_VERSION}
@@ -57,11 +114,6 @@ RSPEC_ITS_VERSION=1.0.0
 SPECINFRA_VERSION=1.27.0
 SERVERSPEC_VERSION=1.16.0
 
-# The install-server image provided lot of tools not used right now in SF
-# and in order to reduce image footprint we clean some useless components
-do_chroot ${dir} rm -Rf /opt/*
-
-HOME=/root do_chroot ${dir} gem uninstall -aIx rspec rspec-core rspec-expectations rspec-extra-formatters rspec-mocks serverspec specinfra
 HOME=/root retry do_chroot ${dir} gem install rspec-core -v ${RSPEC_CORE_VERSION}
 HOME=/root retry do_chroot ${dir} gem install rspec-expectations -v ${RSPEC_EXPECTATIONS_VERSION}
 HOME=/root retry do_chroot ${dir} gem install rspec-its -v ${RSPEC_ITS_VERSION}
@@ -106,19 +158,12 @@ do_chroot ${dir} sed -i '/pysflib/d' /root/puppet-bootstrapper/tools/managesf/re
 retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/managesf; pip install -r requirements.txt"
 do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tools/managesf; python setup.py install"
 
-# install-server-vm embed Jenkins (We dont want to have it here ...)
-# The role Jenkins does not deactivate the jenkins service at startup
-# https://github.com/redhat-cip/edeploy-roles/issues/80
-do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs rm -f ; done"
-
 # install requirements for functional tests
 retry do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tests; pip install -r requirements.txt"
 
-# Cleanup
-clear_packages_cache ${dir}
-# somehow yum left some packages behind...
-rm -f ${dir}/var/cache/yum/*/packages/*.rpm
-rm -f ${dir}/var/cache/yum/*/*.sqlite
+# install third party puppet modules
+retry do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
+
 # When roles are built by jenkins user (the case in our gate)
 # some hidden directories are stored in /var/lib/jenkins (Jenkins home)
 rm -Rf ${dir}/var/lib/jenkins/.[!.]*
@@ -128,7 +173,13 @@ do_chroot ${dir} passwd -l root
 
 disable_selinux
 
-# install third party puppet modules
-retry do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
+remove_epel_repository $DIST
+# Remove development packages, they are no longer needed
+remove_packages ${dir} ${DEV_PKGS}
+# Cleanup
+clear_packages_cache ${dir}
+# somehow yum left some packages behind...
+rm -f ${dir}/var/cache/yum/*/packages/*.rpm
+rm -f ${dir}/var/cache/yum/*/*.sqlite
 
 put_git_mark $dir
