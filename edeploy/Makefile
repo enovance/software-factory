@@ -56,10 +56,10 @@ $(INST)/softwarefactory.done: softwarefactory.install $(EDR_INST)/cloud.done
 	touch $(INST)/softwarefactory.done
 
 install-server-vm: $(INST)/install-server-vm.done
-$(INST)/install-server-vm.done: install-server-vm.install $(EDR_INST)/install-server.done
+$(INST)/install-server-vm.done: install-server-vm.install $(EDR_INST)/cloud.done
 	rm -f $(INST)/install-server-vm-*.img*
 	@(echo "----| Building install-server-vm |----")
-	./install-server-vm.install $(EDR_INST)/install-server $(INST)/install-server-vm $(SF_VERSION)
+	./install-server-vm.install $(EDR_INST)/coud $(INST)/install-server-vm $(SF_VERSION)
 	touch $(INST)/install-server-vm.done
 
 dist:

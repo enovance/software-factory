@@ -42,12 +42,10 @@ case "$(package_tool)" in
      install_packages ${dir} ${PUPPET_REPO_URL}
      add_epel_repository $DIST
 
-     # Install passenger
-     install_packages ${dir} "epel-release pygpgme curl"
+     # Install passenger repo
      http_fetch https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo ${dir}/etc/yum.repos.d/passenger.repo
-     install_packages ${dir} "mod_passenger"
 
-     install_packages ${dir} "puppet monit postfix git vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz ntp openssl mod_ssl"
+     install_packages ${dir} "puppet monit postfix git vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz ntp openssl mod_ssl mod_passenger"
      DEVEL_PKGS="swig libffi-devel openldap-devel zlib-devel libcurl-devel openssl-devel httpd-devel apr-devel apr-util-devel mariadb-devel gcc-c++ ruby-devel ImageMagick-devel gcc cpp python-devel libxml2-devel libxslt-devel"
 
      install_packages ${dir} ${DEVEL_PKGS}
