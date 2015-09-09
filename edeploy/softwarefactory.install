@@ -28,54 +28,86 @@ BUNDLE_RETRIES=3
 DOCDIR="../docs"
 GERRITHOOKS="../gerrit-hooks"
 
-retry $EDEPLOY_ROLES_PATH/jenkins.install ${dir} ${dir} $version
-# The role Jenkins does not deactivate the jenkins service at startup
-# https://github.com/redhat-cip/edeploy-roles/issues/80
-do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs rm -f ; done"
+function install_jenkins() {
+
+    wget -O $dir/etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+    chroot $dir rpm --import http://pkg.jenkins-ci.org/redhat-stable/jenkins-ci.org.key
+
+    [ -n "$JENKINS_VERSION" ] && JENKINS_VERSION="-${JENKINS_VERSION}"
+    install_packages $dir jenkins${JENKINS_VERSION}
+    
+    mkdir -p ${dir}/var/lib/jenkins/plugins
+    do_chroot $dir chown jenkins /var/lib/jenkins /var/lib/jenkins/plugins
+
+    # Jenkins Swarm client
+    swarm_client=$(basename $JENKINS_SWARM_CLIENT_URL)
+    http_fetch $JENKINS_SWARM_CLIENT_URL ${dir}/var/lib/jenkins/${swarm_client}
+    ln -sf ${swarm_client} ${dir}/var/lib/jenkins/swarm-client-latest.jar
+
+    # Jenkins ssh-agent plugin
+    http_fetch $JENKINS_SSH_AGENT_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_SSH_AGENT_PLUGIN_URL)
+    # Jenkins Gearman plugin
+    http_fetch $JENKINS_GEARMAN_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_GEARMAN_PLUGIN_URL)
+
+    # Jenkins Swarm plugin
+    http_fetch $JENKINS_SWARM_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_SWARM_PLUGIN_URL)
+
+    # Jenkins theme plugin
+    http_fetch $JENKINS_THEME_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_THEME_PLUGIN_URL)
+
+    # Jenkins credentials plugin
+    http_fetch $JENKINS_CREDENTIALS_BINDING_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_CREDENTIALS_BINDING_URL)
+
+    # http_fetch $JENKINS_CREDENTIALS_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_CREDENTIALS_URL)
+    http_fetch $JENKINS_WORKFLOW_STEP_API_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_WORKFLOW_STEP_API_URL)
+    http_fetch $JENKINS_PLAIN_CREDENTIALS_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_PLAIN_CREDENTIALS_URL)
+
+    # Jenkins ZMQ event plugin
+    http_fetch $JENKINS_ZMQ_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_ZMQ_PLUGIN_URL)
+
+    do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs rm -f ; done"
+}
+
+PKGS="puppet monit postfix git vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz ntp openssl mod_ssl mod_passenger"
+DEVEL_PKGS="swig libffi-devel openldap-devel zlib-devel libcurl-devel openssl-devel httpd-devel apr-devel apr-util-devel mariadb-devel gcc-c++ ruby-devel ImageMagick-devel gcc cpp python-devel libxml2-devel libxslt-devel"
+
+add_epel_repository $DIST
+# The puppetlas-release package install repo desc for puppet in yum
+install_packages ${dir} ${PUPPET_REPO_URL}
+# Install passenger repo
+http_fetch https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo ${dir}/etc/yum.repos.d/passenger.repo
+
+install_packages ${dir} ${PKGS} ${DEVEL_PKGS}
+
+install_jenkins
 
 # Install the most recent version of PIP at early stage
 retry do_chroot ${dir} pip install -U pip
+# Install a secure platform to get rid of SSL warnings, needs gcc
+retry do_chroot ${dir} pip install pyopenssl ndg-httpsclient pyasn1
 
-case "$(package_tool)" in
-  "yum")
-     # The puppetlas-release package install repo desc for puppet in yum
-     install_packages ${dir} ${PUPPET_REPO_URL}
-     add_epel_repository $DIST
+# Install SQLAlchemy for paste lodegit (not available in yum)
+# TODO(mhu) manage mirror choice with pip
+retry do_chroot ${dir} pip install SQLAlchemy
 
-     install_packages ${dir} "puppet monit postfix git vim-enhanced nodejs httpd java-1.6.0-openjdk mariadb-server python-werkzeug python-babel python-jinja2 MySQL-python socat mod_wsgi m2crypto mariadb gitweb debootstrap unzip pigz ntp openssl mod_ssl"
-     DEVEL_PKGS="swig libffi-devel openldap-devel zlib-devel libcurl-devel openssl-devel httpd-devel apr-devel apr-util-devel mariadb-devel gcc-c++ ruby-devel ImageMagick-devel gcc cpp python-devel libxml2-devel libxslt-devel"
+install_bup ${dir}
 
-     install_packages ${dir} ${DEVEL_PKGS}
+# Install mod authpub tkt for apache (SSO)
+http_fetch $MOD_AUTH_PUBTKT_URL ${dir}/tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz
+do_chroot ${dir} bash -c "cd /tmp && tar -xvzf mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
+do_chroot ${dir} bash -c "cd /tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION} && ./configure --apxs=/usr/bin/apxs && make && make install"
+do_chroot ${dir} rm -Rf /tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}
+mkdir -p ${dir}/var/www/html
+mkdir -p ${dir}/var/log/httpd
 
-     # Install a secure platform to get rid of SSL warnings, needs gcc
-     retry do_chroot ${dir} pip install pyopenssl
-     retry do_chroot ${dir} pip install ndg-httpsclient
-     retry do_chroot ${dir} pip install pyasn1
+# Install Redmine
+HOME=/root do_chroot ${dir} gem install bundler
+http_fetch $REDMINE_RHEL_URL ${dir}/usr/share/redmine.tar.gz
+do_chroot ${dir} bash -c "cd /usr/share && tar -xzpf redmine.tar.gz && mv redmine-${REDMINE_VERSION} redmine && chown -R root:root redmine"
 
-
-     # Install SQLAlchemy for paste lodegit (not available in yum)
-     # TODO(mhu) manage mirror choice with pip
-     retry do_chroot ${dir} pip install SQLAlchemy
-     install_bup ${dir}
-     # Install mod authpub tkt for apache (SSO)
-     http_fetch $MOD_AUTH_PUBTKT_URL ${dir}/tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz
-     do_chroot ${dir} bash -c "cd /tmp && tar -xvzf mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
-     do_chroot ${dir} bash -c "cd /tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION} && ./configure --apxs=/usr/bin/apxs && make && make install"
-     do_chroot ${dir} rm -Rf /tmp/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}
-     # Install Passenger for Redmine
-     mkdir -p ${dir}/var/www/html
-     mkdir -p ${dir}/var/log/httpd
-     HOME=/root do_chroot ${dir} gem install passenger --version ${PASSENGER_VERSION}
-     HOME=/root do_chroot ${dir} gem install bundler
-     HOME=/root do_chroot ${dir} passenger-install-apache2-module -a
-     do_chroot ${dir} bash -c "ln -s \$(find /usr/local/share/gems/gems/passenger-${PASSENGER_VERSION} -maxdepth 0) /usr/lib/passenger"
-     # Install Redmine
-     http_fetch $REDMINE_RHEL_URL ${dir}/usr/share/redmine.tar.gz
-     do_chroot ${dir} bash -c "cd /usr/share && tar -xzpf redmine.tar.gz && mv redmine-${REDMINE_VERSION} redmine && chown -R root:root redmine"
-
-     # We install this fake database file in order to force the bundle to activate the mysql2 lib
-     # Redmine puppet manifest will overwrite it
-     cat > ${dir}/usr/share/redmine/config/database.yml <<EOF
+# We install this fake database file in order to force the bundle to activate the mysql2 lib
+# Redmine puppet manifest will overwrite it
+cat > ${dir}/usr/share/redmine/config/database.yml <<EOF
 production:
   adapter: mysql2
   database: redmine
@@ -84,13 +116,9 @@ production:
   password: ""
   encoding: utf8
 EOF
-     HOME=/root do_chroot ${dir} bash -c "cd /usr/share/redmine && bundle install --retry $BUNDLE_RETRIES"
-     retry do_chroot ${dir} pip install python-dateutil
-     ;;
-  *)
-     fatal_error "$package_tool isn't supported for $ROLE role"
-     ;;
-esac
+
+HOME=/root do_chroot ${dir} bash -c "cd /usr/share/redmine && bundle install --retry $BUNDLE_RETRIES"
+retry do_chroot ${dir} pip install python-dateutil
 
 # Gerrit
 mkdir ${dir}/root/gerrit_data_source/
@@ -102,7 +130,7 @@ cp -Rf $GERRITHOOKS ${dir}/root/gerrit_data_source/
 
 # Install Redmine backlog plugin
 do_chroot ${dir} mkdir -p /usr/share/redmine/plugins
-retry do_chroot ${dir} git clone $REDMINE_BACKLOG_URL /usr/share/redmine/plugins/redmine_backlogs
+retry do_chroot ${dir} git clone --depth 1 $REDMINE_BACKLOG_URL /usr/share/redmine/plugins/redmine_backlogs
 # An update of holidays gem 10/12/2014 to 1.0.7 leads to unable to deploy the backlog plugin
 # Check later if we can safely remove that :
 cd ${dir}/usr/share/redmine/plugins/redmine_backlogs
@@ -112,7 +140,7 @@ HOME=/root do_chroot ${dir} bash -c "cd /usr/share/redmine/plugins/redmine_backl
 HOME=/root do_chroot ${dir} bash -c 'cd /usr/share/redmine && bundle update'
 
 # Install Redmine http plugin
-retry do_chroot ${dir} git clone $REDMINE_HTTP_PLUGIN_URL /usr/share/redmine/plugins/redmine_http_auth
+retry do_chroot ${dir} git clone --depth 1 $REDMINE_HTTP_PLUGIN_URL /usr/share/redmine/plugins/redmine_http_auth
 
 # Twitter Bootstrap - http://getbootstrap.com/
 http_fetch $BOOTSTRAP_URL ${dir}/tmp/bootstrap.zip
@@ -165,7 +193,6 @@ SUDO_UID=0 SUDO_GID=0 HOME=/root npm_install=$NPM_INSTALL do_chroot ${dir} sh /t
 ## Use a mirror
 do_chroot ${dir} sed -i "s|npm install|npm --registry ${NPM_MIRROR_URL} install|" /var/www/etherpad-lite/bin/installDeps.sh
 SUDO_UID=0 SUDO_GID=0 HOME=/root retry do_chroot ${dir} sh /var/www/etherpad-lite/bin/installDeps.sh
-
 # Include topmenu in Etherpad
 cat << EOF | patch ${dir}/var/www/etherpad-lite/src/templates/index.html
 38a39
@@ -183,12 +210,10 @@ EOF
 do_chroot ${dir} mkdir -p /srv/lodgeit
 retry do_chroot ${dir} git clone ${PASTE_URL} /srv/lodgeit/lodgeit
 do_chroot ${dir} bash -c "cd /srv/lodgeit/lodgeit && git checkout ${PASTE_VERSION}"
-
 # Replace absolute URLs beginning with /static/
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/layout.html
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/advanced.html
 do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/pasting.html
-
 # Include topmenu in Paste
 cat << EOF | patch ${dir}/srv/lodgeit/lodgeit/lodgeit/views/layout.html
 11a12
@@ -227,31 +252,20 @@ cd ${DOCDIR} && make BUILDDIR=$DOCBUILDDIR MANAGESF_CLONED_PATH=${MANAGESF_CLONE
 cp -r $DOCBUILDDIR/html/* ${dir}/var/www/docs/
 rm -rf $DOCBUILDDIR
 
-# Jenkins Swarm client
-retry do_chroot ${dir} pip install nose flake8
-swarm_client=$(basename $JENKINS_SWARM_CLIENT_URL)
-http_fetch $JENKINS_SWARM_CLIENT_URL ${dir}/var/lib/jenkins/${swarm_client}
-ln -sf ${swarm_client} ${dir}/var/lib/jenkins/swarm-client-latest.jar
-
-# Jenkins Swarm plugin
-mkdir -p ${dir}/var/lib/jenkins/plugins
-http_fetch $JENKINS_SWARM_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_SWARM_PLUGIN_URL)
-
-# Jenkins theme plugin
-http_fetch $JENKINS_THEME_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_THEME_PLUGIN_URL)
-
-# Jenkins credentials plugin
-http_fetch $JENKINS_CREDENTIALS_BINDING_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_CREDENTIALS_BINDING_URL)
-# http_fetch $JENKINS_CREDENTIALS_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_CREDENTIALS_URL)
-http_fetch $JENKINS_WORKFLOW_STEP_API_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_WORKFLOW_STEP_API_URL)
-http_fetch $JENKINS_PLAIN_CREDENTIALS_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_PLAIN_CREDENTIALS_URL)
-
-# Jenkins ZMQ event plugin
-http_fetch $JENKINS_ZMQ_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_ZMQ_PLUGIN_URL)
-
 # install git-review for internal use
 retry do_chroot ${dir} pip install git-review
 
+# install JJB
+retry do_chroot ${dir} pip install jenkins-job-builder
+
+# Fix /var/www permissions
+do_chroot ${dir} chmod -R 0644 /var/www
+do_chroot ${dir} find /var/www -type d -exec chmod 0755 {} \;
+do_chroot ${dir} chown -R apache:apache /var/www
+
+remove_epel_repository $DIST
+# Remove development packages, they are no longer needed
+remove_packages ${dir} ${DEVEL_PKGS}
 # Cleanup
 clear_packages_cache ${dir}
 # somehow yum left some packages behind...
@@ -260,14 +274,6 @@ rm -f ${dir}/var/cache/yum/*/*.sqlite
 # When roles are built by jenkins user (the case in our gate)
 # some hidden directories are stored in /var/lib/jenkins (Jenkins home)
 rm -Rf ${dir}/var/lib/jenkins/.[!.]*
-
-# Remove development packages, they are no longer needed
-remove_packages ${dir} ${DEVEL_PKGS}
-
-# Fix /var/www permissions
-do_chroot ${dir} chmod -R 0644 /var/www
-do_chroot ${dir} find /var/www -type d -exec chmod 0755 {} \;
-do_chroot ${dir} chown -R apache:apache /var/www
 
 # Disable root passwd
 do_chroot ${dir} passwd -l root
