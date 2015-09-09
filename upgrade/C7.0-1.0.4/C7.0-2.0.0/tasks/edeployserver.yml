@@ -6,10 +6,6 @@
   file: path={{ install_path }}/softwarefactory state=directory
 - name: Create metadata directory for metadata
   file: path={{ metadata_path }} state=directory
-- name: Deflate install-server-vm archive
-  command: tar -xzf {{ upstream_path }}/install-server-vm-{{ version }}.edeploy -C {{ install_path }}/install-server-vm
-  args:
-    creates: "{{ install_path }}/install-server-vm/bin/bash"
 - name: Deflate softwarefactory archive
   command: tar -xzf {{ upstream_path }}/softwarefactory-{{ version }}.edeploy -C {{ install_path }}/softwarefactory
   args:
