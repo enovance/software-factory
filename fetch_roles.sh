@@ -30,7 +30,7 @@ function fetch_base_roles_prebuilt {
     # Fetch edeploy and edeploy-roles (to fetch master EDEPLOY_ROLES_REL)
     echo "Fetch edeploy and edeploy-roles project from github ..."
     fetch_edeploy
-    echo "Fetch prebuilt bases edeploy roles (cloud and install-server) ..."
+    echo "Fetch prebuilt bases edeploy roles (cloud) ..."
     # Prepare prebuild roles
     local temp=$(mktemp -d /tmp/edeploy-check-XXXXX)
     PREBUILD_TARGET=$WORKSPACE/roles/install/$EDEPLOY_ROLES_REL
@@ -39,20 +39,10 @@ function fetch_base_roles_prebuilt {
         sudo chown ${USER}:root $PREBUILD_TARGET
     }
     cloud_img="cloud-$EDEPLOY_ROLES_REL.edeploy"
-    install_server_img="install-server-$EDEPLOY_ROLES_REL.edeploy"
 
     # Check if edeploy roles are up-to-date
-    [ ! -f $PREBUILD_TARGET/$install_server_img.md5 ] && sudo touch $PREBUILD_TARGET/$install_server_img.md5
     [ ! -f $PREBUILD_TARGET/$cloud_img.md5 ] && sudo touch $PREBUILD_TARGET/$cloud_img.md5
-    curl -s -o ${temp}/$install_server_img.md5 ${SWIFT_EDEPLOY_URL}/$install_server_img.md5
     curl -s -o ${temp}/$cloud_img.md5 ${SWIFT_EDEPLOY_URL}/$cloud_img.md5
-    diff $PREBUILD_TARGET/$install_server_img.md5 ${temp}/$install_server_img.md5 || {
-        echo "Fetching $install_server_img ..."
-        curl $PB -o ${temp}/$install_server_img ${SWIFT_EDEPLOY_URL}/$install_server_img
-        sudo mv -f ${temp}/$install_server_img* $PREBUILD_TARGET
-        # Remove the previously unziped archive
-        [ -d $PREBUILD_TARGET/install-server ] && sudo rm -Rf $PREBUILD_TARGET/install-server
-    } && echo "$install_server_img is already synced"
     diff $PREBUILD_TARGET/$cloud_img.md5 ${temp}/$cloud_img.md5 || {
         echo "Fetching $cloud_img ..."
         curl $PB -o ${temp}/$cloud_img ${SWIFT_EDEPLOY_URL}/$cloud_img
@@ -69,14 +59,6 @@ function fetch_base_roles_prebuilt {
         sudo mkdir cloud
         sudo tar -xzf $cloud_img -C cloud
         sudo touch cloud.done
-    }
-    [ ! -d install-server ] && {
-        echo "Check image checksum ..."
-        [ "$(md5sum $install_server_img | awk '{ print $1 }')" == "$(cat $install_server_img.md5 | awk '{ print $1 }')" ] || die "Image md5 checksum failed"
-        echo "Unarchive the install-server base role ..."
-        sudo mkdir install-server
-        sudo tar -xzf $install_server_img -C install-server
-        sudo touch install-server.done
     }
     cd - > /dev/null
     rm -Rf ${temp}
