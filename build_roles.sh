@@ -14,21 +14,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-if [ ! -z "${1}" ]; then
-    ARTIFACTS_DIR=${1}/edeploy
-    mkdir -p ${ARTIFACTS_DIR}
-    ERROR_LOG=${ARTIFACTS_DIR}/error_log
-else
-    ERROR_LOG=/dev/stderr
-fi
-
 LOCK="/var/run/sf-build_roles.lock"
 if [ -f ${LOCK} ]; then
     echo "Lock file present: ${LOCK}"
-    killall make
+    killall softwarefactory.install
 fi
 sudo touch ${LOCK}
-trap "sudo rm -f ${LOCK}" 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+trap "sudo rm -f ${LOCK}" EXIT
 
 set -e
 [ -n "$DEBUG" ] && set -x
@@ -84,7 +76,6 @@ function build_role {
         sudo mkdir ${INST}/${ROLE_NAME}
         echo "Unarchive ..."
         sudo tar -xzf ${UPSTREAM_FILE}.edeploy -C "${INST}/${ROLE_NAME}"
-        sudo touch ${INST}/${ROLE_NAME}.done
         echo ${ROLE_MD5} | sudo tee ${ROLE_FILE}.md5
         if [ -n "$VIRT" ]; then
             echo "Copy prebuilt qcow2 image ..."
@@ -99,17 +90,10 @@ function build_role {
         fi
     else
         if [ ! -f "${ROLE_FILE}.md5" ] || [ "$(cat ${ROLE_FILE}.md5)" != "${ROLE_MD5}" ]; then
-            echo "The locally built ${ROLE_NAME} md5 is different to what we computed from your git branch state."
+            echo "The locally built ${ROLE_NAME} md5 ($(cat ${ROLE_FILE}.md5)) is different to what we computed from your git branch state (${ROLE_MD5})."
             echo "Building role now..."
-            sudo rm -f ${INST}/${ROLE_NAME}.done
-            if [ ! -z "${ARTIFACTS_DIR}" ]; then
-                ROLE_OUTPUT=${ARTIFACTS_DIR}/${ROLE_NAME}_build.log
-            else
-                ROLE_OUTPUT=/dev/stdout
-            fi
-            sudo -H ${MAKE} EDEPLOY_ROLES_PATH=${EDEPLOY_ROLES} PREBUILD_EDR_TARGET=${EDEPLOY_ROLES_REL} \
-                PYSFLIB_CLONED_PATH=${PYSFLIB_CLONED_PATH} CAUTH_CLONED_PATH=${CAUTH_CLONED_PATH} \
-                MANAGESF_CLONED_PATH=${MANAGESF_CLONED_PATH} ${ROLE_NAME} &> ${ROLE_OUTPUT}
+            [ ! -d ${INST}/${ROLE_NAME} ] && sudo mkdir -p ${INST}/${ROLE_NAME}
+            STEP=1 SDIR=/var/lib/sf/git/edeploy sudo -E ./softwarefactory.install ${INST}/${ROLE_NAME} centos ${SF_VER}
             echo ${ROLE_MD5} | sudo tee ${ROLE_FILE}.md5
             if [ -n "$VIRT" ]; then
                 echo "Upstream ${ROLE_NAME} is NOT similar ! I rebuild the qcow2 image."
@@ -119,44 +103,27 @@ function build_role {
     fi
 }
 
+function install_sf {
+    ROLE_NAME="softwarefactory"
+    TAGGED_RELEASE=${TAGGED_RELEASE} PYSFLIB_PINNED_VERSION=${PYSFLIB_PINNED_VERSION} \
+    MANAGESF_PINNED_VERSION=${MANAGESF_PINNED_VERSION} CAUTH_PINNED_VERSION=${CAUTH_PINNED_VERSION} sudo -E ./edeploy/fetch_subprojects.sh
+    cd $SF_ROLES
+    STEP=2 DOCDIR=$DOCDIR GERRITHOOKS=$GERRITHOOKS PYSFLIB_CLONED_PATH=$PYSFLIB_CLONED_PATH CAUTH_CLONED_PATH=$CAUTH_CLONED_PATH MANAGESF_CLONED_PATH=$MANAGESF_CLONED_PATH SDIR=/var/lib/sf/git/edeploy sudo -E ./softwarefactory.install ${INST}/${ROLE_NAME} centos ${SF_VER}
+    cd ..
+}
+
+
 function build_roles {
     [ ! -d "$BUILD_DIR/install/${DVER}-${SF_REL}" ] && sudo mkdir -p $BUILD_DIR/install/${DVER}-${SF_REL}
 
-    # Clean the local copy before the md5 computations
-    if [ -z "$(git ls-files -o -m --exclude-standard)" ]; then
-        git clean -ffdx
-    else
-        (
-            echo "---------------------------------------------------------------------"
-            echo "Error: You have unstaged file in your local copy. Please stage them !"
-            echo "---------------------------------------------------------------------"
-        ) > ${ERROR_LOG}
-        exit 1
-    fi
-
     cd $SF_ROLES
-    build_role "softwarefactory"   $(cd ..; find ${SF_DEPS} ${SUBPROJECTS_DEPS} -type f -not -path "*/.git/*" | sort | xargs cat | md5sum | awk '{ print $1}')
-    SFE=$?
-    build_role "install-server-vm" $(cd ..; find ${IS_DEPS} ${SUBPROJECTS_DEPS} -type f -not -path "*/.git/*" | sort | xargs cat | md5sum | awk '{ print $1}')
+    build_role "softwarefactory" $(cat third_party_tools)
+    cd ..
     IE=$?
 }
 
 prepare_buildenv
-[ -z "$SKIP_UPSTREAM" ] && {
-    [ -z "$SF_SKIP_FETCHBASES" ] && {
-        ./fetch_roles.sh bases || echo "pass..."
-        echo
-    }
-    ./fetch_roles.sh trees || echo "pass..."
-    echo
-    [ -n "$VIRT" ] && {
-        ./fetch_roles.sh imgs || echo "pass..."
-    }
-}
-
 fetch_edeploy
-TAGGED_RELEASE=${TAGGED_RELEASE} PYSFLIB_PINNED_VERSION=${PYSFLIB_PINNED_VERSION} MANAGESF_PINNED_VERSION=${MANAGESF_PINNED_VERSION} CAUTH_PINNED_VERSION=${CAUTH_PINNED_VERSION} ./edeploy/fetch_subprojects.sh
-echo
-build_roles
-
-exit $[ $SFE + $IE ];
+[ -z "${SKIP_BUILD}" ] && build_roles
+install_sf
+exit $IE
