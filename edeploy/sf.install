@@ -1,0 +1,54 @@
+function install_sf {
+    set -e
+    test -n "${CAUTH_CLONED_PATH}"
+    test -n "${MANAGESF_CLONED_PATH}"
+    test -n "${PYSFLIB_CLONED_PATH}"
+    # Install puppet files for SF
+    do_chroot ${dir} mkdir -p /etc/puppet/environments/sf
+    do_chroot ${dir} mkdir -p /etc/puppet/hiera/sf
+    sudo cp -Rv ./../puppet/manifests ${dir}/etc/puppet/environments/sf
+    sudo cp -Rv ./../puppet/modules ${dir}/etc/puppet/environments/sf
+    sudo cp -Rv ./../puppet/hiera/* ${dir}/etc/puppet/hiera/sf
+    sudo cp -Rv ./../puppet/hiera.yaml ${dir}/etc/puppet/
+    # Install the bootstrap scripts
+    sudo mkdir -p ${dir}/root/puppet-bootstrapper
+    sudo cp -Rv ./../tests ${dir}/root/puppet-bootstrapper/
+    sudo cp -Rv ./../tools ${dir}/root/puppet-bootstrapper/
+    sudo cp -Rv ./../serverspec ${dir}/root/puppet-bootstrapper/
+    sudo cp -Rv ./../bootstraps/*.sh ${dir}/root/puppet-bootstrapper/
+    sudo cp -Rv ./../bootstraps/sfcreds.yaml ${dir}/root/puppet-bootstrapper/
+
+    # Install pysflib, managesf, cauth
+    [ ! -d "${dir}/var/www/cauth" ] && sudo mkdir ${dir}/var/www/cauth
+    sudo cp -Rv ${CAUTH_CLONED_PATH}/* ${dir}/var/www/cauth/
+    # override pysflib version from requirements
+    do_chroot ${dir} sed -i '/pysflib/d' /var/www/cauth/requirements.txt
+    do_chroot ${dir} bash -c "cd /var/www/cauth && SWIG_FEATURES='-cpperraswarn -includeall -I/usr/include/openssl' pip install -r requirements.txt"
+    do_chroot ${dir} bash -c "cd /var/www/cauth && python setup.py install"
+
+    sudo mkdir -p ${dir}/tmp/pysflib
+    sudo cp -Rv ${PYSFLIB_CLONED_PATH}/* ${dir}/tmp/pysflib/
+    do_chroot ${dir} bash -c "cd /tmp/pysflib; pip install -r requirements.txt"
+    do_chroot ${dir} bash -c "cd /tmp/pysflib; python setup.py install"
+
+    # install sfmanager. managesf has been checkouted before on the build node in /tmp
+    [ ! -d "${dir}/var/www/managesf" ] && sudo mkdir ${dir}/var/www/managesf
+    sudo cp -Rv ${MANAGESF_CLONED_PATH}/* ${dir}/var/www/managesf/
+    # override pysflib version from requirements
+    do_chroot ${dir} sed -i '/pysflib/d' /var/www/managesf/requirements.txt
+    do_chroot ${dir} bash -c "cd /var/www/managesf; pip install -r requirements.txt"
+    do_chroot ${dir} bash -c "cd /var/www/managesf; python setup.py install"
+
+    # install requirements for functional tests
+    do_chroot ${dir} bash -c "cd /root/puppet-bootstrapper/tests; pip install -r requirements.txt"
+
+    # Install Gerrit hooks
+    cp -Rf $GERRITHOOKS ${dir}/root/gerrit_data_source/
+
+    # Documentation
+    DOCBUILDDIR=/tmp/_build
+    [ ! -d "${dir}/var/www/docs" ] && mkdir ${dir}/var/www/docs
+    cd ${DOCDIR} && make BUILDDIR=$DOCBUILDDIR MANAGESF_CLONED_PATH=${dir}/var/www/managesf html ; cd -
+    cp -r $DOCBUILDDIR/html/* ${dir}/var/www/docs/
+    rm -rf $DOCBUILDDIR
+}
