@@ -17,6 +17,9 @@ cp /etc/httpd/conf.d/puppetmaster.conf.disabled $PM_A_CONF
 sed -i -e "s!SSLCertificateFile.*!SSLCertificateFile /var/lib/puppet/ssl/certs/${FQDN}.pem!" $PM_A_CONF
 sed -i -e "s!SSLCertificateKeyFile.*!SSLCertificateKeyFile /var/lib/puppet/ssl/private_keys/${FQDN}.pem!" $PM_A_CONF
 
+# make sure /var/run/passenger-instreg exists
+[ -d /var/run/passenger-instreg ] || mkdir -p /var/run/passenger-instreg
+
 # We only need to setup puppet conf and certificates the first init of SF
 # This must not be done during an upgrade !
 if [ "$INITIAL" = "yes" ]; then

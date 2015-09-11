@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Saving etherpad API key"
-cp /var/www/etherpad-lite*/APIKEY.txt /tmp/APIKEY.txt
+# make sure /var/run/passenger-instreg exists
+[ -d /var/run/passenger-instreg ] || mkdir -p /var/run/passenger-instreg
 
 exit 0
