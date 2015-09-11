@@ -16,12 +16,11 @@
 class jenkins ($settings = hiera_hash('jenkins', '')) {
 
   require hosts
+  include apache
 
   $jenkins_password = $settings['jenkins_password']
 
-  $http = "httpd"
   $provider = "systemd"
-  $httpd_user = "apache"
   $htpasswd = "/etc/httpd/htpasswd"
 
   file {'/etc/httpd/conf.d/ports.conf':
@@ -38,7 +37,8 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
     owner  => $httpd_user,
     group  => $httpd_user,
     content => template('jenkins/jenkins.site.erb'),
-    require => File['/etc/httpd/conf.d/ports.conf'],
+    require => [File['/etc/httpd/conf.d/ports.conf'],
+        ],
     notify => Service['webserver'],
   }
 
@@ -70,14 +70,6 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
                 File['/var/cache/jenkins'],
                 File['/var/lib/jenkins/config.xml']]
    }
-
-  service {'webserver':
-    name    => $http,
-    ensure  => running,
-    enable  => 'true',
-    require => [File['/etc/httpd/conf.d/jenkins.conf'],
-                File['/etc/httpd/conf.d/ports.conf']]
-  }
 
   user { 'jenkins':
     ensure  => present,
@@ -227,6 +219,7 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
   }
 
   bup::scripts{ 'jenkins_scripts':
+    name => 'jenkins',
     backup_script => 'jenkins/backup.sh.erb',
     restore_script => 'jenkins/restore.sh.erb',
   }
