@@ -254,7 +254,7 @@ resources:
             - encoding: b64
               content: SFCONFIGCONTENT
               path: /root/sfconfig.yaml
-            runcmd:
+            bootcmd:
               - mkdir -p /var/log/edeploy
               - echo "PROFILE=none" >> /var/log/edeploy/vars
               - MY_PRIV_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4 | cut -d, -f1`
@@ -307,7 +307,7 @@ resources:
             hostname: jenkins
             fqdn: jenkins.SF_SUFFIX
             disable_root: 0
-            runcmd:
+            bootcmd:
               - mkdir -p /var/log/edeploy
               - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
@@ -345,7 +345,7 @@ resources:
             hostname: redmine
             fqdn: redmine.SF_SUFFIX
             disable_root: 0
-            runcmd:
+            bootcmd:
               - mkdir -p /var/log/edeploy
               - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
@@ -383,7 +383,7 @@ resources:
             hostname: gerrit
             fqdn: gerrit.SF_SUFFIX
             disable_root: 0
-            runcmd:
+            bootcmd:
               - mkdir -p /var/log/edeploy
               - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
@@ -421,7 +421,7 @@ resources:
             hostname: managesf
             fqdn: managesf.SF_SUFFIX
             disable_root: 0
-            runcmd:
+            bootcmd:
               - mkdir -p /var/log/edeploy
               - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
@@ -459,7 +459,7 @@ resources:
             hostname: mysql
             fqdn: mysql.SF_SUFFIX
             disable_root: 0
-            runcmd:
+            bootcmd:
               - mkdir -p /var/log/edeploy
               - echo "PROFILE=none" >> /var/log/edeploy/vars
               - service puppet stop
@@ -535,7 +535,7 @@ resources:
                 JVMARGS=-Xmx256m
               permissions: '0640'
               path: /etc/sysconfig/swarm
-            runcmd:
+            bootcmd:
              - mkdir -p /var/log/edeploy
              - echo "PROFILE=none" >> /var/log/edeploy/vars
              - echo "127.0.1.1 slave.SF_SUFFIX slave" >> /etc/hosts
