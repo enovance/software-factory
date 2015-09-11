@@ -35,6 +35,8 @@
 /etc/sysconfig/network-scripts/ifcfg-eth0
 /etc/systemd/system/multi-user.target.wants
 /etc/udev/rules.d/*persistent*
+/etc/puppet/environments/production
+/etc/puppet/puppet.conf
 /root/.ssh
 /usr/share/httpd/
 /usr/share/sf-jjb/
@@ -63,6 +65,7 @@
 /var/tmp/
 
 # Sf state data
+/root/puppet-bootstrapper/build/
 /var/spool/
 /var/lib/postfix/master.lock
 /var/lib/zuul/
@@ -95,6 +98,8 @@
 /srv/cauth_keys/
 
 # Sf configuration
+/root/hosts.yaml
+/root/sfconfig.yaml
 /etc/puppet/
 /etc/httpd/conf.d/
 /etc/httpd/conf.modules.d/
@@ -103,3 +108,7 @@
 /etc/jenkins_jobs/
 + /root/gerrit_data_source/
 - /root/*
+
+
+# REMOVEME?: Software factory source code
+/srv/software-factory
