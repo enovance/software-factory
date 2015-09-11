@@ -5,15 +5,12 @@
 
 set -x
 
-cur=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)
-. ${cur}/../../functestslib.sh
-
 SF_ROOT=${SF_ROOT:-"/root/puppet-bootstrapper"}
 SF_SUFFIX=${SF_SUFFIX:-"tests.dom"}
 
 function run {
     local cmd=$1
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@`get_ip puppetmaster` "cd puppet-bootstrapper/tools/provisioner_checker; SF_SUFFIX=${SF_SUFFIX} SF_ROOT=${SF_ROOT} python $cmd.py"
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.134.49 "cd puppet-bootstrapper/tools/provisioner_checker; SF_SUFFIX=${SF_SUFFIX} SF_ROOT=${SF_ROOT} python $cmd.py"
     ERROR=$?
 }
 
