@@ -35,7 +35,7 @@ write_files:
 - encoding: b64
   content: SFCONFIGCONTENT
   path: /root/sfconfig.yaml
-runcmd:
+bootcmd:
   - mkdir -p /var/log/edeploy
   - echo "PROFILE=none" >> /var/log/edeploy/vars
   - MY_PRIV_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4 | cut -d, -f1`

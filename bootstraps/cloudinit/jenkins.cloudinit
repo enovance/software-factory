@@ -3,7 +3,7 @@ output: {all: '| tee -a /var/log/cloud-init-output.log'}
 hostname: jenkins
 fqdn: jenkins.SF_SUFFIX
 disable_root: 0
-runcmd:
+bootcmd:
   - service puppet stop
   - echo puppetmaster-ip-template puppetmaster.SF_SUFFIX puppet puppetmaster >> /etc/hosts
   - sed -i -e '0,/^$/s/^$/server=puppetmaster.SF_SUFFIX\n/g' /etc/puppet/puppet.conf
