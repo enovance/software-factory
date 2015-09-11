@@ -41,7 +41,7 @@ write_files:
     JVMARGS=-Xmx256m
   permissions: '0640'
   path: /etc/sysconfig/swarm
-runcmd:
+bootcmd:
   - echo "127.0.1.1 slave.SF_SUFFIX slave" >> /etc/hosts
   - echo "MANAGESF_IP managesf.SF_SUFFIX SF_SUFFIX" >> /etc/hosts
   - chown -R jenkins /var/lib/jenkins
