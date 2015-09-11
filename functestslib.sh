@@ -123,13 +123,13 @@ function publish_artifacts {
 
 function scan_and_configure_knownhosts {
     local ip=`get_ip puppetmaster`
-    ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$ip" > /dev/null 2>&1 || echo
+    rm -f "$HOME/.ssh/known_hosts"
     RETRIES=0
     echo " [+] Starting ssh-keyscan on $ip:22"
     while true; do
         KEY=`ssh-keyscan -p 22 $ip 2> /dev/null`
         if [ "$KEY" != ""  ]; then
-            ssh-keyscan $ip 2> /dev/null >> "$HOME/.ssh/known_hosts"
+            ssh-keyscan $ip | tee -a "$HOME/.ssh/known_hosts"
             echo "  -> $role:22 is up!"
             return 0
         fi
@@ -192,16 +192,7 @@ function pre_fail {
     echo -e "\n\n\n====== $1 OUTPUT ======\n"
     case $1 in
         "Roles building FAILED")
-            if [ -f "${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log" ]; then
-                F="${ARTIFACTS_DIR}/edeploy/softwarefactory_build.log"
-            elif [ -f "${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log" ]; then
-                F="${ARTIFACTS_DIR}/edeploy/install-server-vm_build.log"
-            fi
-            if [ -f "${F}" ]; then
-                echo ${F}
-                tail -n 120 ${F}
-            fi
-            [ -f "${ARTIFACTS_DIR}/edeploy/error_log" ] && cat ${ARTIFACTS_DIR}/edeploy/error_log
+            echo "bad luck..."
             ;;
         "LXC bootstrap FAILED")
             tail -n 120 ${ARTIFACTS_DIR}/lxc-start.output
