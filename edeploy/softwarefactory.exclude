@@ -72,23 +72,9 @@
 /usr/share/redmine/public/plugin_assets/
 /usr/share/config.init.done
 /srv/cauth_keys/
+/srv/software-factory/
 
 # Sf configuration
 /root/hosts.yaml
 /root/sfconfig.yaml
 /etc/httpd/htpasswd
-
-# REMOVEME?
-/etc/zuul/
-/etc/jenkins_jobs/
-/srv/software-factory
-/usr/lib/systemd/system/etherpad.service
-/usr/lib/systemd/system/gerrit.service
-/usr/lib/systemd/system/jenkins.service
-/usr/lib/systemd/system/lodgeit.service
-/usr/lib/systemd/system/socat.service
-/usr/lib/systemd/system/zuul-merger.service
-/usr/lib/systemd/system/zuul.service
-/usr/share/httpd/
-/usr/share/sf-jjb/
-/usr/share/sf-zuul/
