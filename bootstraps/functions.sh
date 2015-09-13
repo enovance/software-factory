@@ -247,7 +247,7 @@ function run_puppet_agent {
     # Puppet agent will return code 2 on success...
     # We create a sub-process () and convert the error
     puppet agent --test --environment sf || (
-        [ "$?" == 2 ] && exit 0
+        [ "$?" != 4 ] && [ "$?" != 6 ] && exit 0
         echo "========================================="
         echo "FAIL: Puppet agent failed on puppetmaster"
         echo "========================================="
@@ -275,7 +275,7 @@ function trigger_puppet_apply {
         # Puppet agent will return code 2 on success...
         # We create a sub-process () and convert the error
         $SSHPASS ssh -p$ssh_port root@${role}.${SF_SUFFIX} "puppet agent --test --environment sf" || (
-            [ "$?" == 2 ] && exit 0
+            [ "$?" != 4 ] && [ "$?" != 6 ] && exit 0
             echo "======================================"
             echo "FAIL: Puppet agent failed for ${role}"
             echo "======================================"
