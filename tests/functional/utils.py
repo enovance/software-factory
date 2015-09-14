@@ -237,6 +237,21 @@ class ManageSfUtils(Tool):
             output = None
         return output
 
+    def create_init_tests(self, project):
+        subcmd = (" user create --username=%s "
+                  "--password=%s --email=%s "
+                  "--fullname=%s" % (user, password, email, user))
+        auth_user = config.ADMIN_USER
+        auth_password = config.USERS[config.ADMIN_USER]['password']
+        cmd = self.base_cmd % (auth_user, auth_password) + subcmd
+        cmd = shlex.split(cmd)
+        try:
+            output = subprocess.check_output(cmd)
+        except:
+            output = None
+        return output
+
+
 
 class GerritGitUtils(Tool):
     def __init__(self, user, priv_key_path, email):
