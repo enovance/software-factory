@@ -19,8 +19,8 @@ set -x
 
 ROLES="puppetmaster"
 ROLES="$ROLES mysql"
-ROLES="$ROLES redmine"
-ROLES="$ROLES gerrit"
+#ROLES="$ROLES redmine"
+#ROLES="$ROLES gerrit"
 ROLES="$ROLES managesf"
 ROLES="$ROLES jenkins"
 ROLES="$ROLES slave"

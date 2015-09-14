@@ -18,12 +18,12 @@ write_files:
         ip: jenkins_host
         host_aliases: [jenkins]
       redmine.SF_SUFFIX:
-        ip: redmine_host
+        ip: managesf_host
         host_aliases: [redmine]
       api-redmine.SF_SUFFIX:
-        ip: redmine_host
+        ip: managesf_host
       gerrit.SF_SUFFIX:
-        ip: gerrit_host
+        ip: managesf_host
         host_aliases: [gerrit]
       managesf.SF_SUFFIX:
         ip: managesf_host
@@ -44,8 +44,8 @@ runcmd:
   - echo "mysql_host mysql.SF_SUFFIX mysql" >> /etc/hosts
   - echo "jenkins_host jenkins.SF_SUFFIX jenkins" >> /etc/hosts
   - echo "slave_host slave.SF_SUFFIX slave" >> /etc/hosts
-  - echo "redmine_host redmine.SF_SUFFIX redmine" >> /etc/hosts
-  - echo "gerrit_host gerrit.SF_SUFFIX gerrit" >> /etc/hosts
+  - echo "managesf_host redmine.SF_SUFFIX redmine" >> /etc/hosts
+  - echo "managesf_host gerrit.SF_SUFFIX gerrit" >> /etc/hosts
   - echo "managesf_host managesf.SF_SUFFIX auth.SF_SUFFIX managesf SF_SUFFIX" >> /etc/hosts
   - echo NAMESERVER > /etc/resolv.conf
   - cd /root/puppet-bootstrapper

@@ -26,15 +26,6 @@ node /.*jenkins.*/ {
 
 node /.*redmine.*/ {
   include sfbase
-  include redmine
-  include cauth_client
-}
-
-node /.*gerrit.*/ {
-  include sfbase
-  include ssh_keys_gerrit
-  include gerrit
-  include bup
 }
 
 node /.*mysql.*/ {
@@ -45,13 +36,22 @@ node /.*mysql.*/ {
 
 node /.*managesf.*/ {
   include sfbase
+
+  # Gerrit
+  include ssh_keys_gerrit
+  include gerrit
+  include bup
+
+  # Redmine
+  include redmine
+
+  # Managesf
   include apache
   include managesf
   include cauth
   include cauth_client
   include commonservices-apache
   include commonservices-socat
-  include socat_gerrit
   include etherpad
   include lodgeit
   include replication
