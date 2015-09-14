@@ -70,7 +70,7 @@ function build_role {
             fi
             cd $SF_ROLES
             STEP=1 SDIR=/var/lib/sf/git/edeploy \
-            sudo -E ./softwarefactory.install "${INST}/${ROLE_NAME}_cache" centos ${SF_VER} &> ${ROLE_OUTPUT} || { echo "(STEP1) Build failed"; sudo rm -Rf ${ROLE_FILE}.md5; exit 1; }
+            sudo -E ./softwarefactory.install "${INST}/${ROLE_NAME}_cache" ${SF_VER} &> ${ROLE_OUTPUT} || { echo "(STEP1) Build failed"; sudo rm -Rf ${ROLE_FILE}.md5; exit 1; }
             cd -
         } || {
             echo "(STEP1) Skip rebuilding cache (forced)."
@@ -109,14 +109,13 @@ function finalize_role {
     STEP=2 DOCDIR=$DOCDIR GERRITHOOKS=$GERRITHOOKS PYSFLIB_CLONED_PATH=$PYSFLIB_CLONED_PATH \
     CAUTH_CLONED_PATH=$CAUTH_CLONED_PATH MANAGESF_CLONED_PATH=$MANAGESF_CLONED_PATH \
     SDIR=/var/lib/sf/git/edeploy \
-    sudo -E ./softwarefactory.install ${INST}/${ROLE_NAME} centos ${SF_VER} &> ${ROLE_OUTPUT}
+    sudo -E ./softwarefactory.install ${INST}/${ROLE_NAME} ${SF_VER} &> ${ROLE_OUTPUT}
     cd -
 
     echo ${ROLE_MD5} | sudo tee ${ROLE_FILE}.md5
 }
 
 prepare_buildenv
-fetch_edeploy
 build_role "softwarefactory" $(find ${BASE_DEPS} -type f -not -path "*/.git/*" | sort | xargs cat | md5sum | awk '{ print $1}')
 finalize_role "softwarefactory"
 if [ -n "$VIRT" ]; then
