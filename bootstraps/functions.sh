@@ -18,11 +18,11 @@ set -e
 set -x
 
 ROLES="puppetmaster"
-ROLES="$ROLES mysql"
-ROLES="$ROLES redmine"
-ROLES="$ROLES gerrit"
+#ROLES="$ROLES mysql"
+#ROLES="$ROLES redmine"
+#ROLES="$ROLES gerrit"
 ROLES="$ROLES managesf"
-ROLES="$ROLES jenkins"
+#ROLES="$ROLES jenkins"
 ROLES="$ROLES slave"
 
 PUPPETIZED_ROLES=$(echo $ROLES | sed -e s/puppetmaster// -e s/slave//)
