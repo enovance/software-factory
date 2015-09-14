@@ -171,7 +171,7 @@ function start {
         sudo lxc-start -d -L /var/log/lxc$name.log --name $name;
     done
     sleep 20
-    for name in gerrit jenkins managesf redmine slave; do
+    for name in gerrit jenkins managesf slave; do
         sudo lxc-start -d -L /var/log/lxc$name.log --name $name
     done
     # Start iptables rules

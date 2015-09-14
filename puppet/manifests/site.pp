@@ -26,8 +26,6 @@ node /.*jenkins.*/ {
 
 node /.*redmine.*/ {
   include sfbase
-  include redmine
-  include cauth_client
 }
 
 node /.*gerrit.*/ {
@@ -45,6 +43,7 @@ node /.*mysql.*/ {
 
 node /.*managesf.*/ {
   include sfbase
+  include redmine
   include apache
   include managesf
   include cauth

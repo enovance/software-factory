@@ -20,11 +20,6 @@ hosts:
     role: softwarefactory
     cloudinit: CIPATH/mysql.cloudinit
   -
-    address: 192.168.134.51
-    name: redmine
-    role: softwarefactory
-    cloudinit: CIPATH/redmine.cloudinit
-  -
     address: 192.168.134.52
     name: gerrit
     role: softwarefactory
