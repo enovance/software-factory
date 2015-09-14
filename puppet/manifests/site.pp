@@ -32,42 +32,29 @@ node /.*jenkins.*/ {
   include bup
 }
 
-node /.*redmine.*/ {
-  include sfbase
-  include postfix
-  include monit
-  include redmine
-  include cauth_client
-}
+node /.*managesf.*/ {
+  class {'sfbase': stage => first }
+  class {'mysql': stage => first }
+  class {'bup': stage => first }
 
-node /.*gerrit.*/ {
-  include sfbase
   include postfix
   include monit
+
+  # Gerrit
   include ssh_keys_gerrit
   include gerrit
   include bup
-}
 
-node /.*mysql.*/ {
-  include sfbase
-  include postfix
-  include monit
-  include mysql
-  include bup
-}
+  # Redmine
+  include redmine
 
-node /.*managesf.*/ {
-  include sfbase
-  include postfix
-  include monit
+  # Managesf
   include apache
   include managesf
   include cauth
   include cauth_client
   include commonservices-apache
   include commonservices-socat
-  include socat_gerrit
   include etherpad
   include lodgeit
   include replication
