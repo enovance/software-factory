@@ -69,10 +69,8 @@ class TestManageSF(Base):
         for dirs in self.dirs_to_delete:
             shutil.rmtree(dirs)
 
-    def create_project(self, name, user,
-                       options=None):
-        self.msu.createProject(name, user,
-                               options)
+    def create_project(self, name, user, options=None):
+        self.msu.createProject(name, user, options)
         self.projects.append(name)
 
     def test_create_public_project_as_admin(self):
@@ -411,7 +409,7 @@ class TestManageSF(Base):
         self.assertEqual(set(files), set(us_files))
 
     def test_delete_project_as_admin(self):
-        """ Checking if admin can delete projects that are not owned by admin
+        """ Check if admin can delete projects that are not owned by admin
         """
         pname = 'p_%s' % create_random_str()
         self.create_project(pname, config.USER_2)
@@ -428,3 +426,15 @@ class TestManageSF(Base):
         """ Check the list of members as a list of tuples of emails and names
         """
         self.assertTrue(self.msu.list_active_members(config.USER_2))
+
+    def test_init_user_tests(self):
+        """ Create a commit
+        """
+        project = 'test_project'
+        self.create_project(project, config.USER_4)
+        self.msu.create_init_tests(project)
+        ggu = GerritGitUtils(config.ADMIN_USER,
+                             config.ADMIN_PRIV_KEY_PATH,
+                             config.USERS[config.ADMIN_USER]['email'])
+        open_reviews = ggu.list_open_reviews('config')
+        self.assertTrue(len(open_reviews) > 0)
