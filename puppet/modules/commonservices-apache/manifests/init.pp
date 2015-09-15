@@ -14,6 +14,7 @@
 # under the License.
 
 class commonservices-apache ($cauth = hiera_hash('cauth', ''),
+                             $allowed_proxy_prefixes = hiera('allowed_proxy_prefixes', ['127.0.0.1']),
                              $authenticated_only = hiera('authenticated_only', false)) {
 
   require hosts

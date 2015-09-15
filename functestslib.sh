@@ -6,6 +6,7 @@ export SF_SUFFIX=${SF_SUFFIX:-tests.dom}
 export SKIP_CLEAN_ROLES="y"
 
 MANAGESF_URL=http://managesf.${SF_SUFFIX}
+JENKINS_URL="http://${SF_SUFFIX:-tests.dom}/jenkinslogs/${JENKINS_IP}:8081/"
 
 ARTIFACTS_DIR="/var/lib/sf/artifacts"
 # This environment variable is set ZUUL in the jenkins job workspace
