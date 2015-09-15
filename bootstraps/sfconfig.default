@@ -104,3 +104,13 @@ swift_logsexport_tenantname: tenantname
 # Use 1 for using the tempauth of Swift or use 2
 # if you rely on a keystone authentication
 swift_logsexport_authversion: 1
+
+# Allowed URLs or URL prefixes that are accessible via the gateway
+# This can be used to ensure only authenticated users access the Jenkins logs
+# on the slaves. In this case the Jenkins slaves must be accessible only from
+# the gateway.
+# Can bei either full domains or only prefixes, for example to allow IP-ranges
+allowed_proxy_prefixes:
+  - "198.154.188."
+  - "127.0.0.1"
+  - "tests.dom"
