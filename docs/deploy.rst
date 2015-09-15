@@ -543,3 +543,48 @@ something like this:
 Please note that Gerrit overwrites all commits that are merged elsewhere. That
 means that merged Pull Requests in Github itself will be lost in the history
 (technically they are still there, but no longer visible).
+
+Using nodepool to manage Jenkins slaves
+---------------------------------------
+
+Nodepool automates management of Jenkins slave. It automatically prepares and
+starts VMs that are used for a single test. After each test the VM is destroyed
+and a fresh one is started for the next test. Nodepool also prepares the images
+that are used for testing, for example when additional packages are required.
+
+To do this, an account on an OpenStack cloud is required and credentials need to
+be known by nodepool.
+
+There are basically two options to configure nodepool. The easiest way to test
+nodepool is to use a LXC environment and add a file ~/sfconfig.local with the
+following content::
+
+ nodepool_os_username: 'username'
+ nodepool_os_password: 'secret'
+ nodepool_os_project_id: 'tenant'
+ nodepool_os_auth_url: 'http://mykeystoneendpoint:35357/v2.0'
+
+If you don't use a LXC environment, you need to modify
+puppet/hiera/nodepool.yaml and change settings there.
+
+By default an image named "centos7" is required and used by nodepool.  If there
+is none yet, create one and use the following URL as source:
+http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+
+If you want to test nodepool with SF itself, do the following::
+
+ cd software-factory
+ DEBUG=1 ./run_functional-tests.sh
+ # enable public network access after LXC containers
+ sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+Once the deployment is up and running you should see a new VM running on the
+OpenStack cloud. It will take some time before the nodepool image is ready,
+because of the sfstack install script and downloading of the prebuilt roles. You
+can see nodepool actions on the Jenkins container::
+
+ ssh -l root -A 192.168.134.53
+ tail -f /var/log/nodepool/nodepool.log
+
+Finally, you should see a Jenkins slave on Jenkins after some time. Now you're
+ready to run test on your nodepool-managed Jenkins slaves!
