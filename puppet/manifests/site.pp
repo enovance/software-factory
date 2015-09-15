@@ -4,17 +4,25 @@ Package {
 
 $httpd_user = "apache"
 
+stage { 'first':
+  before => Stage["main"],
+}
+
 node default {
 }
 
 node /.*puppetmaster.*/ {
   include sfbase
+  include postfix
+  include monit
   include edeploy_server
   include auto_backup
 }
 
 node /.*jenkins.*/ {
   include sfbase
+  include postfix
+  include monit
   include ssh_keys_jenkins
   include jenkins
   include jjb
@@ -26,12 +34,16 @@ node /.*jenkins.*/ {
 
 node /.*redmine.*/ {
   include sfbase
+  include postfix
+  include monit
   include redmine
   include cauth_client
 }
 
 node /.*gerrit.*/ {
   include sfbase
+  include postfix
+  include monit
   include ssh_keys_gerrit
   include gerrit
   include bup
@@ -39,12 +51,16 @@ node /.*gerrit.*/ {
 
 node /.*mysql.*/ {
   include sfbase
+  include postfix
+  include monit
   include mysql
   include bup
 }
 
 node /.*managesf.*/ {
   include sfbase
+  include postfix
+  include monit
   include apache
   include managesf
   include cauth
@@ -59,7 +75,9 @@ node /.*managesf.*/ {
 
 node /.*allinone.*/ {
   include sfbase
-
+  include postfix
+  include monit
+ 
   # Puppetmaster
   include edeploy_server
   include auto_backup
