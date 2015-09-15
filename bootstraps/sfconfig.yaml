@@ -84,3 +84,13 @@ nodepool_os_pool: 'nova'
 nodepool_os_pool_max_amount: 10
 # Public IP of deployment, will land in slave /etc/hosts
 public_ip: 127.0.0.1
+
+# Allowed URLs or URL prefixes that are accessible via the gateway
+# This can be used to ensure only authenticated users access the Jenkins logs
+# on the slaves. In this case the Jenkins slaves must be accessible only from
+# the gateway.
+# Can bei either full domains or only prefixes, for example to allow IP-ranges
+allowed_proxy_prefixes:
+  - "198.154.188."
+  - "127.0.0.1"
+  - "tests.dom"
