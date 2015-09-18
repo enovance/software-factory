@@ -31,8 +31,19 @@ sudo yum install -y java
 
 # zuul-cloner is needed as well
 sudo yum install -y epel-release
-sudo yum install -y python-pip git python-devel gcc
-sudo pip install zuul gitdb
+sudo yum install -y python-pip git python-devel gcc patch
+sudo pip install zuul gitdb requests glob2 python-magic argparse python-swiftclient python-keystoneclient
+
+sudo curl -o /usr/local/bin/zuul_swift_upload.py \
+    https://raw.githubusercontent.com/openstack-infra/project-config/master/jenkins/scripts/zuul_swift_upload.py
+sudo chmod +x /usr/local/bin/zuul_swift_upload.py
+
+# We patch zuul_swift_upload just to have more debug
+cat << EOF | sudo patch /usr/local/bin/zuul_swift_upload.py
+35a36,37
+> root = logging.getLogger()
+> root.setLevel(logging.DEBUG)
+EOF
 
 # The Swarm client should be started by Jenkins via a request from Nodepool.
 # If public_ip has been set in sfconfig.yaml then the slave can be aware
