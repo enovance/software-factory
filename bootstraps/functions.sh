@@ -17,15 +17,8 @@
 set -e
 set -x
 
-ROLES="puppetmaster"
-#ROLES="$ROLES mysql"
-#ROLES="$ROLES redmine"
-#ROLES="$ROLES gerrit"
-ROLES="$ROLES managesf"
-#ROLES="$ROLES jenkins"
-ROLES="$ROLES slave"
-
-PUPPETIZED_ROLES=$(echo $ROLES | sed -e s/puppetmaster// -e s/slave//)
+ROLES="puppetmaster managesf"
+PUPPETIZED_ROLES="managesf"
 
 BUILD=${BUILD:-/root/sf-bootstrap-data}
 
@@ -136,10 +129,6 @@ function wait_all_nodes {
         echo $role $ip
         scan_and_configure_knownhosts "$role" $ip $port
     done
-    # Install ssh key on slave because it's not part of the puppet gang:
-    if [ "$INITIAL" = "yes" ]; then
-        $SSHPASS ssh-copy-id $(getip_from_yaml slave)
-    fi
 }
 
 function scan_and_configure_knownhosts {
