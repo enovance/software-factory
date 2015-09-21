@@ -42,6 +42,7 @@ function get_ip {
     # the upgrade test from 0.9.2 to 0.9.3
     # TODO(fbo) remove that when 0.9.3 is tagged
     [ ! -f "$p" ] && p=/tmp/lxc-conf/sf-lxc.yaml
+    [ ! -f "$p" ] && p=/home/jenkins/workspace/software-factory-upgrade-tests/software-factory/bootstraps/lxc/sf-lxc.yaml
     grep -B 1 "name:[ \t]*$1" $p | head -1 | awk '{ print $2 }'
 }
 
