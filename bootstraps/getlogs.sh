@@ -30,9 +30,6 @@ dlogs=/tmp/logs
 [ -d $dlogs ] && rm -Rf $dlogs
 mkdir $dlogs
 
-# Boostrap process log
-cp /var/log/sf-bootstrap.log $dlogs/
-
 echo "Checking for edeploy logs ..."
 [ -f /var/lib/edeploy/rsync_*.out ] && edeploy_logs=true || edeploy_logs=false
 
