@@ -154,6 +154,7 @@ class jenkins ($settings = hiera_hash('jenkins', '')) {
 
   file {'/var/lib/jenkins/config.xml':
     ensure  => file,
+    replace => false,
     mode    => '0644',
     owner   => 'jenkins',
     group   => 'jenkins',
