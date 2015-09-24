@@ -1,0 +1,9 @@
+---
+- hosts: managesf
+  gather_facts: no
+  tasks:
+  - name: Puppet apply all-in-one
+    shell: puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/ /etc/puppet/environments/sf/manifests/site.pp
+    register: puppet_apply
+    changed_when: puppet_apply.rc == 2
+    failed_when: puppet_apply.rc != 2 and puppet_apply.rc != 6 and puppet_apply.rc != 0

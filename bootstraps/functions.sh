@@ -14,8 +14,7 @@
 # license for the specific language governing permissions and limitations
 # under the license.
 
-set -e
-set -x
+[ -z "${DEBUG}" ] && DISABLE_SETX=1 || set -x
 
 BUILD=${BUILD:-/root/sf-bootstrap-data}
 
@@ -27,28 +26,14 @@ function generate_hosts_yaml {
     OUTPUT=${BUILD}/hiera
     cat << EOF > ${OUTPUT}/hosts.yaml
 hosts:
-  localhost:
-    ip: 127.0.0.1
-  puppetmaster.SF_SUFFIX:
-    ip: 192.168.135.54
-    host_aliases: [puppetmaster]
-  mysql.SF_SUFFIX:
-    ip: 192.168.135.54
-    host_aliases: [mysql]
-  jenkins.SF_SUFFIX:
-    ip: 192.168.135.54
-    host_aliases: [jenkins]
-  redmine.SF_SUFFIX:
-    ip: 192.168.135.54
-    host_aliases: [redmine]
-  api-redmine.SF_SUFFIX:
-    ip: 192.168.135.54
-  gerrit.SF_SUFFIX:
-    ip: 192.168.135.54
-    host_aliases: [gerrit]
-  managesf.SF_SUFFIX:
-    ip: 192.168.135.54
-    host_aliases: [managesf, auth.SF_SUFFIX, SF_SUFFIX]
+  localhost:              {ip: 127.0.0.1}
+  puppetmaster.SF_SUFFIX: {ip: 192.168.135.101, host_aliases: [puppetmaster]}
+  mysql.SF_SUFFIX:        {ip: 192.168.135.101, host_aliases: [mysql]}
+  jenkins.SF_SUFFIX:      {ip: 192.168.135.101, host_aliases: [jenkins]}
+  redmine.SF_SUFFIX:      {ip: 192.168.135.101, host_aliases: [redmine]}
+  api-redmine.SF_SUFFIX:  {ip: 192.168.135.101}
+  gerrit.SF_SUFFIX:       {ip: 192.168.135.101, host_aliases: [gerrit]}
+  managesf.SF_SUFFIX:     {ip: 192.168.135.101, host_aliases: [managesf, auth.SF_SUFFIX, SF_SUFFIX]}
 EOF
     sed -i "s/SF_SUFFIX/${SF_SUFFIX}/g" ${OUTPUT}/hosts.yaml
 }
@@ -57,22 +42,13 @@ function generate_sfconfig {
     OUTPUT=${BUILD}/hiera
     cp sfconfig.yaml ${OUTPUT}/
     # Set and generated admin password
-    DEFAULT_ADMIN_USER=$(cat ${OUTPUT}/sfconfig.yaml | grep '^admin_name:' | awk '{ print $2 }')
-    DEFAULT_ADMIN_PASSWORD=$(cat ${OUTPUT}/sfconfig.yaml | grep '^admin_password:' | awk '{ print $2 }')
-    ADMIN_USER=${ADMIN_USER:-${DEFAULT_ADMIN_USER}}
-    ADMIN_PASSWORD=${ADMIN_PASSWORD:-${DEFAULT_ADMIN_PASSWORD}}
+    sed -i "s/^domain:.*/domain: \"${SF_SUFFIX}\"/" ${OUTPUT}/sfconfig.yaml
+    ADMIN_USER=${ADMIN_USER:-user1}
+    ADMIN_PASSWORD=${ADMIN_PASSWORD:-userpass}
     ADMIN_PASSWORD_HASHED=$(hash_password "${ADMIN_PASSWORD}")
     sed -i "s/^admin_name:.*/admin_name: ${ADMIN_USER}/" ${OUTPUT}/sfconfig.yaml
-
-    # TODO: remove this, it should work without
-    sed -i "s/^admin_password:.*/admin_password: ${ADMIN_PASSWORD}/" ${OUTPUT}/sfconfig.yaml
-
-    # Make sure admin password is hashed and avoid duplicate entry
-    grep -q "^admin_password_hashed:" ${OUTPUT}/sfconfig.yaml && {
-        sed -i "s/^admin_password_hashed:.*/admin_password_hashed: \"${ADMIN_PASSWORD_HASHED}\"/" ${OUTPUT}/sfconfig.yaml
-    } || {
-        echo "admin_password_hashed: \"${ADMIN_PASSWORD_HASHED}\"" >> ${OUTPUT}/sfconfig.yaml
-    }
+    sed -i "s/^admin_password:.*/admin_password: \"${ADMIN_PASSWORD}\"/" ${OUTPUT}/sfconfig.yaml
+    sed -i "s#^admin_password_hashed:.*#admin_password_hashed: \"${ADMIN_PASSWORD_HASHED}\"#" ${OUTPUT}/sfconfig.yaml
 }
 
 function generate_random_pswd {
@@ -136,8 +112,8 @@ function generate_creds_yaml {
 
 function generate_keys {
     OUTPUT=${BUILD}/ssh_keys
-    # Service key is used to allow puppetmaster root to
-    # connect on other node as root
+
+    # Service key is used to allow root access from managesf to other nodes
     ssh-keygen -N '' -f ${OUTPUT}/service_rsa
     cp ${OUTPUT}/service_rsa /root/.ssh/id_rsa
     ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa
@@ -203,4 +179,5 @@ function prepare_etc_puppet {
     chown -R puppet:puppet /etc/puppet/environments/sf
     chown -R puppet:puppet /etc/puppet/hiera/sf
     chown -R puppet:puppet /var/lib/puppet
+    chmod -R 0750 /etc/puppet/hiera/sf
 }

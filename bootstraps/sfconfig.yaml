@@ -12,6 +12,7 @@ enforce_ssl: false
 admin_name: user1
 admin_mail: user1@tests.dom
 admin_password: userpass
+admin_password_hashed: $6$pbXimMwKD7ZBd7RO$ThSMVN4Jv4QsEYvLdLh18GBRhKEoSZVbxa9vaYBNxVa8D.1rqyPAMq4a2yu9/Ecesr5TDeyzgiRzcoU07/abf0
 admin_lastname: "Demo user1"
 
 # If you envisage to authenticate users using an LDAP directory
