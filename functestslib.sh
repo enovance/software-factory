@@ -89,9 +89,6 @@ function get_logs {
     ssh -o StrictHostKeyChecking=no root@192.168.134.54 "cd puppet-bootstrapper; ./getlogs.sh"
     scp -r -o StrictHostKeyChecking=no root@192.168.134.54:/tmp/logs/* $O/
 
-    # Retrieve Xunit output and store it in Jenkins workspace
-    scp -r -o StrictHostKeyChecking=no root@192.168.134.54:~/puppet-bootstrapper/nosetests.xml .
-
     # Retrieve mariadb log
     mkdir -p ${O}/mysql
     scp -r -o StrictHostKeyChecking=no root@192.168.134.54:/var/log/mariadb/mariadb.log ${O}/mysql
