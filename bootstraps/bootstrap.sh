@@ -43,5 +43,5 @@ prepare_etc_puppet
 # Apply puppet stuff
 set +e
 puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/ /etc/puppet/environments/sf/manifests/site.pp
-[ "$?" != 2 ] && exit 1
+[ "$?" != 2 ] && exit 1 || exit 1
 exit 0
