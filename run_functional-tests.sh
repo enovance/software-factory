@@ -79,4 +79,5 @@ checkpoint "get-logs"
 [ -z "${DEBUG}" ] && lxc_stop
 checkpoint "lxc-stop"
 clean_old_cache
+echo "$0: SUCCESS"
 exit 0;
