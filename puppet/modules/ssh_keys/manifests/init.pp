@@ -13,7 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-class ssh_keys ($keys = hiera_hash("ssh_keys")) {
+class ssh_keys ($keys = hiera_hash("ssh_keys"), $sfcreds = hiera_hash('sfcreds', '')) {
+
+  $service_rsa = hiera('service_rsa')
 
   file { '/root/.ssh':
     ensure  => directory,
@@ -29,7 +31,7 @@ class ssh_keys ($keys = hiera_hash("ssh_keys")) {
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
-    source => 'puppet:///modules/ssh_keys/service_rsa',
+    content => inline_template('<%= service_rsa %>'),
     require => File['/root/.ssh'],
   }
 }

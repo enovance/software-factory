@@ -104,6 +104,8 @@ function generate_creds_yaml {
     # Lodgeit/Paste part
     LODGEIT_SESSION_KEY=$(generate_random_pswd 32)
     sed -i "s#LODGEIT_SESSION_KEY#${LODGEIT_SESSION_KEY}#" ${OUTPUT}/sfcreds.yaml
+
+    ./hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/service_rsa service_rsa
 }
 
 function generate_keys {
@@ -111,7 +113,6 @@ function generate_keys {
 
     # Service key is used to allow root access from managesf to other nodes
     ssh-keygen -N '' -f ${OUTPUT}/service_rsa
-    cp ${OUTPUT}/service_rsa /root/.ssh/id_rsa
     ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa
     ssh-keygen -N '' -f ${OUTPUT}/gerrit_service_rsa
     ssh-keygen -N '' -f ${OUTPUT}/gerrit_admin_rsa
@@ -155,7 +156,6 @@ function prepare_etc_puppet {
         exit -1
     fi
     echo "sf_version: $(echo ${TMP_VERSION} | cut -d'-' -f2)" > /etc/puppet/hiera/sf/sf_version.yaml
-    cp ${SSH_KEYS}/service_rsa /etc/puppet/environments/sf/modules/ssh_keys/files/
     cp ${SSH_KEYS}/service_rsa /root/.ssh/id_rsa
     cp ${SSH_KEYS}/service_rsa.pub /root/.ssh/id_rsa.pub
     cp ${SSH_KEYS}/jenkins_rsa /etc/puppet/environments/sf/modules/jenkins/files/
