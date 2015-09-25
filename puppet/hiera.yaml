@@ -9,7 +9,6 @@
   - ssh_jenkins
   - edeploy_client
   - edeploy_server
-  - postfix
   - "%{::clientcert}"
   - bup
   - mysql
