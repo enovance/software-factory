@@ -14,11 +14,14 @@
 # under the License.
 
 
-class ntpserver ($settings = hiera_hash('ntpserver', '')) {
+class ntpserver {
+
+    $reference_server = hiera('ntp_main_server')
+
     case $hostname {
         'puppetmaster' : {
             class { '::ntp':
-                    servers => [$settings['reference_server'], ],
+                    servers => [$reference_server',],
                     restrict => ['redmine', 'mysql', 'gerrit', 'jenkins', 'slave', 'managesf'],
             }
         }
