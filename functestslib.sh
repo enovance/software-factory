@@ -148,6 +148,7 @@ function fail {
         get_logs
         checkpoint "get-logs"
     }
+    echo "$0: FAILED"
     exit 1
 }
 
@@ -170,13 +171,21 @@ function waiting_stack_created {
     done
 }
 
-function wait_for_bootstrap_done {
+function run_bootstraps {
+    scan_and_configure_knownhosts || fail "Can't SSH"
+    checkpoint "scan_and_configure_knownhosts"
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     ssh -A -tt root@192.168.135.101 "cd bootstraps; exec ./bootstrap.sh ${REFARCH}"
     res=$?
     kill -9 $SSH_AGENT_PID
-    return $res
+    if [ "$res" != "0" ]; then
+        fail "Bootstrap fails"
+    fi
+    checkpoint "wait_for_bootstrap_done"
+    echo "[+] Fetch tests.dom ssl cert"
+    scp -r root@puppetmaster.tests.dom:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem
+    cp /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem /var/lib/sf/venv/lib/python2.7/site-packages/pip/_vendor/requests/cacert.pem
 }
 
 function prepare_functional_tests_venv {
@@ -231,9 +240,6 @@ EOF
     echo "[+] Fetch bootstrap data"
     rm -Rf sf-bootstrap-data
     scp -r root@puppetmaster.tests.dom:sf-bootstrap-data .
-    echo "[+] Fetch tests.dom ssl cert"
-    scp -r root@puppetmaster.tests.dom:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem
-    cp /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem /var/lib/sf/venv/lib/python2.7/site-packages/pip/_vendor/requests/cacert.pem
     echo "[+] Run tests"
     sudo rm -Rf /tmp/debug
     . /var/lib/sf/venv/bin/activate
@@ -253,14 +259,35 @@ function run_puppet_allinone_tests {
 }
 
 function run_tests {
-    scan_and_configure_knownhosts || fail "Can't SSH"
-    checkpoint "scan_and_configure_knownhosts"
-    wait_for_bootstrap_done || fail "Bootstrap did not complete"
-    checkpoint "wait_for_bootstrap_done"
     run_functional_tests || fail "Functional tests failed"
     checkpoint "run_functional_tests"
     run_puppet_allinone_tests || fail "Puppet all in one tests failed"
     checkpoint "run_puppet_allinone_tests"
+}
+
+function run_backup_tests {
+    . /var/lib/sf/venv/bin/activate
+    set -x
+    rm -Rf backup_test_project
+    # Create a project, perform a backup, delete project, restore backup, check if project is still there.
+    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass project create --name backup_test_project
+    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_start || fail "Backup failed"
+    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_get || fail "Backup get failed"
+    checkpoint "backup created"
+    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass project delete --name backup_test_project
+    git clone http://tests.dom/r/backup_test_project 2> /dev/null && fail "Backup project not deleted" || true
+    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system restore --filename $(pwd)/sf_backup.tar.gz || fail "Backup resore failed"
+    deactivate
+    checkpoint "backup restore"
+    echo "[+] Waiting for gerrit to restart..."
+    retry=0
+    while [ $retry < 1000 ]; do
+        git clone ${MANAGESF_URL}/r/backup_test_project && break
+        sleep 1
+        retry=$[ $retry + 1 ]
+    done
+    checkpoint "wait for gerrit"
+    [ $retry -eq 1000 ] && fail "Backup_test project was not restored..."
 }
 
 function run_backup_restore_tests {
