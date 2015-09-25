@@ -49,11 +49,13 @@ checkpoint "lxc-first-clean"
 case "${TEST_TYPE}" in
     "functional")
         lxc_start
+        run_bootstraps
         run_tests
         ;;
-    "backup_restore_tests")
-        echo "[+] Backup/restore tests are not supported..."
-        exit 1
+    "backup")
+        lxc_start
+        run_bootstraps
+        run_backup_tests
         ;;
     "upgrade")
         echo "[+] Upgrade tests from 1.0.4 to 2.0.0 are not supported..."
@@ -62,6 +64,7 @@ case "${TEST_TYPE}" in
     "*")
         echo "[+] Unknown test type ${TEST_TYPE}"
         exit 1
+        ;;
 esac
 
 DISABLE_SETX=1
