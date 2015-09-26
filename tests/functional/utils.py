@@ -27,6 +27,7 @@ import random
 import config
 import requests
 import time
+import sys
 import yaml
 
 import logging
@@ -106,7 +107,7 @@ class Base(unittest.TestCase):
 
 class Tool:
     def __init__(self):
-        self.debug = file('/tmp/debug', 'a')
+        self.debug = sys.stdout
         self.env = os.environ.copy()
 
     def exe(self, cmd, cwd=None):
