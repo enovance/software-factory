@@ -3,10 +3,10 @@
 DISABLE_SETX=0
 [ -z "${DEBUG}" ] && DISABLE_SETX=1 || set -x
 
-export SF_SUFFIX=${SF_SUFFIX:-tests.dom}
+export SF_HOST=${SF_HOST:-tests.dom}
 export SKIP_CLEAN_ROLES="y"
 
-MANAGESF_URL=https://${SF_SUFFIX}
+MANAGESF_URL=https://${SF_HOST}
 
 ARTIFACTS_DIR="/var/lib/sf/artifacts"
 # This environment variable is set ZUUL in the jenkins job workspace
@@ -47,6 +47,10 @@ function lxc_start {
 }
 
 function configure_network {
+    if [ "${SF_HOST}" != "tests.dom" ]; then
+        echo "${SF_HOST} must have ssh key authentitcation and use root user by default"
+        return
+    fi
     local ip=192.168.135.101
     rm -f "$HOME/.ssh/known_hosts"
     RETRIES=0
@@ -65,13 +69,14 @@ function configure_network {
     [ $RETRIES -eq 40 ] && fail "Can't connect to $ip"
     echo "[+] Avoid ssh error"
     cat << EOF > ~/.ssh/config
-Host tests.dom
+Host ${SF_HOST}
     Hostname 192.168.135.101
+    User root
 EOF
     chmod 0600 ~/.ssh/config
 
-    echo "[+] Adds tests.dom to /etc/hosts"
-    reset_etc_hosts_dns 'tests.dom' 192.168.135.101
+    echo "[+] Adds ${SF_HOST} to /etc/hosts"
+    reset_etc_hosts_dns '${SF_HOST}' 192.168.135.101
     checkpoint "configure_network"
 }
 
@@ -152,14 +157,14 @@ function run_bootstraps {
     configure_network || fail "Can't SSH"
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
-    ssh -A -tt root@192.168.135.101 "cd bootstraps; exec ./bootstrap.sh ${REFARCH}"
+    ssh -A -tt ${SF_HOST} "cd bootstraps; exec ./bootstrap.sh ${REFARCH}"
     res=$?
     kill -9 $SSH_AGENT_PID
     if [ "$res" != "0" ]; then
         fail "Bootstrap fails"
     fi
-    echo "[+] Fetch tests.dom ssl cert"
-    scp -r root@tests.dom:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem
+    echo "[+] Fetch ${SF_HOST} ssl cert"
+    scp -r ${SF_HOST}:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem
     cp /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem /var/lib/sf/venv/lib/python2.7/site-packages/pip/_vendor/requests/cacert.pem
     checkpoint "run_bootstraps"
 }
@@ -199,11 +204,12 @@ function reset_etc_hosts_dns {
     ) &> ${ARTIFACTS_DIR}/etc_hosts.log
 }
 
+
 function run_functional_tests {
     echo "$(date) ======= Starting functional tests ========="
     echo "[+] Fetch bootstrap data"
     rm -Rf sf-bootstrap-data
-    scp -r root@tests.dom:sf-bootstrap-data .
+    scp -r ${SF_HOST}:sf-bootstrap-data .
     echo "[+] Run tests"
     sudo rm -Rf /tmp/debug
     . /var/lib/sf/venv/bin/activate
@@ -216,17 +222,21 @@ function run_functional_tests {
     return $RES
 }
 
+function run_serverspec_tests {
+    echo "$(date) ======= Starting serverspec tests ========="
+    ssh ${SF_HOST} "cd serverspec; rake spec" 2>&1 | tee ${ARTIFACTS_DIR}/serverspec.output || fail "Serverspec tests failed"
+    checkpoint "run_serverspec_tests"
+}
+
 function run_puppet_allinone_tests {
     echo "$(date) ======= Starting Puppet all in one tests ========="
-    ssh -o StrictHostKeyChecking=no root@192.168.135.101 \
-            "puppet master --compile allinone --environment=sf" 2>&1 &> ${ARTIFACTS_DIR}/functional-tests.output
-    return ${PIPESTATUS[0]}
+    ssh ${SF_HOST} "puppet master --compile allinone --environment=sf" 2>&1 > ${ARTIFACTS_DIR}/functional-tests.output || fail "Puppet apply all in one failed"
+    checkpoint "run_puppet_allinone_tests"
 }
 
 function run_tests {
     run_functional_tests || fail "Functional tests failed"
     run_puppet_allinone_tests || fail "Puppet all in one tests failed"
-    checkpoint "run_puppet_allinone_tests"
 }
 
 function run_backup_tests {
@@ -239,7 +249,7 @@ function run_backup_tests {
     sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_get || fail "Backup get failed"
     checkpoint "backup created"
     sfmanager --url "${MANAGESF_URL}" --auth user1:userpass project delete --name backup_test_project
-    git clone http://tests.dom/r/backup_test_project 2> /dev/null && fail "Backup project not deleted" || true
+    git clone http://${SF_HOST}/r/backup_test_project 2> /dev/null && fail "Backup project not deleted" || true
     sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system restore --filename $(pwd)/sf_backup.tar.gz || fail "Backup resore failed"
     deactivate
     checkpoint "backup restore"
@@ -252,40 +262,6 @@ function run_backup_tests {
     done
     checkpoint "wait for gerrit"
     [ -d backup_test_project ] || fail "Backup_test project was not restored..."
-}
-
-function run_backup_restore_tests {
-    r=$1
-    type=$2
-    if [ "$type" == "provision" ]; then
-        configure_network
-        wait_for_bootstrap_done || fail "Bootstrap did not complete"
-        # Run server spec to be more confident
-        run_serverspec || fail "Serverspec failed"
-        # Start the provisioner
-        ./tools/provisioner_checker/run.sh provisioner
-        # Create a backup
-        ssh -o StrictHostKeyChecking=no root@192.168.135.101 "sfmanager --url ${MANAGESF_URL} --auth-server-url ${MANAGESF_URL} --auth user1:userpass backup start"
-        sleep 10
-        # Fetch the backup
-        ssh -o StrictHostKeyChecking=no root@192.168.135.101 "sfmanager --url ${MANAGESF_URL} --auth-server-url ${MANAGESF_URL} --auth user1:userpass backup get"
-        scp -o  StrictHostKeyChecking=no root@192.168.135.101:sf_backup.tar.gz /tmp
-        # We assume if we cannot move the backup file
-        # we need to stop right now
-        return $?
-    fi
-    if [ "$type" == "check" ]; then
-        configure_network || fail "Can't SSH"
-        # Run server spec to be more confident
-        run_serverspec || fail "Serverspec failed"
-        # Restore backup
-        scp -o  StrictHostKeyChecking=no /tmp/sf_backup.tar.gz root@192.168.135.101:/root/
-        ssh -o StrictHostKeyChecking=no root@192.168.135.101 "sfmanager --url ${MANAGESF_URL} --auth-server-url ${MANAGESF_URL} --auth user1:userpass backup restore --filename sf_backup.tar.gz"
-        # Start the checker
-        sleep 60
-        ./tools/provisioner_checker/run.sh checker
-        return $?
-    fi
 }
 
 START=$(date '+%s')

@@ -17,7 +17,7 @@
 DEBUG=1
 source functions.sh
 
-SF_SUFFIX=${SF_SUFFIX:-tests.dom}
+SF_HOST=${SF_HOST:-tests.dom}
 BUILD=/root/sf-bootstrap-data
 REFARCH=${1:-1node-allinone}
 
@@ -35,6 +35,7 @@ if [ ! -f "${BUILD}/generate.done" ]; then
     generate_sfconfig
     generate_apache_cert
     generate_creds_yaml
+    prepare_etc_puppet
     touch "${BUILD}/generate.done"
 fi
 
@@ -70,28 +71,27 @@ function puppet_apply {
 function puppet_copy {
     host=$1
     echo "[bootstrap][$host] Copy puppet configuration"
-    rsync -a --delete /etc/puppet/ ${host}:/etc/puppet/
+    rsync -a --delete /etc/puppet/hiera/ ${host}:/etc/puppet/hiera/
 }
 
 echo "Boostrapping $REFARCH"
 # Apply puppet stuff with good old shell scrips
 case "${REFARCH}" in
     "1node-allinone")
-        prepare_etc_puppet
-        wait_for_ssh "managesf.${SF_SUFFIX}"
-        puppet_apply "managesf.${SF_SUFFIX}" /etc/puppet/environments/sf/manifests/1node-allinone.pp
+        wait_for_ssh "managesf.${SF_HOST}"
+        puppet_apply "managesf.${SF_HOST}" /etc/puppet/environments/sf/manifests/1node-allinone.pp
         ;;
     "2nodes-jenkins")
         # Prepare environment
         sed -i "s/jenkins\.\([^1]*\)192.168.135.101/jenkins.\1192.168.135.102/" ${BUILD}/hiera/hosts.yaml
-        prepare_etc_puppet
-        wait_for_ssh "managesf.${SF_SUFFIX}"
+        cp ${HIERA}/hosts.yaml /etc/puppet/hiera/sf
+        wait_for_ssh "managesf.${SF_HOST}"
 
         # Run puppet apply
-        puppet_apply "managesf.${SF_SUFFIX}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
-        wait_for_ssh "jenkins.${SF_SUFFIX}"
-        puppet_copy jenkins.${SF_SUFFIX}
-        puppet_apply "jenkins.${SF_SUFFIX}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
+        puppet_apply "managesf.${SF_HOST}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
+        wait_for_ssh "jenkins.${SF_HOST}"
+        puppet_copy jenkins.${SF_HOST}
+        puppet_apply "jenkins.${SF_HOST}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
         ;;
     "*")
         echo "Unknown refarch ${REFARCH}"

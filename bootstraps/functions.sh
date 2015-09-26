@@ -23,15 +23,14 @@ function generate_hosts_yaml {
     cat << EOF > ${OUTPUT}/hosts.yaml
 hosts:
   localhost:              {ip: 127.0.0.1}
-  puppetmaster.SF_SUFFIX: {ip: 192.168.135.101, host_aliases: [puppetmaster]}
-  mysql.SF_SUFFIX:        {ip: 192.168.135.101, host_aliases: [mysql]}
-  jenkins.SF_SUFFIX:      {ip: 192.168.135.101, host_aliases: [jenkins]}
-  redmine.SF_SUFFIX:      {ip: 192.168.135.101, host_aliases: [redmine]}
-  api-redmine.SF_SUFFIX:  {ip: 192.168.135.101}
-  gerrit.SF_SUFFIX:       {ip: 192.168.135.101, host_aliases: [gerrit]}
-  managesf.SF_SUFFIX:     {ip: 192.168.135.101, host_aliases: [managesf, auth.SF_SUFFIX, SF_SUFFIX]}
+  mysql.SF_HOST:        {ip: 192.168.135.101, host_aliases: [mysql]}
+  jenkins.SF_HOST:      {ip: 192.168.135.101, host_aliases: [jenkins]}
+  redmine.SF_HOST:      {ip: 192.168.135.101, host_aliases: [redmine]}
+  api-redmine.SF_HOST:  {ip: 192.168.135.101}
+  gerrit.SF_HOST:       {ip: 192.168.135.101, host_aliases: [gerrit]}
+  managesf.SF_HOST:     {ip: 192.168.135.101, host_aliases: [managesf, auth.SF_HOST, SF_HOST]}
 EOF
-    sed -i "s/SF_SUFFIX/${SF_SUFFIX}/g" ${OUTPUT}/hosts.yaml
+    sed -i "s/SF_HOST/${SF_HOST}/g" ${OUTPUT}/hosts.yaml
 }
 
 function generate_sfconfig {
@@ -140,16 +139,16 @@ req_extensions = v3_req
 distinguished_name = req_distinguished_name
 
 [ req_distinguished_name ]
-commonName_default = ${SF_SUFFIX}
+commonName_default = ${SF_HOST}
 
 [ v3_req ]
 subjectAltName=@alt_names
 
 [alt_names]
-DNS.1 = ${SF_SUFFIX}
-DNS.2 = auth.${SF_SUFFIX}
+DNS.1 = ${SF_HOST}
+DNS.2 = auth.${SF_HOST}
 EOF
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=${SF_SUFFIX}" -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt -extensions v3_req -config openssl.cnf
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=${SF_HOST}" -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt -extensions v3_req -config openssl.cnf
 }
 
 function prepare_etc_puppet {
