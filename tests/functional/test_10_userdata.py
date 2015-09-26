@@ -40,7 +40,7 @@ class TestUserdata(Base):
             config.REDMINE_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
         self.gu = GerritUtils(
-            'https://%s/' % config.GATEWAY_HOST,
+            config.GATEWAY_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def tearDown(self):
@@ -67,11 +67,11 @@ class TestUserdata(Base):
         self.assertEqual(config.USERS[login]['email'], user.mail)
 
     def logout(self):
-        url = 'https://{}/auth/logout/'.format(config.GATEWAY_HOST)
+        url = config.GATEWAY_URL + '/auth/logout/'
         requests.get(url)
 
     def login(self, username, password, redirect='/'):
-        url = "https://%s/auth/login" % config.GATEWAY_HOST
+        url = config.GATEWAY_URL + "/auth/login"
         data = {'username': username,
                 'password': password,
                 'back': redirect}
@@ -83,7 +83,7 @@ class TestUserdata(Base):
         self.logout()
         response = self.login('user5', 'userpass',
                               'http%3a%2f%2ftests.dom%2fjenkins%2f')
-        expected_url = "http://{}/jenkins/".format(config.GATEWAY_HOST)
+        expected_url = config.GATEWAY_URL + "/jenkins/"
 
         self.assertEqual(expected_url, response.url)
         # verify if user is created in gerrit and redmine
@@ -96,7 +96,7 @@ class TestUserdata(Base):
         self.logout()
         response = self.login('user5', 'userpass',
                               'http%3a%2f%2ftests.dom%2fredmine%2fprojects')
-        expect_url = "http://{}/redmine/projects".format(config.GATEWAY_HOST)
+        expect_url = config.GATEWAY_URL + "/redmine/projects"
 
         self.assertEqual(expect_url, response.url)
         # verify if user is created in gerrit and redmine
@@ -119,7 +119,7 @@ class TestUserdata(Base):
         time.sleep(10)
         response = self.login('Flea', 'RHCP',
                               'http%3a%2f%2ftests.dom%2fredmine%2fprojects')
-        expect_url = "http://{}/redmine/projects".format(config.GATEWAY_HOST)
+        expect_url = config.GATEWAY_URL + "/redmine/projects"
         self.assertEqual(expect_url, response.url)
 
     def test_nonmember_backlog_permissions(self):

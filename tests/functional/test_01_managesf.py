@@ -48,7 +48,7 @@ class TestManageSF(Base):
             config.REDMINE_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
         self.gu = GerritUtils(
-            'https://%s/' % config.GATEWAY_HOST,
+            config.GATEWAY_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def project_exists_ex(self, name, user):
@@ -311,7 +311,7 @@ class TestManageSF(Base):
         self.create_project(pname, config.ADMIN_USER)
         # add user2 ssh pubkey to user2
         gu = GerritUtils(
-            'https://%s/' % config.GATEWAY_HOST,
+            config.GATEWAY_URL,
             auth_cookie=config.USERS[config.USER_2]['auth_cookie'])
         gu.add_pubkey(config.USER_2_PUB_KEY)
         # prepare to clone
@@ -339,7 +339,7 @@ class TestManageSF(Base):
         self.create_project(pname, config.USER_2)
         # add user2 ssh pubkey to user2
         gu = GerritUtils(
-            'https://%s/' % config.GATEWAY_HOST,
+            config.GATEWAY_URL,
             auth_cookie=config.USERS[config.USER_2]['auth_cookie'])
         gu.add_pubkey(config.USER_2_PUB_KEY)
         # prepare to clone
