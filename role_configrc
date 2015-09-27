@@ -1,12 +1,9 @@
 #!/bin/sh
 #
-PREVIOUS_SF_REL=1.0.4
-SF_REL=2.0.0
+SF_REL=2.0.1
 DVER=C7.0
 DIST=centos
 
-# Set this variable to 1 if we tag and set it back to 0 the commit after the tag
-TAGGED_RELEASE=0
 # Pinned versions of the subprojects to go with the current release
 PYSFLIB_PINNED_VERSION=0.3.0
 MANAGESF_PINNED_VERSION=0.6.0
@@ -15,8 +12,8 @@ CAUTH_PINNED_VERSION=0.5.0
 export LC_ALL=C
 
 # Version string
+SF_PREVIOUS_VER=C7.0-2.0.0
 SF_VER=${DVER}-${SF_REL}
-PREVIOUS_SF_VER=${DVER}-${PREVIOUS_SF_REL}
 
 SWIFT_BASE_URL="http://os.enocloud.com:8080"
 SWIFT_ACCOUNT="70aab03f69b549cead3cb5f463174a51"
