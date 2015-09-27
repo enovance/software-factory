@@ -230,7 +230,7 @@ function install_jenkins() {
     do_chroot ${dir} bash -c "for x in {0..6}; do ls /etc/rc\${x}.d/*jenkins | xargs rm -f ; done"
 
     # install JJB
-    retry do_chroot ${dir} pip install jenkins-job-builder
+    retry do_chroot ${dir} pip install 'jenkins-job-builder<1.2.0'
     mkdir -p ${dir}/etc/jenkins_jobs
 
     retry do_chroot ${dir} pip install nose flake8
