@@ -18,8 +18,8 @@
 # Then will start the SF in LXC containers
 # Then will run the serverspecs and functional tests
 
-source functestslib.sh
 . role_configrc
+source functestslib.sh
 
 REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
@@ -42,29 +42,37 @@ lxc_stop
     sudo rsync -a --delete puppet/hiera/ ${dir}/etc/puppet/hiera/sf/
     sudo rsync -a --delete bootstraps/ ${dir}/root/bootstraps/
     sudo rsync -a --delete serverspec/ ${dir}/root/serverspec/
+    sudo cp edeploy/edeploy ${dir}/root/usr/sbin/edeploy
 }
 
 case "${TEST_TYPE}" in
     "functional")
-        lxc_start
+        lxc_init
         run_bootstraps
         run_serverspec_tests
         run_functional_tests
         ;;
     "backup")
-        lxc_start
+        lxc_init
         run_bootstraps
         run_serverspec_tests
         run_provisioner
+        run_backup_start
         lxc_stop
-        lxc_start
+        lxc_init
         run_bootstraps
+        run_backup_restore
         run_checker
         ;;
     "upgrade")
-        lxc_start
+        ./fetch_roles.sh ${SF_PREVIOUS_VER}
+        lxc_init ${SF_PREVIOUS_VER}
         run_bootstraps
+        run_provisioner
+        run_upgrade
+        run_checker
         run_serverspec_tests
+        run_functional_tests
         ;;
     "*")
         echo "[+] Unknown test type ${TEST_TYPE}"

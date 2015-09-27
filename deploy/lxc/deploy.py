@@ -79,10 +79,8 @@ def stop():
         virsh(["undefine", instance])
 
 
-def init():
+def init(base):
     print "[deploy] Init"
-    # Extract INST path from role_configrc... needs bash evaluation here
-    base = pread(["bash", "-c", ". ../../role_configrc; echo $INST"]).strip()
     prepare_role(base, "managesf", "192.168.135.101")
     if args.refarch == "2nodes-jenkins":
         prepare_role(base, "jenkins",  "192.168.135.102")
@@ -112,6 +110,7 @@ if "SUDO_USER" not in os.environ:
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--domain", default="tests.dom")
+parser.add_argument("--version")
 parser.add_argument("--refarch", choices=[
     "1node-allinone", "2nodes-jenkins"],
     default="1node-allinone")
@@ -129,5 +128,9 @@ elif args.action == "restart":
 elif args.action == "destroy":
     destroy()
 elif args.action == "init":
-    init()
+    if args.version is None:
+        # Extract INST path from role_configrc... needs bash evaluation here
+        args.version = pread([
+            "bash", "-c", ". ../../role_configrc; echo $SF_VER"]).strip()
+    init("/var/lib/sf/roles/install/%s" % args.version)
     start()
