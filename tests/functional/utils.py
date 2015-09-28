@@ -36,6 +36,7 @@ import pkg_resources
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.captureWarnings(True)
 
+
 # Empty job for jenkins
 EMPTY_JOB_XML = """<?xml version='1.0' encoding='UTF-8'?>
 <project>
@@ -108,7 +109,7 @@ class Base(unittest.TestCase):
 class Tool:
     def __init__(self):
         self.debug = None
-        if "DEBUG" in os.environ:
+        if "DEBUG" in sys.environ:
             self.debug = sys.stdout
         self.env = os.environ.copy()
 
@@ -181,7 +182,7 @@ class ManageSfUtils(Tool):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[new_user]['email']
         cmd = self.base_cmd % (auth_user, passwd)
-        cmd = cmd + " project add_user --name %s " % project
+        cmd = cmd + " membership add --project %s " % project
         cmd = cmd + " --user %s --groups %s" % (umail, groups)
         self.exe(cmd)
 
@@ -189,15 +190,15 @@ class ManageSfUtils(Tool):
                                     project, user, group=None):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[user]['email']
-        cmd = self.base_cmd % (auth_user, passwd) + " project delete_user "
+        cmd = self.base_cmd % (auth_user, passwd) + " membership remove "
         cmd = cmd + " --name %s --user %s " % (project, umail)
         if group:
-            cmd = cmd + " --group %s " % group
+            cmd = cmd + " --groups %s " % group
         self.exe(cmd)
 
     def list_active_members(self, user):
         passwd = config.USERS[user]['password']
-        cmd = self.base_cmd % (user, passwd) + " project list_active_users "
+        cmd = self.base_cmd % (user, passwd) + " membership list "
         cmd = shlex.split(cmd)
         try:
             output = subprocess.check_output(cmd)
