@@ -36,8 +36,8 @@ The upgrade script will:
 - Fetch the SF images related to the tagged SF version.
 - Stop all SF components (Gerrit, Jenkins, ...)
 - Run the live copy of the file system diff between the new images and the running
-  system on each nodes.
-- Trigger puppet agents on each node and apply changes if needed.
+  system on each node.
+- Trigger puppet apply on each node.
 - Auto submit a new Review to Gerrit config repository if the upgrade
   bring modifications for the default JBB and Zuul base files.
 
@@ -62,9 +62,9 @@ Here are the steps to upgrade:
 
 .. code-block:: bash
 
- $ ssh root@puppetmaster_public_address
- $ git clone http://softwarefactory.enovance.com/r/software-factory /srv/software-factory
- $ cd /srv/software-factory
+ $ ssh root@managesf_public_address
+ $ git clone http://softwarefactory.enovance.com/r/software-factory software-factory
+ $ cd software-factory
  $ ./upgrade.sh <latest TAG>
 
 Upgrade are tested in our CI
