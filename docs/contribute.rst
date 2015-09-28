@@ -51,11 +51,12 @@ download instructions as the *sfinstall.sh* script already done that for you.
 How to run the tests locally
 ----------------------------
 
-We have three kinds of tests that are: ::
+We have four kinds of tests that are: ::
 
  * Unit tests
- * Functional tests against a LXC deployment
- * Functional tests against an OpenStack HEAT deployment
+ * Functional tests
+ * Upgrade tests
+ * Backup tests
 
 Before sending a patch to the upstream softwarefactory code, we advise
 you to run the LXC tests and unittests.
@@ -91,23 +92,10 @@ Tips: ::
 
 .. code-block:: none
 
-  Host *
+  Host tests.dom
     StrictHostKeyChecking no
     User root
-  Host puppetmaster
-    Hostname 192.168.134.49
-  Host mysql
-    Hostname 192.168.134.50
-  Host redmine
-    Hostname 192.168.134.51
-  Host gerrit
-    Hostname 192.168.134.52
-  Host jenkins
-    Hostname 192.168.134.53
-  Host managesf
-    Hostname 192.168.134.101
-  Host slave
-    Hostname 192.168.134.55
+    Hostname 192.168.135.101
 
 
 How to contribute
