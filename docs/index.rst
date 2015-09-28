@@ -18,4 +18,5 @@ Welcome to software-factory's documentation!
    analytics
    testing
    contribute
+   rebuild_image
    tools

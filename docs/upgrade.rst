@@ -20,7 +20,7 @@ Software Factory being image-based, each new releases provides a new set of imag
 either for new deployment, or to upgrade an existing one.
 
 Indeed the main mechanism behind a Software Factory upgrade is the (rsync) copy of the
-files system diff between a running instance and the images reference. This copy
+files system diff between a running instance and the image reference. This copy
 can be performed without shutting down Virtual nodes that compound a Software
 Factory deployment.
 
@@ -33,11 +33,11 @@ The steps involved during an upgrade:
 The upgrade script will:
 
 - Checkout the wanted version (TAG) of Software Factory.
-- Fetch the SF images related to the tagged SF version.
+- Fetch the SF image related to the tagged SF version.
 - Stop all SF components (Gerrit, Jenkins, ...)
-- Run the live copy of the file system diff between the new images and the running
-  system on each nodes.
-- Trigger puppet agents on each node and apply changes if needed.
+- Run the live copy of the file system diff between the new image and the running
+  system on each node.
+- Trigger puppet apply on each node.
 - Auto submit a new Review to Gerrit config repository if the upgrade
   bring modifications for the default JBB and Zuul base files.
 
@@ -62,9 +62,9 @@ Here are the steps to upgrade:
 
 .. code-block:: bash
 
- $ ssh root@puppetmaster_public_address
- $ git clone http://softwarefactory.enovance.com/r/software-factory /srv/software-factory
- $ cd /srv/software-factory
+ $ ssh root@managesf_public_address
+ $ git clone http://softwarefactory-project.io/r/software-factory software-factory
+ $ cd software-factory
  $ ./upgrade.sh <latest TAG>
 
 Upgrade are tested in our CI
