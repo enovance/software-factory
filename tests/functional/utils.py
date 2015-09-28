@@ -36,6 +36,7 @@ import pkg_resources
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.captureWarnings(True)
 
+
 # Empty job for jenkins
 EMPTY_JOB_XML = """<?xml version='1.0' encoding='UTF-8'?>
 <project>
@@ -181,7 +182,7 @@ class ManageSfUtils(Tool):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[new_user]['email']
         cmd = self.base_cmd % (auth_user, passwd)
-        cmd = cmd + " project add_user --name %s " % project
+        cmd = cmd + " membership add --project %s " % project
         cmd = cmd + " --user %s --groups %s" % (umail, groups)
         self.exe(cmd)
 
@@ -189,8 +190,8 @@ class ManageSfUtils(Tool):
                                     project, user, group=None):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[user]['email']
-        cmd = self.base_cmd % (auth_user, passwd) + " project delete_user "
-        cmd = cmd + " --name %s --user %s " % (project, umail)
+        cmd = self.base_cmd % (auth_user, passwd) + " membership remove "
+        cmd = cmd + " --project %s --user %s " % (project, umail)
         if group:
             cmd = cmd + " --group %s " % group
         self.exe(cmd)
