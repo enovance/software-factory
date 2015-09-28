@@ -9,18 +9,9 @@ echo "PREPARE SUBPROJECTS DIRECTORIES"
 [ -n "$ZUUL_PROJECT" ] && IN_ZUUL=1 || IN_ZUUL=0
 [ $IN_ZUUL -eq 1 ] && echo "Triggered by Zuul ..."
 
-[ "$TAGGED_RELEASE" -eq 1 ] && {
-    echo "This is a tagged release; using pinned versions of subprojects to build images."
-    PYSFLIB_REV=${PYSFLIB_PINNED_VERSION}
-    CAUTH_REV=${CAUTH_PINNED_VERSION}
-    MANAGESF_REV=${MANAGESF_PINNED_VERSION}
-} || {
-    echo "This is a non-tagged release; using current versions of subprojects to build images."
-}
-
-PYSFLIB_REV=${PYSFLIB_REV:="master"}
-CAUTH_REV=${CAUTH_REV:="master"}
-MANAGESF_REV=${MANAGESF_REV:="master"}
+PYSFLIB_REV=${PYSFLIB_PINNED_VERSION:-master}
+CAUTH_REV=${CAUTH_PINNED_VERSION:-master}
+MANAGESF_REV=${MANAGESF_PINNED_VERSION:-master}
 
 # Default paths to find cloned dependencies
 PYSFLIB_CLONED_PATH=${PYSFLIB_CLONED_PATH:="${PWD}/../deps/pysflib"}
