@@ -69,7 +69,7 @@ function build_image {
         PYSFLIB_LOC=${dir}/$(sudo chroot ${dir} pip show pysflib | grep '^Location:' | awk '{ print $2 }')
         echo "SKIP_BUILD: direct copy of ${PYSFLIB_CLONED_PATH}/pysflib/ to ${PYSFLIB_LOC}/pysflib/"
         sudo rsync -a --delete ${PYSFLIB_CLONED_PATH}/pysflib/ ${PYSFLIB_LOC}/pysflib/
-        sudo cp edeploy/edeploy ${dir}/usr/sbin/edeploy
+        sudo cp image/edeploy ${dir}/usr/sbin/edeploy
         set +e
     fi
 }
