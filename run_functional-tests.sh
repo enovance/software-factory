@@ -37,12 +37,21 @@ lxc_stop
     prepare_functional_tests_venv
 } || {
     dir=${INST}/softwarefactory
+    set -e
     sudo rsync -a --delete puppet/manifests/ ${dir}/etc/puppet/environments/sf/manifests/
     sudo rsync -a --delete puppet/modules/ ${dir}/etc/puppet/environments/sf/modules/
     sudo rsync -a --delete puppet/hiera/ ${dir}/etc/puppet/hiera/sf/
     sudo rsync -a --delete bootstraps/ ${dir}/root/bootstraps/
     sudo rsync -a --delete serverspec/ ${dir}/root/serverspec/
+    echo "SKIP_BUILD: direct copy of ${MANAGESF_CLONED_PATH}/ to ${dir}/var/www/managesf/"
+    sudo rsync -a --delete ${MANAGESF_CLONED_PATH}/ ${dir}/var/www/managesf/
+    echo "SKIP_BUILD: direct copy of ${CAUTH_CLONED_PATH}/ to ${dir}/var/www/cauth/"
+    sudo rsync -a --delete ${CAUTH_CLONED_PATH}/ ${dir}/var/www/cauth/
+    PYSFLIB_LOC=$(sudo chroot ${dir} pip show pysflib | grep '^Location:' | awk '{ print $2 }')
+    echo "SKIP_BUILD: direct copy of ${PYSFLIB_CLONED_PATH}/pysflib/ to ${PYTSFLIB_LOC}/pysflib/"
+    sudo rsync -a --delete ${PYSFLIB_CLONED_PATH}/pysflib/ ${PYTSFLIB_LOC}/pysflib/
     sudo cp edeploy/edeploy ${dir}/usr/sbin/edeploy
+    set +e
 }
 
 case "${TEST_TYPE}" in
