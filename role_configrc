@@ -2,8 +2,8 @@
 #
 
 # Version string
-SF_PREVIOUS_VER=C7.0-2.0.0beta
-SF_VER=C7.0-2.0.0
+SF_PREVIOUS_VER=C7.0-2.0.0
+SF_VER=C7.0-2.0.1
 
 # Set this variable to 1 if we tag and set it back to 0 the commit after the tag
 TAGGED_RELEASE=0
