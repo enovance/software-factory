@@ -198,7 +198,8 @@ function run_bootstraps {
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
-    ssh -A -tt ${SF_HOST} "cd bootstraps; exec ./bootstrap.sh ${REFARCH}" 2>&1 | tee ${ARTIFACTS_DIR}/bootstraps.log | grep '\(Info:\|Warning:\|Error:\|\[bootstrap\]\)'
+    [ "${REFARCH}" = "2nodes-jenkins" ] && OPTIONS="-i 192.168.135.102"
+    ssh -A -tt ${SF_HOST} "cd bootstraps; exec ./bootstrap.sh -a ${REFARCH} ${OPTIONS}" 2>&1 | tee ${ARTIFACTS_DIR}/bootstraps.log | grep '\(Info:\|Warning:\|Error:\|\[bootstrap\]\)'
     res=${PIPESTATUS[0]}
     kill -9 $SSH_AGENT_PID
     [ "$res" != "0" ] && fail "Bootstrap fails" ${ARTIFACTS_DIR}/bootstraps.log
