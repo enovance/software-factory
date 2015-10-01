@@ -104,7 +104,7 @@ function wait_for_ssh {
     while true; do
         KEY=`ssh-keyscan -p 22 $ip`
         if [ "$KEY" != ""  ]; then
-            ssh-keyscan $ip | tee -a "$HOME/.ssh/known_hosts"
+            ssh-keyscan $ip | tee -a "/root/.ssh/known_hosts"
             echo "  -> $ip:22 is up!"
             return 0
         fi
