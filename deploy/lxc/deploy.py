@@ -140,7 +140,7 @@ elif args.action == "destroy":
     destroy()
 elif args.action == "init":
     if args.version is None:
-        # Extract INST path from role_configrc... needs bash evaluation here
+        # Extracts version from role_configrc... needs bash evaluation here
         args.version = pread([
             "bash", "-c", ". ../../role_configrc; echo $SF_VER"]).strip()
     init("/var/lib/sf/roles/install/%s" % args.version)
