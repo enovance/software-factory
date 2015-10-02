@@ -16,22 +16,31 @@
 
 [ -z "${DEBUG}" ] && DISABLE_SETX=1 || set -x
 
-BUILD=${BUILD:-/root/sf-bootstrap-data}
+# Defaults
+DOMAIN=tests.dom
+REFARCH=1node-allinone
+IP_JENKINS=127.0.0.1
+BUILD=/root/sf-bootstrap-data
+
+function get_yaml {
+    file=$1
+    key=$2
+
+    cat $file | grep "^${key}:" | sed "s/^${key}: //"
+}
 
 function generate_hosts_yaml {
     OUTPUT=${BUILD}/hiera
-    local domain=$(cat ${OUTPUT}/sfconfig.yaml | grep '^domain:' | awk '{ print $2 }')
     local localip=$(ip route get 8.8.8.8 | awk '{ print $7 }')
-    local ip=$1
     cat << EOF > ${OUTPUT}/hosts.yaml
 hosts:
   localhost:            {ip: 127.0.0.1}
-  mysql.$domain:        {ip: ${localip}, host_aliases: [mysql]}
-  jenkins.$domain:      {ip: $ip, host_aliases: [jenkins]}
-  redmine.$domain:      {ip: ${localip}, host_aliases: [redmine]}
-  api-redmine.$domain:  {ip: ${localip}}
-  gerrit.$domain:       {ip: ${localip}, host_aliases: [gerrit]}
-  managesf.$domain:     {ip: ${localip}, host_aliases: [managesf, auth.$domain, $domain]}
+  mysql.${DOMAIN}:        {ip: ${localip}, host_aliases: [mysql]}
+  jenkins.${DOMAIN}:      {ip: ${IP_JENKINS}, host_aliases: [jenkins]}
+  redmine.${DOMAIN}:      {ip: ${localip}, host_aliases: [redmine]}
+  api-redmine.${DOMAIN}:  {ip: ${localip}}
+  gerrit.${DOMAIN}:       {ip: ${localip}, host_aliases: [gerrit]}
+  managesf.${DOMAIN}:     {ip: ${localip}, host_aliases: [managesf, auth.${DOMAIN}, ${DOMAIN}]}
 EOF
 }
 
@@ -50,9 +59,18 @@ function generate_api_key {
     echo $out | awk '{print tolower($0)}'
 }
 
+function generate_sfconfig_yaml {
+    OUTPUT=${BUILD}/hiera
+    mv sfconfig.yaml ${OUTPUT}/
+    ln -s ${OUTPUT}/sfconfig.yaml .
+    ./hieraedit.py --yaml ${OUTPUT}/sfconfig.yaml domain "${DOMAIN}"
+    ./hieraedit.py --yaml ${OUTPUT}/sfconfig.yaml refarch "${REFARCH}"
+    ./hieraedit.py --yaml ${OUTPUT}/sfconfig.yaml ip_jenkins "${IP_JENKINS}"
+}
+
 function generate_creds_yaml {
     OUTPUT=${BUILD}/hiera
-    cp sfcreds.yaml ${OUTPUT}/
+    mv sfcreds.yaml ${OUTPUT}/
     # MySQL password for services
     MYSQL_ROOT_SECRET=$(generate_random_pswd 32)
     REDMINE_MYSQL_SECRET=$(generate_random_pswd 32)
@@ -121,7 +139,6 @@ function generate_keys {
 
 function generate_apache_cert {
     OUTPUT=${BUILD}/certs
-    domain=$(cat ${BUILD}/hiera/sfconfig.yaml | grep '^domain:' | awk '{ print $2 }')
     # Generate self-signed Apache certificate
     cat > openssl.cnf << EOF
 [req]
@@ -129,16 +146,16 @@ req_extensions = v3_req
 distinguished_name = req_distinguished_name
 
 [ req_distinguished_name ]
-commonName_default = $domain
+commonName_default = ${DOMAIN}
 
 [ v3_req ]
 subjectAltName=@alt_names
 
 [alt_names]
-DNS.1 = $domain
-DNS.2 = auth.$domain
+DNS.1 = ${DOMAIN}
+DNS.2 = auth.${DOMAIN}
 EOF
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=$domain" -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt -extensions v3_req -config openssl.cnf
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=${DOMAIN}" -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt -extensions v3_req -config openssl.cnf
 }
 
 function prepare_etc_puppet {

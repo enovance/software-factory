@@ -287,6 +287,8 @@ function run_backup_restore {
     done
     [ $retry -eq 1000 ] && fail "Gerrit did not restart"
     echo "=> Took ${retry} retries"
+    # Give it some more time...
+    sleep 5
     deactivate
 }
 
