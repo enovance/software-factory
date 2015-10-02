@@ -161,7 +161,7 @@ function fail {
     msg=$1
     log_file=$2
     DISABLE_SETX=1
-    echo -e "\n\n>>>>>>>>> $(hostname) FAIL: $msg"
+    echo -e "\n\n-----8<-------8<------\n  END OF TEST, FAIL: "
     if [ ! -z "$log_file" ] && [ -f "$log_file" ]; then
         echo "=> Log file $log_file --["
         tail -n 500 $log_file
@@ -271,7 +271,8 @@ function run_backup_start {
     sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_start || fail "Backup failed"
     sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_get || fail "Backup get failed"
     deactivate
-
+    sudo cp /var/lib/lxc/managesf/rootfs/var/log/managesf/managesf.log ${ARTIFACTS_DIR}/backup_managesf.log
+    tar tzvf sf_backup.tar.gz > ${ARTIFACTS_DIR}/backup_content.log
 }
 
 function run_backup_restore {
@@ -287,6 +288,8 @@ function run_backup_restore {
     done
     [ $retry -eq 1000 ] && fail "Gerrit did not restart"
     echo "=> Took ${retry} retries"
+    # Give it some more time...
+    sleep 5
     deactivate
 }
 
