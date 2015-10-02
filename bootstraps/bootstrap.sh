@@ -14,6 +14,8 @@
 # license for the specific language governing permissions and limitations
 # under the license.
 
+source functions.sh
+
 while getopts ":a:i:d:h" opt; do
     case $opt in
         a)
@@ -24,7 +26,7 @@ while getopts ":a:i:d:h" opt; do
             }
             ;;
         i)
-            IP=$OPTARG
+            IP_JENKINS=$OPTARG
             ;;
         d)
             DOMAIN=$OPTARG
@@ -45,7 +47,7 @@ while getopts ":a:i:d:h" opt; do
             echo ""
             echo "Use -d option to specify under which domain the SF gateway"
             echo "will be installed. If you intend to reconfigure the domain on"
-            echo "an already deploy SF then this is the option use need to use."
+            echo "an already deploy SF then this is the option you need to use."
             exit 0
             ;;
         \?)
@@ -59,42 +61,22 @@ while getopts ":a:i:d:h" opt; do
     esac
 done
 
-
-DEBUG=1
-source functions.sh
-
-BUILD=/root/sf-bootstrap-data
 # Make sure sf-bootstrap-data sub-directories exist
 for i in hiera ssh_keys certs; do
     [ -d ${BUILD}/$i ] || mkdir -p ${BUILD}/$i
 done
 
-DOMAIN=${DOMAIN:-tests.dom}
-sed -i "s/^domain:.*/domain: $DOMAIN/" sfconfig.yaml
-cp sfconfig.yaml ${BUILD}/hiera/
-
 # Generate site specifics configuration
 if [ ! -f "${BUILD}/generate.done" ]; then
-    REFARCH=${REFARCH:-1node-allinone}
-    IP=${IP:-127.0.0.1}
-    mkdir -p /var/log/edeploy
-    echo "PROFILE=none" >> /var/log/edeploy/vars
     generate_keys
     generate_apache_cert
     generate_creds_yaml
-    echo -n ${REFARCH} > ${BUILD}/refarch
-    echo -n ${IP} > ${BUILD}/ip
+    generate_sfconfig_yaml
     touch "${BUILD}/generate.done"
 else
-    [ -n "$REFARCH" ] && {
-        echo "REFARCH has been already selected. Skipping your choice from options."
-    }
-    [ -n "$IP" ] && {
-        echo "IP has been already selected. Skipping your choice from options."
-    }
     # During upgrade or another bootstrap rup, reuse the same refarch
-    [ -f ${BUILD}/refarch ] && REFARCH=$(cat ${BUILD}/refarch)
-    [ -f ${BUILD}/ip ] && IP=$(cat ${BUILD}/ip)
+    REFARCH=$(get_yaml ${BUILD}/hiera/sfconfig.yaml refarch)
+    IP_JENKINS=$(get_yaml ${BUILD}/hiera/sfconfig.yaml jenkins_ip)
 fi
 
 
@@ -125,7 +107,9 @@ function puppet_apply {
     host=$1
     manifest=$2
     echo "[bootstrap][$host] Applying $manifest"
-    ssh -tt root@$host puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/ $manifest
+    [ "$host" == "managesf.${DOMAIN}" ] && ssh="" || ssh="ssh -tt root@$host"
+        S
+    $ssh puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/ $manifest
     res=$?
     if [ "$res" != 2 ] && [ "$res" != 0 ]; then
         echo "[bootstrap][$host] Failed ($res) to apply $manifest"
@@ -140,31 +124,30 @@ function puppet_copy {
 }
 
 echo "Boostrapping $REFARCH"
-domain=$(cat ${BUILD}/hiera/sfconfig.yaml | grep '^domain:' | awk '{ print $2 }')
 # Apply puppet stuff with good old shell scrips
 case "${REFARCH}" in
     "1node-allinone")
         generate_hosts_yaml "127.0.0.1"
         prepare_etc_puppet
         puppet_apply_host
-        wait_for_ssh "managesf.${domain}"
-        puppet_apply "managesf.${domain}" /etc/puppet/environments/sf/manifests/1node-allinone.pp
+        wait_for_ssh "managesf.${DOMAIN}"
+        puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/1node-allinone.pp
         ;;
     "2nodes-jenkins")
-        [ "$IP" = "127.0.0.1" ] && {
-            echo "Please select another IP than 127.0.0.1 for this REFARCH"
+        [ "$IP_JENKINS" = "127.0.0.1" ] && {
+            echo "Please select another IP_JENKINS than 127.0.0.1 for this REFARCH"
             exit 1
         }
-        generate_hosts_yaml $IP
+        generate_hosts_yaml
         prepare_etc_puppet
         puppet_apply_host
-        wait_for_ssh "managesf.${domain}"
-        wait_for_ssh "jenkins.${domain}"
-        puppet_copy jenkins.${domain}
+        wait_for_ssh "managesf.${DOMAIN}"
+        wait_for_ssh "jenkins.${DOMAIN}"
+        puppet_copy jenkins.${DOMAIN}
 
         # Run puppet apply
-        puppet_apply "managesf.${domain}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
-        puppet_apply "jenkins.${domain}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
+        puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
+        puppet_apply "jenkins.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
         ;;
     *)
         echo "Unknown refarch ${REFARCH}"
@@ -173,7 +156,3 @@ case "${REFARCH}" in
 esac
 echo "SUCCESS ${REFARCH}"
 exit 0
-
-# Apply puppet stuff with fancy but broken ansible
-#cd ansible;
-#exec ansible-playbook -i ${REFARCH}-hosts ${REFARCH}-playbook.yaml
