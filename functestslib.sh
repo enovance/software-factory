@@ -161,7 +161,7 @@ function fail {
     msg=$1
     log_file=$2
     DISABLE_SETX=1
-    echo -e "\n\n>>>>>>>>> $(hostname) FAIL: $msg"
+    echo -e "\n\n-----8<-------8<------\n  END OF TEST, FAIL: "
     if [ ! -z "$log_file" ] && [ -f "$log_file" ]; then
         echo "=> Log file $log_file --["
         tail -n 500 $log_file
@@ -263,15 +263,18 @@ function run_provisioner {
     . /var/lib/sf/venv/bin/activate
     ./tests/functional/provisioner/provisioner.py 2>> ${ARTIFACTS_DIR}/provisioner.debug || fail "Provisioner failed" ${ARTIFACTS_DIR}/provisioner.debug
     deactivate
+    checkpoint "run_provisioner"
 }
 
 function run_backup_start {
     echo "$(date) ======= run_backup_start"
     . /var/lib/sf/venv/bin/activate
     sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_start || fail "Backup failed"
-    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_get || fail "Backup get failed"
+    sfmanager --url "${MANAGESF_URL}" --auth user1:userpass system backup_get   || fail "Backup get failed"
     deactivate
-
+    sudo cp /var/lib/lxc/managesf/rootfs/var/log/managesf/managesf.log ${ARTIFACTS_DIR}/backup_managesf.log
+    tar tzvf sf_backup.tar.gz > ${ARTIFACTS_DIR}/backup_content.log
+    checkpoint "run_backup_start"
 }
 
 function run_backup_restore {
@@ -287,7 +290,10 @@ function run_backup_restore {
     done
     [ $retry -eq 1000 ] && fail "Gerrit did not restart"
     echo "=> Took ${retry} retries"
+    # Give it some more time...
+    sleep 5
     deactivate
+    checkpoint "run_backup_restore"
 }
 
 function run_upgrade {
@@ -306,6 +312,7 @@ function run_checker {
     . /var/lib/sf/venv/bin/activate
     ./tests/functional/provisioner/checker.py 2>> ${ARTIFACTS_DIR}/checker.debug || fail "Backup checker failed" ${ARTIFACTS_DIR}/checker.debug
     deactivate
+    checkpoint "run_checker"
 }
 
 function run_functional_tests {
