@@ -1,6 +1,31 @@
 # Change Log
 
-## 1.0.4 [unreleased]
+## 2.0.0 2015-10-09
+
+SF v2 is a major refactor to make deployment more modular.
+
+### Added
+
+- Backup and restore tests
+- All in one deployment mode
+
+### Changed
+
+- Bootstrap do puppet apply instead of agent
+- Only support all-in-one and 2node deployment
+- Image building system without edeploy
+- Functional tests run from host
+
+### Removed
+
+- Cloud-init bootstrap
+- Puppetmaster and install server
+- Edeploy-roles
+- Puppet agent
+
+## 1.0.4 2015-09-09
+
+- Fix overlayfs usage in LXC deployment
 
 ## 1.0.3 2015-09-04
 
