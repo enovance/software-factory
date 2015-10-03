@@ -18,7 +18,7 @@ function install_sf {
 
     # Make sure subproject are available
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || [ ! -d "${PYSFLIB_CLONED_PATH}" ]; then
-        ./fetch_subprojects.sh
+        (cd ..; ./image/fetch_subprojects.sh)
     fi
 
     # Install cauth

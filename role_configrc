@@ -26,7 +26,7 @@ SWIFT_SF_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/edeploy-roles"
 SWIFT_DOCS_URL="${SWIFT_BASE_URL}/v1/AUTH_${SWIFT_ACCOUNT}/sfdocs"
 
 # Paths
-WORKSPACE="${WORKSPACE:-/var/lib/sf}"
+WORKSPACE="${SF_WORKSPACE:-/var/lib/sf}"
 BUILD_DIR="$WORKSPACE/roles"
 
 UPSTREAM="${BUILD_DIR}/upstream"

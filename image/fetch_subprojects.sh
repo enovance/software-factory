@@ -2,6 +2,7 @@
 
 set -e
 
+. ./role_configrc
 echo "PREPARE SUBPROJECTS DIRECTORIES"
 
 # If this script is run in our job runner the
@@ -22,11 +23,6 @@ PYSFLIB_REV=${PYSFLIB_REV:-"origin/master"}
 CAUTH_REV=${CAUTH_REV:-"origin/master"}
 MANAGESF_REV=${MANAGESF_REV:-"origin/master"}
 
-# Default paths to find cloned dependencies
-PYSFLIB_CLONED_PATH=${PYSFLIB_CLONED_PATH:-"${PWD}/../deps/pysflib"}
-CAUTH_CLONED_PATH=${CAUTH_CLONED_PATH:-"${PWD}/../deps/cauth"}
-MANAGESF_CLONED_PATH=${MANAGESF_CLONED_PATH:-"${PWD}/../deps/managesf"}
-
 # Default repo for deps if we need to fetch them
 PYSFLIB_REPO=${PYSFLIB_REPO:-"http://softwarefactory.enovance.com/r/pysflib"}
 CAUTH_REPO=${CAUTH_REPO:-"http://softwarefactory.enovance.com/r/cauth"}
@@ -46,7 +42,7 @@ for PROJECT in "PYSFLIB" "CAUTH" "MANAGESF"; do
     eval PROJECT_KEEP=\$${PROJECT}_KEEP
     if [ "$PROJECT_FETCH_MODE" = "remote" ]; then
         if [ -z "$PROJECT_KEEP" ]; then
-            echo "Fetch $PROJECT:$PROJECT_REV in $PROJECT_CLONED_PATH."
+            echo "Fetch $PROJECT:$PROJECT_REV in $PROJECT_CLONED_PATH"
             if [ -d $PROJECT_CLONED_PATH ]; then
                 (cd $PROJECT_CLONED_PATH; git fetch --all) &> /dev/null
             else
