@@ -7,6 +7,9 @@
   </head>
   <body>
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <% if scope.function_hiera(["topmenu_logo_data"]) %><div class="navbar-header">
+            <a class="navbar-brand" href="/"><img src="data:image/png;base64,<%= scope.function_hiera(["topmenu_logo_data"]) %>" style="<%= scope.function_hiera(["topmenu_logo_style"]) %>" alt="Software Factory" /></a>
+        </div><% end %>
         <div class="navbar-header">
           <a class="navbar-brand" href="/">Software Factory</a>
         </div>
