@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.0.1 [unreleased]
+
+### Changed
+
+- Renamed bootstraps scripts to sfconfig.sh
+- Moved script from /root to /usr/local/bin
+
+
 ## 2.0.0 2015-10-07
 
 SF v2 is a major refactor to make deployment more modular.
