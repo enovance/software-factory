@@ -48,6 +48,7 @@ function fetch_prebuilt {
     sudo curl -o ${UPSTREAM}/${IMG}.digest ${SWIFT_SF_URL}/${IMG}.digest
     sudo curl -o ${UPSTREAM}/${IMG}.hash ${SWIFT_SF_URL}/${IMG}.hash || exit -1
     echo "Digests..."
+    sed -i "/qcow2/d" ${UPSTREAM}/${IMG}.digest # Needed after upgrade
     (cd ${UPSTREAM}; exec sha256sum -c ./${IMG}.digest) || exit -1
 }
 
