@@ -13,20 +13,45 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-class gerrit ($settings = hiera_hash('gerrit', ''),
-              $cauth = hiera_hash('cauth', '')) {
+class gerrit {
 
   require hosts
   include apache
   include gerrituser
 
   $fqdn = hiera('fqdn')
-  $redmine_pub_url = hiera('redmine_pub_url')
+  $url = hiera('url')
+  $cauth = hiera('cauth')
+  $settings = hiera('gerrit')
+  $auth = hiera('authentication')
+
+  $gerrit_email_pk = hiera('creds_gerrit_email_pk')
+  $gerrit_token_pk = hiera('creds_gerrit_token_pk')
+  $gerrit_local_key = hiera('creds_gerrit_local_sshkey')
+  $gerrit_admin_key = hiera('creds_gerrit_admin_sshkey')
   $gerrit_service_rsa = hiera('gerrit_service_rsa')
   $gerrit_service_rsa_pub = hiera('gerrit_service_rsa_pub')
-  $auth = hiera('authentication')
+
+  $gerrit_local_sshkey_rsa = hiera('creds_gerrit_local_sshkey')
+  $gerrit_local_sshkey = "ssh-rsa $gerrit_local_sshkey_rsa"
+  $gerrit_admin_sshkey_rsa = hiera('creds_gerrit_admin_sshkey')
+  $gerrit_admin_sshkey = "ssh-rsa $gerrit_admin_sshkey_rsa"
+  $gerrit_jenkins_sshkey_rsa = hiera('creds_jenkins_pub_key')
+  $gerrit_jenkins_sshkey = "ssh-rsa $gerrit_jenkins_sshkey_rsa"
+
+  $issues_tracker_api_url = $url['redmine_url']
+  $issues_tracker_api_key = hiera('creds_issues_tracker_api_key')
+  $gitweb_url = $url['gerrit_pub_url']
+
+  $gerrit_admin_mail = "admin@$fqdn"
   $provider = "systemd"
   $gitweb_cgi = "/var/www/git/gitweb.cgi"
+
+  $mysql_host = "mysql.$fqdn"
+  $mysql_port = 3306
+  $mysql_user = "gerrit"
+  $mysql_password = hiera('creds_gerrit_sql_pwd')
+  $mysql_db = "gerrit"
 
   file { 'gerrit_init':
     path  => '/lib/systemd/system/gerrit.service',
@@ -43,8 +68,8 @@ class gerrit ($settings = hiera_hash('gerrit', ''),
   # and update replication.config
   ssh_authorized_key { 'gerrit_admin_user':
     user => 'gerrit',
-    type => 'rsa',
-    key  => $settings['gerrit_admin_key'],
+    type => 'ssh-rsa',
+    key  => "$gerrit_admin_key",
     require => File['/home/gerrit/.ssh'],
   }
 
