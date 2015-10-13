@@ -65,8 +65,9 @@ function build_image {
         sudo rsync -a --delete puppet/manifests/ ${IMAGE_PATH}/etc/puppet/environments/sf/manifests/
         sudo rsync -a --delete puppet/modules/ ${IMAGE_PATH}/etc/puppet/environments/sf/modules/
         sudo rsync -a --delete puppet/hiera/ ${IMAGE_PATH}/etc/puppet/hiera/sf/
-        sudo cp -Rv config/scripts/* ${IMAGE_PATH}/usr/local/bin/
-        sudo cp -Rv config/defaults/* ${IMAGE_PATH}/etc/puppet/hiera/sf/
+        sudo rsync -a config/scripts/ ${IMAGE_PATH}/usr/local/bin/
+        sudo rsync -a config/defaults/ ${IMAGE_PATH}/etc/puppet/hiera/sf/
+        sudo rsync -a --delete config/specs/ ${IMAGE_PATH}/usr/share/sfconfig-specs/
         echo "SKIP_BUILD: direct copy of ${MANAGESF_CLONED_PATH}/ to ${IMAGE_PATH}/var/www/managesf/"
         sudo rsync -a --delete ${MANAGESF_CLONED_PATH}/ ${IMAGE_PATH}/var/www/managesf/
         echo "SKIP_BUILD: direct copy of ${CAUTH_CLONED_PATH}/ to ${IMAGE_PATH}/var/www/cauth/"

@@ -3,7 +3,7 @@ fqdn: tests.dom
 
 network:
     enforce_ssl: false
-    smtp_relay:
+    smtp_relay: ""
     # NTP main reference server
     ntp_main_server: pool.ntp.org
 
@@ -28,9 +28,9 @@ authentication:
         ldap_account_surname_attribute: sn
 
     github:
-        github_app_id:
-        github_app_secret:
-        github_allowed_organizations:
+        github_app_id: ""
+        github_app_secret: ""
+        github_allowed_organizations: ""
 
 
 theme:
@@ -52,10 +52,10 @@ theme:
 
 backup:
     disabled: True
-    os_auth_url:
-    os_tenant_name:
-    os_username:
-    os_password:
+    os_auth_url: ""
+    os_tenant_name: ""
+    os_username: ""
+    os_password: ""
     swift_backup_container: sfbackups
     swift_backup_max_retention_secs: 864000
 

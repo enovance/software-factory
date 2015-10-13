@@ -1,0 +1,80 @@
+type: map
+mapping:
+  fqdn: {type: str, required: yes}
+  network:
+    type: map
+    required: yes
+    mapping:
+      enforce_ssl: {type: bool}
+      smtp_relay: {type: str}
+      admin_mail_forward: {type: str}
+      ntp_main_server: {type: str}
+  authentication:
+    type: map
+    mapping:
+      admin_name: {type: str, required: yes}
+      admin_password: {type: str, required: yes}
+      sso_cookie_timeout: {type: int}
+      authenticated_only: {type: bool}
+      ldap:
+        type: map
+        mapping:
+          ldap_url: {type: str}
+          ldap_account_base: {type: str}
+          ldap_account_username_attribute: {type: str}
+          ldap_account_mail_attribute: {type: str}
+          ldap_account_surname_attribute: {type: str}
+      github:
+        type: map
+        mapping:
+          github_app_id: {type: str}
+          github_app_secret: {type: str}
+          github_allowed_organizations: {type: str}
+  theme:
+    type: map
+    mapping:
+      loginpage_custom_footer: {type: str}
+      topmenu_logo_style: {type: str}
+      topmenu_logo_data: {type: str}
+      favicon_data: {type: str}
+      topmenu_hide_redmine: {type: bool}
+      topmenu_hide_etherpad: {type: bool}
+      topmenu_hide_paste: {type: bool}
+
+  backup:
+    type: map
+    mapping:
+      disabled: {type: bool}
+      os_auth_url: {type: str}
+      os_tenant_name: {type: str}
+      os_username: {type: str}
+      os_password: {type: str}
+      swift_backup_container: {type: str}
+      swift_backup_max_retention_secs: {type: int}
+
+  nodepool:
+    type: map
+    mapping:
+      disabled: {type: bool}
+      nodepool_os_username: {type: str}
+      nodepool_os_password: {type: str}
+      nodepool_os_project_id: {type: str}
+      nodepool_os_auth_url: {type: str}
+      nodepool_os_pool: {type: str}
+      nodepool_os_pool_max_amount: {type: int}
+      public_ip: {type: str}
+      nodepool_provider_rate: {type: float}
+
+  logs:
+    type: map
+    mapping:
+      disabled: {type: bool}
+      swift_logsexport_activated: {type: bool}
+      swift_logsexport_container: {type: str}
+      swift_logsexport_logserver_prefix: {type: str}
+      swift_logsexport_authurl: {type: str}
+      swift_logsexport_x_storage_url: {type: str}
+      swift_logsexport_username: {type: str}
+      swift_logsexport_password: {type: str}
+      swift_logsexport_tenantname: {type: str}
+      swift_logsexport_authversion: {type: int}

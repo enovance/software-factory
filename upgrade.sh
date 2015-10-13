@@ -28,7 +28,7 @@ grep -q '^admin_name' ${DST} && {
     echo "[+] sfconfig migration"
     ./config/scripts/migration_sfconfig-2.0.0.py ${DST} ${SRC} || exit -1
 }
-./config/scripts/validate_sfconfig.py ${DST} || exit -1
+./config/scripts/validate_sfconfig.py ${DST} ./config/specs/sfconfig.yaml || exit -1
 
 # check install files
 if [ ! -d "/var/lib/debootstrap/install/${SF_VER}/softwarefactory/" ]; then
