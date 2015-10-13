@@ -1,7 +1,7 @@
 ---
 top_domain: "%{hiera('domain')}"
 gateway_host: "%{hiera('domain')}"
-gateway_url: "http://%{hiera('domain')}"
+gateway_url: "http://%{hiera('domain')}/"
 redmine_url: "http://redmine.%{hiera('domain')}:8083/redmine/"
 redmine_host: "redmine.%{hiera('domain')}"
 api_redmine_host: "api-redmine.%{hiera('domain')}"
