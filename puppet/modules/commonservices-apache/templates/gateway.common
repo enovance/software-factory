@@ -1,3 +1,7 @@
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} !<%= scope.function_hiera(["domain"]) %>/$1 [NC]
+    RewriteRule ^(.*)$ http://<%= scope.function_hiera(["domain"]) %>/$1 [R=301,L]
+
     <LocationMatch "/r/(?!(login|logout|a))">
 	RewriteEngine On
 
