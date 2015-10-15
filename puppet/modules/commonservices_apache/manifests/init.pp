@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
+class commonservices_apache ($cauth = hiera_hash('cauth', '')) {
   require hosts
   include ::apache
 
@@ -51,7 +51,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode    => '0640',
     owner   => $httpd_user,
     group   => $httpd_user,
-    content => template('commonservices-apache/gateway.common'),
+    content => template('commonservices_apache/gateway.common'),
   }
 
   file {'gateway_conf':
@@ -60,7 +60,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode    => '0640',
     owner   => $httpd_user,
     group   => $httpd_user,
-    content => template('commonservices-apache/gateway.conf'),
+    content => template('commonservices_apache/gateway.conf'),
     notify  => Service['webserver'],
     require => [File['gateway_crt'],
                 File['gateway_key'],
@@ -74,7 +74,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode    => '0640',
     owner   => $httpd_user,
     group   => $httpd_user,
-    content => template('commonservices-apache/topmenu.js'),
+    content => template('commonservices_apache/topmenu.js'),
   }
 
   file {'/var/www/static/js/menu.js':
@@ -82,7 +82,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode   => '0640',
     owner  => $httpd_user,
     group  => $httpd_user,
-    source => 'puppet:///modules/commonservices-apache/menu.js',
+    source => 'puppet:///modules/commonservices_apache/menu.js',
   }
 
   file {'/var/www/topmenu.html':
@@ -90,7 +90,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode    => '0640',
     owner   => $httpd_user,
     group   => $httpd_user,
-    content => template('commonservices-apache/topmenu.html'),
+    content => template('commonservices_apache/topmenu.html'),
   }
 
   file {'/var/www/dashboard':
@@ -106,7 +106,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode    => '0640',
     owner   => $httpd_user,
     group   => $httpd_user,
-    source  => 'puppet:///modules/commonservices-apache/dashboard.html',
+    source  => 'puppet:///modules/commonservices_apache/dashboard.html',
     require => File['/var/www/dashboard'],
   }
 
@@ -115,7 +115,7 @@ class commonservices-apache ($cauth = hiera_hash('cauth', '')) {
     mode    => '0640',
     owner   => $httpd_user,
     group   => $httpd_user,
-    source  => 'puppet:///modules/commonservices-apache/dashboard.js',
+    source  => 'puppet:///modules/commonservices_apache/dashboard.js',
     require => File['/var/www/dashboard'],
   }
 
