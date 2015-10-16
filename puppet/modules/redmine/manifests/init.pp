@@ -30,12 +30,12 @@ class redmine {
     include ::apache
 
     file { 'conf_yml':
-      ensure  => file,
-      path    => '/usr/share/redmine/config/configuration.yml',
-      mode    => '0640',
-      owner   => $httpd_user,
-      group   => $httpd_user,
-      content => template('redmine/configuration.yml.erb'),
+      ensure => file,
+      path   => '/usr/share/redmine/config/configuration.yml',
+      mode   => '0640',
+      owner  => $httpd_user,
+      group  => $httpd_user,
+      source => 'puppet:///modules/redmine/configuration.yml',
     }
 
     file { 'dbconf_yml':
