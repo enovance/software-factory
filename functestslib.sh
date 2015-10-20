@@ -54,11 +54,11 @@ function build_image {
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || [ ! -d "${PYSFLIB_CLONED_PATH}" ]; then
         ./image/fetch_subprojects.sh
     fi
+    prepare_functional_tests_venv
     if [ -z "${SKIP_BUILD}" ]; then
         # Retry to build role if it fails before exiting
         ./build_image.sh ${ARTIFACTS_DIR} || ./build_image.sh ${ARTIFACTS_DIR} || fail "Roles building FAILED"
         checkpoint "build_image"
-        prepare_functional_tests_venv
     else
         echo "SKIP_BUILD: Reusing previously built image, just update source code without re-installing"
         echo "            To update requirements and do a full installation, do not use SKIP_BUILD"
