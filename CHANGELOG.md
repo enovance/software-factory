@@ -1,10 +1,25 @@
 # Change Log
 
-## 2.0.2 [unreleased]
+## 2.0.2 2015-10-23
+
+### Added
+
+- disabled setting for nodepool and swift
+
+### Changed
+
+- removed default root password and set age to 0
+
+### Fixed
+
+- python-redmine version capped
+- jenkins url in gerrit comment
 
 ### Removed
 
 - Admin name settings, it's now forced to "admin"
+- public_ip settings for nodepool
+
 
 ## 2.0.1 2015-10-16
 
