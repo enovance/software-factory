@@ -128,6 +128,13 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>config-check</string>
+        <string>config-update</string>
+        <string>zuul-demo-functional-tests</string>
+        <string>zuul-demo-unit-tests</string>
+      </jobNames>
       <jobFilters/>
       <columns>
         <hudson.views.StatusColumn/>
@@ -168,6 +175,10 @@
           <dateShift>0</dateShift>
           <displayStatus>ALL</displayStatus>
         </hudson.plugins.view.dashboard.test.TestTrendChart>
+        <hudson.plugins.cobertura.dashboard.CoverageTablePortlet plugin="cobertura@1.9.7">
+          <id>dashboard_portlet_29066</id>
+          <name>Code Coverage</name>
+        </hudson.plugins.cobertura.dashboard.CoverageTablePortlet>
       </topPortlets>
       <bottomPortlets/>
     </hudson.plugins.view.dashboard.Dashboard>
