@@ -46,4 +46,7 @@ node default {
   class {'::jenkins': stage => last }
   # jjb also deploys zuul and nodepool
   class {'::jjb': stage => last }
+
+  # Graphite and statsd
+  include ::graphite
 }

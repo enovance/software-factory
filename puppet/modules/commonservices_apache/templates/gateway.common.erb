@@ -82,6 +82,10 @@
         ProxyPassMatch ^/jenkinslogs/<%= prefix %>(.*)$ http://<%= prefix %>$1
 	    <% end -%>
 
+        RewriteRule ^/grafana$ grafana/ [R]
+        ProxyPass /grafana/ http://127.0.0.1:3000/
+        ProxyPassReverse /grafana/ http://127.0.0.1:3000/
+
     </IfModule>
 
     <LocationMatch "/jenkinslogs/">

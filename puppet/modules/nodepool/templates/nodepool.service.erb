@@ -7,6 +7,9 @@ Type=simple
 User=jenkins
 Group=jenkins
 ExecStart=/usr/bin/nodepoold -p /var/run/nodepool/nodepool.pid -l /etc/nodepool/nodepool.logging.conf
+<% if @statsd['host'] -%>
+Environment="STATSD_HOST=<%= @statsd['host'] %>" "STATSD_PORT=<%= @statsd['port'] %>"
+<% end -%>
 KillSignal=SIGUSR1
 
 [Install]
