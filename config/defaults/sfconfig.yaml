@@ -104,3 +104,8 @@ logs:
     # Use 1 for using the tempauth of Swift or use 2
     # if you rely on a keystone authentication
     swift_logsexport_authversion: 1
+
+statsd:
+    # Zuul and Nodepool will send statsd metrics to this defined server
+    host: 127.0.0.1
+    port: 8125

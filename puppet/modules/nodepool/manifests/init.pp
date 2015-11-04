@@ -17,6 +17,7 @@ class nodepool {
 
   $jenkins_rsa_pub = hiera('jenkins_rsa_pub')
   $nodepool = hiera('nodepool')
+  $statsd = hiera('statsd')
   $fqdn = hiera('fqdn')
   $url = hiera('url')
 

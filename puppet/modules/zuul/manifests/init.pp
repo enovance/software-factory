@@ -21,6 +21,7 @@ class zuul {
   $url = hiera('url')
   $logs = hiera('logs')
   $hosts = hiera('hosts')
+  $statsd = hiera('statsd')
   $jenkins_rsa = hiera('jenkins_rsa')
   $gerrit_host = "gerrit.${fqdn}"
   $gerrit_ip = $hosts[$gerrit_host]['ip']
@@ -54,7 +55,7 @@ class zuul {
     mode   => '0555',
     owner  => 'root',
     group  => 'root',
-    source => 'puppet:///modules/zuul/zuul.systemd.service',
+    content => template('zuul/zuul.systemd.service.erb'),
   }
 
   file {'zuul_merger_init':
