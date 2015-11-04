@@ -73,6 +73,8 @@ backup:
 
 nodepool:
     disabled: True
+    # If statsd_host is set, nodepool will sent statistic via UDP to this host
+    # statsd_host: 127.0.0.1
     providers:
       - name: default
         auth-url: http://localhost:35357/v2.0
