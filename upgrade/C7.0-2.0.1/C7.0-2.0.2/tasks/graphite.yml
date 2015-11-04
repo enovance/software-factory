@@ -1,0 +1,30 @@
+---
+- shell: dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w 32 | head -n1
+  register: creds_grafana_sql_pwd
+
+- lineinfile:
+    dest: /etc/puppet/hiera/sf/sfcreds.yaml
+    create: yes
+    state: present
+    regexp: 'creds_grafana_sql_pwd.*'
+    line: "creds_grafana_sql_pwd: {{ creds_grafana_sql_pwd.stdout }}"
+
+- shell: dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w 32 | head -n1
+  register: creds_graphite_secret_key
+
+- lineinfile:
+    dest: /etc/puppet/hiera/sf/sfcreds.yaml
+    create: yes
+    state: present
+    regexp: 'creds_graphite_secret_key.*'
+    line: "creds_graphite_secret_key: {{ creds_graphite_secret_key.stdout }}"
+
+- shell: dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w 32 | head -n1
+  register: creds_graphite_sql_pwd
+
+- lineinfile:
+    dest: /etc/puppet/hiera/sf/sfcreds.yaml
+    create: yes
+    state: present
+    regexp: 'creds_graphite_sql_pwd.*'
+    line: "creds_graphite_sql_pwd: {{ creds_graphite_sql_pwd.stdout }}"
