@@ -40,4 +40,7 @@ node default {
 
   include ::edeploy_server
   include ::auto_backup
+
+  # graphite, statsd and grafana
+  include ::graphite
 }
