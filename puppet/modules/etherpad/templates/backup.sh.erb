@@ -4,4 +4,4 @@ mysqldump -u root -p<%= @mysql_root_pwd %> \
     --ignore-table mysql.user  \
     --databases information_schema performance_schema mysql | \
         gzip -9 | \
-        ssh root@managesf.<%= @fqdn %> tee /root/mysqldb.sql.gz > /dev/null
+        ssh root@managesf.<%= @fqdn %> tee /root/etherpaddb.sql.gz > /dev/null
