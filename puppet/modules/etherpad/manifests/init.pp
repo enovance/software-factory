@@ -114,4 +114,10 @@ class etherpad {
     require => File['/var/www/etherpad-lite'],
   }
 
+  bup::scripts{ 'etherpad_scripts':
+    name           => 'etherpad',
+    backup_script  => 'etherpad/backup.sh.erb',
+    restore_script => 'etherpad/restore.sh.erb',
+  }
+
 }
