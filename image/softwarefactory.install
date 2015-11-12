@@ -117,6 +117,7 @@ install_sf_packages() {
     remove_epel_repository
 
     # don't rename net ifaces
+    rm ${target}/etc/udev/rules.d/80-net-name-slot.rules
     ln -s /dev/null ${target}/etc/udev/rules.d/80-net-name-slot.rules
 
     # tune sshd conf
@@ -420,10 +421,10 @@ check_binary rpm
     install_mod_authpub_tkt
     put_git_mark ${dir}
     do_chroot ${dir} passwd -l root
-} || true
+}
 
 [ "$STEP" = 2 ] && {
     mount_fs
     . sf.install
     install_sf
-} || true
+}
