@@ -1,10 +1,10 @@
   set daemon 120
   set logfile /var/log/monit.log
-  set idfile /var/lib/monit/id
-  set statefile /var/lib/monit/state
-  set mailserver <%= @smtp_server %>
+  set idfile /var/.monit.id
+  set statefile /var/.monit.state
+  set mailserver localhost
   set eventqueue
-      basedir /var/lib/monit/events
+      basedir /var/monit
       slots 100
   set mail-format { from: <%= @mail_from %> }
   set alert <%= @mail_to %>
