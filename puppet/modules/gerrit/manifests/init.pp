@@ -404,13 +404,6 @@ class gerrit {
     notify  => Service['monit'],
   }
 
-  file { '/etc/monit/conf.d/gerrit-fs':
-    ensure  => file,
-    source  => 'puppet:///modules/gerrit/monit-fs',
-    require => [Package['monit'], File['/etc/monit/conf.d']],
-    notify  => Service['monit'],
-  }
-
   #Create an empty file, later this file is configured with init-config-repo
   file { '/home/gerrit/site_path/etc/replication.config':
     ensure  => file,
