@@ -18,7 +18,8 @@ class monit {
 
   $fqdn = hiera('fqdn')
   $mail_from = "monit@${fqdn}"
-  $mail_to = 'admin@fqdn'
+  # mail forward managed by admin_mail_forward parameter
+  $mail_to = 'root@localhost'
   $provider = 'systemd'
 
   package { 'monit':
