@@ -420,10 +420,10 @@ check_binary rpm
     install_mod_authpub_tkt
     put_git_mark ${dir}
     do_chroot ${dir} passwd -l root
-} || true
+}
 
 [ "$STEP" = 2 ] && {
     mount_fs
     . sf.install
     install_sf
-} || true
+}

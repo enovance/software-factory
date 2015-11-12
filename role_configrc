@@ -65,4 +65,6 @@ function prepare_buildenv {
     [ ! -d "$BUILD_DIR" ] && sudo mkdir -p $BUILD_DIR
     [ ! -d "$DEPS" ]      && sudo mkdir -p $DEPS && sudo chown ${USER}:root $DEPS
     [ ! -d "$UPSTREAM" ]  && sudo mkdir -p $UPSTREAM
+    [ ! -f "/usr/bin/wget" ] && sudo yum install -y wget
+    [ ! -f "/usr/bin/virtualenv" ] && sudo yum install -y python-virtualenv
 }
