@@ -336,6 +336,16 @@ class gerrit {
     logoutput   => on_failure,
   }
 
+  # Gerrit reindex after first initialization
+  exec { 'gerrit-reindex':
+    user        => 'gerrit',
+    command     => '/usr/bin/java -jar /home/gerrit/gerrit.war reindex -d /home/gerrit/site_path',
+    require     => [Exec['gerrit-initial-init']],
+    subscribe   => File['/home/gerrit/gerrit.war'],
+    refreshonly => true,
+    logoutput   => on_failure,
+  }
+
   # This ressource wait for gerrit TCP ports are up
   # Be really tolenrant with the timeout Gerrit can take long
   # to start in, it seems, low mem env ...
