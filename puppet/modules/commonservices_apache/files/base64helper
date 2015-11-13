@@ -1,0 +1,9 @@
+#!/usr/bin/python
+import base64
+import sys
+
+while True:
+    request = sys.stdin.readline().strip()
+    response = base64.b64encode("%s:password" % request)
+    sys.stdout.write(response + '\n')
+    sys.stdout.flush()
