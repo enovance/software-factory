@@ -49,7 +49,7 @@ BUP_VERSION=0.26
 GIT_REPO_LIST="$GIT_REPO_LIST $BUP_URL"
 
 # gerrit
-GERRIT_VERSION=2.8.6.1
+GERRIT_VERSION=2.9.4
 GERRIT_URL="http://gerrit-releases.storage.googleapis.com/gerrit-${GERRIT_VERSION}.war"
 MYSQLJAVA_VERSION=5.1.21
 MYSQLJAVA_URL="http://repo2.maven.org/maven2/mysql/mysql-connector-java/${MYSQLJAVA_VERSION}/mysql-connector-java-${MYSQLJAVA_VERSION}.jar"
