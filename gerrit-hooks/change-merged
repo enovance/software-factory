@@ -57,7 +57,7 @@ gitweb: %(gitweb)s
 
 
 arguments = ('change', 'change-url', 'project',
-             'branch', 'topic', 'submitter', 'commit')
+             'branch', 'topic', 'submitter', 'commit', 'change-owner', 'newrev')
 
 
 class ChangeMergedHook(hooks.GerritHook):
