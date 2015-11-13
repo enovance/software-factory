@@ -1,0 +1,5 @@
+---
+- name: Upgrade Gerrit schema
+  shell: /usr/bin/java -jar /home/gerrit/gerrit.war init -d /home/gerrit/site_path --batch --no-auto-start
+ - name: Create secondary Gerrit index
+  shell: /usr/bin/java -jar /home/gerrit/gerrit.war reindex -d /home/gerrit/site_path
