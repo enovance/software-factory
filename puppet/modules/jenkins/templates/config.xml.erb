@@ -7,14 +7,19 @@
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Create:jenkins</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Create:authenticated</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Create:admin</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Delete:jenkins</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Delete:authenticated</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Delete:admin</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains:jenkins</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains:authenticated</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains:admin</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Update:jenkins</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Update:authenticated</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Update:admin</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:jenkins</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:authenticated</permission>
     <permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:admin</permission>
     <permission>hudson.model.Computer.Build:jenkins</permission>
     <permission>hudson.model.Computer.Build:admin</permission>
@@ -33,6 +38,7 @@
     <permission>hudson.model.Hudson.ConfigureUpdateCenter:jenkins</permission>
     <permission>hudson.model.Hudson.ConfigureUpdateCenter:admin</permission>
     <permission>hudson.model.Hudson.Read:anonymous</permission>
+    <permission>hudson.model.Hudson.Read:authenticated</permission>
     <permission>hudson.model.Hudson.Read:jenkins</permission>
     <permission>hudson.model.Hudson.Read:admin</permission>
     <permission>hudson.model.Hudson.RunScripts:jenkins</permission>
@@ -53,6 +59,7 @@
     <permission>hudson.model.Item.Discover:admin</permission>
     <permission>hudson.model.Item.Read:anonymous</permission>
     <permission>hudson.model.Item.Read:jenkins</permission>
+    <permission>hudson.model.Item.Read:authenticated</permission>
     <permission>hudson.model.Item.Read:admin</permission>
     <permission>hudson.model.Item.Workspace:jenkins</permission>
     <permission>hudson.model.Item.Workspace:admin</permission>
