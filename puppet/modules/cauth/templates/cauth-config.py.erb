@@ -82,25 +82,25 @@ auth = {
             "mail": "admin@<%= @fqdn %>",
             "password": "<%= @admin_password_hashed %>",
         },
-        <% if @fqdn == "tests.dom" %>
+        <% if @fqdn == "tests.com" %>
             "user2": {
                 "lastname": "Demo user2",
-                "mail": "user2@tests.dom",
+                "mail": "user2@tests.com",
                 "password": "<%= @admin_password_hashed %>",
             },
             "user3": {
                 "lastname": "Demo user3",
-                "mail": "user3@tests.dom",
+                "mail": "user3@tests.com",
                 "password": "<%= @admin_password_hashed %>",
             },
              "user4": {
                 "lastname": "Demo user4",
-                "mail": "user4@tests.dom",
+                "mail": "user4@tests.com",
                 "password": "<%= @admin_password_hashed %>",
             },
             "user5": {
                 "lastname": "Demo user5",
-                "mail": "user5@tests.dom",
+                "mail": "user5@tests.com",
                 "password": "<%= @admin_password_hashed %>",
             }
         <% end %>

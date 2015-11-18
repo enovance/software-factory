@@ -1,0 +1,13 @@
+---
+
+- name: Replace TLD dom with com in /etc/puppet/hiera/sf/hosts.yaml
+  replace:
+    dest=/etc/puppet/hiera/sf/hosts.yaml
+    regexp='(.*)dom(.*)'
+    replace='\1com\2'
+
+- name: Replace TLD dom with com in /etc/puppet/hiera/sf/sfconfig.yaml
+  replace:
+    dest=/etc/puppet/hiera/sf/sfconfig.yaml
+    regexp='(.*)dom(.*)'
+    replace='\1com\2'
