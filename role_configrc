@@ -69,4 +69,5 @@ function prepare_buildenv {
     which virtualenv &> /dev/null || sudo yum install -y python-virtualenv
     which sphinx-build &> /dev/null || sudo yum install -y python-sphinx
     which gcc &> /dev/null || sudo yum install -y gcc
+    which patch &> /dev/null || sudo yum install -y patch
 }
