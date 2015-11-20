@@ -24,6 +24,16 @@ source functestslib.sh
 REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
+if [ ${TEST_TYPE} == "openstack" ]; then
+    if [ ! -n "${OS_AUTH_URL}" ]; then
+        echo "Source openrc first"
+        exit 1
+    fi
+    if [ ! -f "${IMAGE_PATH}.img.qcow2" ]; then
+        export BUILD_QCOW=1
+    fi
+fi
+
 ###############
 # Preparation #
 ###############
@@ -62,6 +72,12 @@ case "${TEST_TYPE}" in
         run_checker
         run_serverspec_tests
         run_functional_tests
+        ;;
+    "openstack")
+        heat_init
+        heat_wait
+        configure_network ${HEAT_IP}
+        heat_dashboard_wait
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"
