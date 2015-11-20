@@ -30,6 +30,27 @@
           # Publish artifacts on a Swift server
           /usr/local/bin/zuul_swift_upload.py --name artifacts --delete-after 0 artifacts
 
+- builder:
+    name: rdo-prepare
+    builders:
+      - shell: |
+          sudo packstack --allinone --os-swift-install=n --os-ceilometer-install=n --nagios-install=n \
+                --provision-demo=n --keystone-admin-passwd=sf4ever
+          export OS_USERNAME=admin
+          export OS_PASSWORD=sf4ever
+          export OS_AUTH_URL=http://localhost:5000/v2.0
+          export OS_TENANT_NAME=admin
+          export OS_REGION_NAME=RegionOne
+          # Create network
+          neutron net-create external_network  --router:external --shared
+          neutron subnet-create --name public_subnet --enable_dhcp=False --allocation-pool=start=192.168.200.10,end=192.168.200.200 \
+                --gateway 192.168.200.1 external_network 192.168.200.0/24
+          # Create 3 tenants
+          for tenantname in sfmain sfnodepool sfswift; do
+            openstack project create $tenantname
+            openstack user create --project $tenantname --password sf4ever $tenantname
+          done
+
 - publisher:
     name: zuul-swift-upload
     publishers:
