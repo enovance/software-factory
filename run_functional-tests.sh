@@ -32,6 +32,9 @@ display_head
 prepare_artifacts
 checkpoint "Running tests on $(hostname)"
 lxc_stop
+if [ ${TEST_TYPE} == "openstack" ] && [ ! -f "${IMAGE_PATH}.img.qcow3" ]; then
+    export BUILD_QCOW=1
+fi
 build_image
 
 case "${TEST_TYPE}" in
@@ -62,6 +65,13 @@ case "${TEST_TYPE}" in
         run_checker
         run_serverspec_tests
         run_functional_tests
+        ;;
+    "openstack")
+        glance image-create --progress --disk-format qcow2 --container-format bare --name sf-${SF_VER} --file ${IMAGE_PATH}-${SF_VER}.img.qcow2
+        NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head)
+        GLANCE_ID=$(glance image-list | grep "sf-${SF_VER}" | awk '{ print $2 }' | head)
+        heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P "sf_root_size=40;key_name=id_rsa;domain=tests.dom;image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" sf_stack
+        exit 0
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"

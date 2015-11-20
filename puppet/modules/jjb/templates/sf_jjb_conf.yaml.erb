@@ -30,6 +30,30 @@
           # Publish artifacts on a Swift server
           /usr/local/bin/zuul_swift_upload.py --name artifacts --delete-after 0 artifacts
 
+- builder:
+    name: rdo-prepare
+    builders:
+      - shell: |
+          sudo packstack --allinone --os-swift-install=y --os-ceilometer-install=n --nagios-install=n \
+                --provision-demo=n --keystone-admin-passwd=sf4ever --os-heat-install=y
+          export OS_USERNAME=admin
+          export OS_PASSWORD=sf4ever
+          export OS_AUTH_URL=http://localhost:5000/v2.0
+          export OS_TENANT_NAME=admin
+          export OS_REGION_NAME=RegionOne
+          # Create network
+          neutron net-create external_network  --router:external --shared
+          neutron subnet-create --name public_subnet --enable_dhcp=False --allocation-pool=start=192.168.200.10,end=192.168.200.200 \
+                --gateway 192.168.200.1 external_network 192.168.200.0/24
+          # Create Keypairs
+          yes n | ssh-keygen -N '' -f ~/.ssh/id_rsa -q || true
+          nova keypair-add --pub-key ~/.ssh/id_rsa id_rsa
+          # Create 3 tenants
+          for tenantname in sfmain sfnodepool sfswift; do
+            openstack project create $tenantname
+            openstack user create --project $tenantname --password sf4ever $tenantname
+          done
+
 - publisher:
     name: zuul-swift-upload
     publishers:
@@ -56,6 +80,21 @@
     builders:
       - prepare-workspace
       - shell: cd $ZUUL_PROJECT && ./run_functional-tests.sh
+    triggers:
+      - zuul
+    node: '{node}'
+
+- job-template:
+    name: '{name}-openstack-functional-tests'
+    defaults: global
+    builders:
+      - prepare-workspace
+      - rdo-prepare
+      - shell: |
+          export OS_USERNAME=sfmain
+          export OS_TENANT_NAME=sfmain
+          nova keypair-add --pub-key ~/.ssh/id_rsa.pub id_rsa
+          cd $ZUUL_PROJECT && ./run_functional-tests.sh 1node-allinone openstack
     triggers:
       - zuul
     node: '{node}'
