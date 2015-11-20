@@ -2,3 +2,5 @@
 # Synchronize the FS with eDeploy
 - name: Synchronize FS with eDeploy
   command: edeploy upgrade {{ version }}
+- name: Update bootloader configuration
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
