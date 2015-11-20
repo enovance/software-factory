@@ -57,6 +57,7 @@ services = [
     'SFGerrit',
     'jenkins',
     'etherpad',
+    'nodepool',
 ]
 
 mysql = {
@@ -67,6 +68,11 @@ jenkins = {
 }
 etherpad = {
     'host': 'managesf.<%= @fqdn %>',
+}
+
+# fake host, does not matter
+nodepool = {
+    'host': 'nodepool.<%= @fqdn %>',
 }
 
 managesf = {
