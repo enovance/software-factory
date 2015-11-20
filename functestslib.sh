@@ -49,6 +49,60 @@ function lxc_start {
     checkpoint "lxc-start"
 }
 
+function heat_init {
+    glance image-create --progress --disk-format qcow2 --container-format bare --name sf-${SF_VER} --file ${IMAGE_PATH}-${SF_VER}.img.qcow2
+    NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head)
+    GLANCE_ID=$(glance image-list | grep "sf-${SF_VER}" | awk '{ print $2 }' | head)
+    heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P "sf_root_size=10;key_name=id_rsa;domain=tests.dom;image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" sf_stack
+    checkpoint "heat-init"
+}
+
+function heat_wait {
+    RETRY=40
+    while [ $RETRY -gt 0 ]; do
+        STACK_STATUS=$(heat stack-show sf_stack | grep 'stack_status ' | awk '{ print $4 }')
+        [ "${STACK_STATUS}" != "CREATE_IN_PROGRESS" ] && break
+        sleep 5
+        let RETRY--
+    done
+    if [ "${STACK_STATUS}" != "CREATE_COMPLETE" ]; then
+        heat stack-show sf_stack
+        heat resource-list sf_stack
+        fail "Heat stack create failed"
+    fi
+    export HEAT_IP=$(heat stack-show sf_stack | grep "Public address of the SF instance" | sed 's/.*: //' | awk '{ print $1 }' | sed 's/..$//')
+    export HEAT_PASSWORD=$(heat stack-show sf_stack | grep "Administrator password for SF services" | sed 's/.*: //' | awk '{ print $1 }' | sed 's/..$//')
+    if [ ! -n "${HEAT_IP}" ] || [ ! -n "${HEAT_PASSWORD}" ]; then
+        fail "Couldn't retrieve stack paramters..."
+    fi
+
+    echo "Wait for ping..."
+    RETRY=40
+    while [ $RETRY -gt 0 ]; do
+        ping -c 1 -w 1 ${HEAT_IP} && break || true
+        sleep 5
+        let RETRY--
+    done
+    if [ $RETRY -eq 0 ]; then
+        fail "Instance ping failed..."
+    fi
+    checkpoint "heat-wait"
+}
+
+function heat_dashboard_wait {
+    echo "Waiting for dashboard..."
+    RETRY=40
+    while [ $RETRY -gt 0 ]; do
+        curl http://tests.dom | grep 'dashboard' && break || true
+        sleep 5
+        let RETRY--
+    done
+    if [ $RETRY -eq 0 ]; then
+        fail "Instance ping failed..."
+    fi
+    checkpoint "heat-dashboard-wait"
+}
+
 function build_image {
     # Make sure subproject are available
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || [ ! -d "${PYSFLIB_CLONED_PATH}" ]; then
@@ -85,7 +139,7 @@ function configure_network {
         echo "${SF_HOST} must have ssh key authentitcation and use root user by default"
         return
     fi
-    local ip=192.168.135.101
+    local ip=$1
     rm -f "$HOME/.ssh/known_hosts"
     RETRIES=0
     echo " [+] Starting ssh-keyscan on $ip:22"
@@ -104,13 +158,13 @@ function configure_network {
     echo "[+] Avoid ssh error"
     cat << EOF > ~/.ssh/config
 Host ${SF_HOST}
-    Hostname 192.168.135.101
+    Hostname ${ip}
     User root
 EOF
     chmod 0600 ~/.ssh/config
 
     echo "[+] Adds ${SF_HOST} to /etc/hosts"
-    reset_etc_hosts_dns "${SF_HOST}" 192.168.135.101
+    reset_etc_hosts_dns "${SF_HOST}" ${ip}
     checkpoint "configure_network"
 }
 
@@ -202,7 +256,7 @@ function waiting_stack_created {
 }
 
 function run_bootstraps {
-    configure_network
+    configure_network 192.168.135.101
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
