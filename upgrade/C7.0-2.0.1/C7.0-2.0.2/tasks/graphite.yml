@@ -36,7 +36,10 @@
     line: "creds_graphite_sql_pwd: {{ creds_graphite_sql_pwd.stdout }}"
 
 - name: Add user grafana
-  user: name=grafana
+  user: name=grafana shell=/sbin/nologin
 
 - name: Add user carbon
-  user: name=carbon
+  user: name=carbon shell=/sbin/nologin
+
+- name: Add user statsd
+  user: name=statsd shell=/sbin/nologin
