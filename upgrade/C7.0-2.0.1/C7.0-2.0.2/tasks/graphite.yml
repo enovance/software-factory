@@ -34,9 +34,3 @@
     state: present
     regexp: 'creds_graphite_sql_pwd.*'
     line: "creds_graphite_sql_pwd: {{ creds_graphite_sql_pwd.stdout }}"
-
-- name: Add user grafana
-  user: name=grafana
-
-- name: Add user carbon
-  user: name=carbon
