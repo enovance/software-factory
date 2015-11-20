@@ -49,6 +49,81 @@ function lxc_start {
     checkpoint "lxc-start"
 }
 
+function heat_stop {
+    heat stack-delete sf_stack || return
+    RETRY=40
+    while [ $RETRY -gt 0 ]; do
+        heat stack-show sf_stack 2>&1 > /dev/null || break
+        sleep 5
+        let RETRY--
+    done
+    if [ $RETRY -eq 0 ]; then
+        fail "Heat stack-delete failed..."
+    fi
+    checkpoint "heat-stop"
+}
+
+function heat_init {
+    GLANCE_ID=$(glance image-list | grep "sf-${SF_VER}" | awk '{ print $2 }')
+    if [ ! -n "${GLANCE_ID}" ]; then
+        glance image-create --progress --disk-format qcow2 --container-format bare --name sf-${SF_VER} --file ${IMAGE_PATH}-${SF_VER}.img.qcow2
+        GLANCE_ID=$(glance image-list | grep "sf-${SF_VER}" | awk '{ print $2 }' | head)
+    fi
+    NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head)
+    heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P \
+        "sf_root_size=5;key_name=id_rsa;domain=tests.dom;image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" \
+        sf_stack || fail "Heat stack-create failed"
+    checkpoint "heat-init"
+}
+
+function heat_wait {
+    # Wait 20 minutes for stack-create to COMPLETE
+    RETRY=200
+    while [ $RETRY -gt 0 ]; do
+        STACK_STATUS=$(heat stack-show sf_stack | grep 'stack_status ' | awk '{ print $4 }')
+        [ "${STACK_STATUS}" != "CREATE_IN_PROGRESS" ] && break
+        sleep 6
+        let RETRY--
+    done
+    if [ "${STACK_STATUS}" != "CREATE_COMPLETE" ]; then
+        heat stack-show sf_stack
+        heat resource-list sf_stack
+        fail "Heat stack create failed"
+    fi
+    checkpoint "heat-stack-created"
+    export HEAT_IP=$(heat stack-show sf_stack | grep "Public address of the SF instance" | sed 's/.*: //' | awk '{ print $1 }' | sed 's/..$//')
+    export HEAT_PASSWORD=$(heat stack-show sf_stack | grep "Administrator password for SF services" | sed 's/.*: //' | awk '{ print $1 }' | sed 's/..$//')
+    if [ ! -n "${HEAT_IP}" ] || [ ! -n "${HEAT_PASSWORD}" ]; then
+        fail "Couldn't retrieve stack paramters..."
+    fi
+
+    echo "Wait for ping..."
+    RETRY=40
+    while [ $RETRY -gt 0 ]; do
+        ping -c 1 -w 1 ${HEAT_IP} && break
+        sleep 5
+        let RETRY--
+    done
+    if [ $RETRY -eq 0 ]; then
+        fail "Instance ping failed..."
+    fi
+    checkpoint "heat-wait"
+}
+
+function heat_dashboard_wait {
+    # Wait 10 minutes for dashboard to be available
+    RETRY=100
+    while [ $RETRY -gt 0 ]; do
+        curl http://${SF_HOST} 2> /dev/null | grep -q 'dashboard' && break
+        sleep 6
+        let RETRY--
+    done
+    if [ $RETRY -eq 0 ]; then
+        fail "Instance dashboard is not available..."
+    fi
+    checkpoint "heat-dashboard-wait"
+}
+
 function build_image {
     # Make sure subproject are available
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || [ ! -d "${PYSFLIB_CLONED_PATH}" ]; then
@@ -182,25 +257,6 @@ function fail {
     exit 1
 }
 
-function waiting_stack_created {
-    local stackname=$1
-    RETRIES=0
-    while true; do
-        heat stack-list | grep -i $stackname | grep -i fail
-        [ "$?" -eq "0" ] && {
-            echo "Stack creation has failed ..."
-            # TODO: get the logs (heat stack-show)
-            heat_stop
-            exit 1
-        }
-        heat stack-list | grep -i $stackname | grep -i create_complete
-        [ "$?" -eq "0" ] && break
-        let RETRIES=RETRIES+1
-        [ "$RETRIES" == "40" ] && exit 1
-        sleep 60
-    done
-}
-
 function fetch_bootstraps_data {
     echo "[+] Fetch ${SF_HOST} ssl cert"
     scp -r ${SF_HOST}:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem
@@ -224,6 +280,27 @@ function run_bootstraps {
     kill -9 $SSH_AGENT_PID
     [ "$res" != "0" ] && fail "Bootstrap fails" ${ARTIFACTS_DIR}/bootstraps.log
     checkpoint "run_bootstraps"
+    fetch_bootstraps_data
+}
+
+function run_heat_bootstraps {
+    configure_network ${HEAT_IP}
+    RETRY=40
+    # Wait for ssh access
+    while [ $RETRY -gt 0 ]; do
+        ssh ${SF_HOST} "hostname -f" && break
+        sleep 5
+        let RETRY--
+    done
+    [ $RETRY -eq 0 ] && fail "Couldn't ssh to ${SF_HOST}"
+    RETRY=100
+    while [ $RETRY -gt 0 ]; do
+        ssh ${SF_HOST} "grep SUCCESS /var/log/cloud-init-output.log" && break
+        sleep 6
+        let RETRY--
+    done
+    [ $RETRY -eq 0 ] && fail "Sfconfig.sh didn't finished"
+    checkpoint "run_heat_bootstraps"
     fetch_bootstraps_data
 }
 
