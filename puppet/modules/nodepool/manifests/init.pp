@@ -94,6 +94,15 @@ class nodepool {
     require => [File['/usr/share/sf-nodepool']],
   }
 
+  file { '/usr/share/sf-nodepool/centos_rdo_setup.sh':
+    ensure  => file,
+    mode    => '0755',
+    owner   => 'root',
+    group   => 'root',
+    source  => 'puppet:///modules/nodepool/centos_rdo_setup.sh',
+    require => [File['/usr/share/sf-nodepool']],
+  }
+
   file { '/usr/share/sf-nodepool/sf_slave_setup.sh':
     ensure  => file,
     mode    => '0755',
