@@ -137,14 +137,14 @@ function generate_keys {
     OUTPUT=${BUILD}/ssh_keys
 
     # Service key is used to allow root access from managesf to other nodes
-    ssh-keygen -N '' -f ${OUTPUT}/service_rsa
-    ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa
-    ssh-keygen -N '' -f ${OUTPUT}/gerrit_service_rsa
-    ssh-keygen -N '' -f ${OUTPUT}/gerrit_admin_rsa
+    [ ! -f "${OUTPUT}/service_rsa" ] && ssh-keygen -N '' -f ${OUTPUT}/service_rsa
+    [ ! -f "${OUTPUT}/jenkins_rsa" ] && ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa
+    [ ! -f "${OUTPUT}/gerrit_service_rsa" ] && ssh-keygen -N '' -f ${OUTPUT}/gerrit_service_rsa
+    [ ! -f "${OUTPUT}/gerrit_admin_rsa" ] && ssh-keygen -N '' -f ${OUTPUT}/gerrit_admin_rsa
     # generating keys for cauth
     OUTPUT=${BUILD}/certs
-    openssl genrsa -out ${OUTPUT}/privkey.pem 1024
-    openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
+    [ ! -f "${OUTPUT}/provkey.pem" ] && openssl genrsa -out ${OUTPUT}/privkey.pem 1024
+    [ ! -f "${OUTPUT}/pubkey.pem" ] && openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
 }
 
 function generate_apache_cert {
