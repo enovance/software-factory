@@ -3,13 +3,13 @@
 DISABLE_SETX=0
 [ -z "${DEBUG}" ] && DISABLE_SETX=1 || set -x
 
-export SF_HOST=${SF_HOST:-tests.dom}
+export SF_HOST=${SF_HOST:-sftests.com}
 export SKIP_CLEAN_ROLES="y"
 
 MANAGESF_URL=https://${SF_HOST}
 ADMIN_USER=admin
 ADMIN_PASSWORD=userpass
-JENKINS_URL="http://${SF_HOST:-tests.dom}/jenkinslogs/${JENKINS_IP}:8081/"
+JENKINS_URL="http://${SF_HOST:-sftests.com}/jenkinslogs/${JENKINS_IP}:8081/"
 
 ARTIFACTS_DIR="/var/lib/sf/artifacts"
 # This environment variable is set ZUUL in the jenkins job workspace
@@ -81,7 +81,7 @@ function build_image {
 }
 
 function configure_network {
-    if [ "${SF_HOST}" != "tests.dom" ]; then
+    if [ "${SF_HOST}" != "sftests.com" ]; then
         echo "${SF_HOST} must have ssh key authentitcation and use root user by default"
         return
     fi
@@ -111,6 +111,7 @@ EOF
 
     echo "[+] Adds ${SF_HOST} to /etc/hosts"
     reset_etc_hosts_dns "${SF_HOST}" 192.168.135.101
+
     checkpoint "configure_network"
 }
 
@@ -218,6 +219,7 @@ function run_bootstraps {
     echo "[+] Fetch bootstrap data"
     rm -Rf sf-bootstrap-data
     scp -r ${SF_HOST}:sf-bootstrap-data .
+
     checkpoint "run_bootstraps"
 }
 
@@ -284,7 +286,7 @@ function run_backup_restore {
     echo "[+] Waiting for gerrit to restart..."
     retry=0
     while [ $retry -lt 1000 ]; do
-        wget --spider  http://tests.dom/r/ 2> /dev/null && break
+        wget --spider  http://sftests.com/r/ 2> /dev/null && break
         sleep 1
         let retry=retry+1
     done
@@ -304,7 +306,23 @@ function run_upgrade {
     sudo rsync -a --delete ${IMAGE_PATH}/ /var/lib/lxc/managesf/rootfs/${IMAGE_PATH}/ || fail "Could not copy ${SF_VER}"
     echo "[+] Running upgrade"
     ssh ${SF_HOST} "cd software-factory; ./upgrade.sh ${REFARCH}" || fail "Upgrade failed" "/var/lib/lxc/managesf/rootfs/var/log/upgrade-bootstrap.log"
+
+    change_domain
+
     checkpoint "run_upgrade"
+}
+
+function change_domain {
+    OLD_FQDN=`grep fqdn sf-bootstrap-data/hiera/sfconfig.yaml | cut -c 7-`
+    if [ "$OLD_FQDN" != "${SF_HOST}" ]; then
+        sed -i "s/${OLD_FQDN}/${SF_HOST}/g" sf-bootstrap-data/hiera/sfconfig.yaml
+        rm -f /tmp/cacert.pem
+        scp ${SF_HOST}:/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt /tmp/cacert.pem
+        sudo cp /tmp/cacert.pem /var/lib/sf/venv/lib/python2.7/site-packages/requests/cacert.pem
+        sudo cp /tmp/cacert.pem /var/lib/sf/venv/lib/python2.7/site-packages/pip/_vendor/requests/cacert.pem
+
+        reset_etc_hosts_dns "${OLD_FQDN}" 192.168.135.101
+    fi
 }
 
 function run_checker {
