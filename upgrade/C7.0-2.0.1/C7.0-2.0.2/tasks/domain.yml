@@ -1,0 +1,22 @@
+---
+
+- name: Replace TLD tests.dom with sftests.com in /etc/puppet/hiera/sf/hosts.yaml
+  replace:
+    dest=/etc/puppet/hiera/sf/hosts.yaml
+    regexp='tests\.dom'
+    replace='sftests.com'
+
+- name: Replace tests.dom with sftests.com in /etc/puppet/hiera/sf/sfconfig.yaml
+  replace:
+    dest=/etc/puppet/hiera/sf/sfconfig.yaml
+    regexp='tests\.dom'
+    replace='sftests.com'
+
+- name: Replace tests,dc=dom with sftests,dc=com in /etc/puppet/hiera/sf/sfconfig.yaml
+  replace:
+    dest=/etc/puppet/hiera/sf/sfconfig.yaml
+    regexp='tests,dc=dom'
+    replace='sftests,dc=com'
+
+- name: Trigger creating Apache certs
+  shell: /root/software-factory/recreate_https_cert.sh
