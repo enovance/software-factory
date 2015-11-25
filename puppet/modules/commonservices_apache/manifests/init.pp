@@ -55,6 +55,16 @@ class commonservices_apache ($cauth = hiera_hash('cauth', '')) {
     content => template('commonservices_apache/gateway.common.erb'),
   }
 
+  file {'pages':
+    ensure  => file,
+    path    => '/etc/httpd/pages.txt',
+    mode    => '0640',
+    owner   => $::httpd_user,
+    group   => $::httpd_user,
+    content => "",
+    replace => false,
+  }
+
   file {'gateway_conf':
     ensure  => file,
     path    => '/etc/httpd/conf.d/gateway.conf',
@@ -118,6 +128,14 @@ class commonservices_apache ($cauth = hiera_hash('cauth', '')) {
     group   => $::httpd_user,
     source  => 'puppet:///modules/commonservices_apache/dashboard.js',
     require => File['/var/www/dashboard'],
+  }
+
+  file {'/var/www/pages-404.html':
+    ensure  => file,
+    mode    => '0640',
+    owner   => $::httpd_user,
+    group   => $::httpd_user,
+    source  => 'puppet:///modules/commonservices_apache/pages-404.html',
   }
 
   file {'managesf_htpasswd':
