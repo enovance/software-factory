@@ -120,6 +120,14 @@ class commonservices_apache ($cauth = hiera_hash('cauth', '')) {
     require => File['/var/www/dashboard'],
   }
 
+  file {'/var/www/pages-404.html':
+    ensure  => file,
+    mode    => '0640',
+    owner   => $::httpd_user,
+    group   => $::httpd_user,
+    source  => 'puppet:///modules/commonservices_apache/pages-404.html',
+  }
+
   file {'managesf_htpasswd':
     ensure => file,
     path   => '/etc/httpd/managesf_htpasswd',
