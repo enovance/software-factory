@@ -131,8 +131,8 @@ URL_LIST="$URL_LIST $NPM_MIRROR_URL $NODEJS_NPM"
 # JQuery
 JQUERY_VERSION=2.1.1
 JQUERY_URL="http://code.jquery.com/jquery-${JQUERY_VERSION}.min.js"
-JQUERY_VISIBILITY_URL="http://status.openstack.org/jquery-visibility.min.js"
-JQUERY_GRAPHITE_URL="http://status.openstack.org/jquery-graphite.js"
+JQUERY_VISIBILITY_URL="https://raw.githubusercontent.com/mathiasbynens/jquery-visibility/master/jquery-visibility.min.js"
+JQUERY_GRAPHITE_URL="https://raw.githubusercontent.com/prestontimmons/graphitejs/master/jquery.graphite.js"
 
 URL_LIST="$URL_LIST $JQUERY_URL $JQUERY_VISIBILITY_URL $JQUERY_GRAPHITE_URL"
 
