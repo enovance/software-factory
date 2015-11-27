@@ -120,6 +120,11 @@ htpasswd = {
     'filename': '/etc/httpd/managesf_htpasswd'
 }
 
+pages = {
+    'maps': '/etc/httpd/pages.txt'
+}
+
+
 <% if @fqdn == "tests.dom" %>
 project_create_administrator_only = False
 <% end %>
