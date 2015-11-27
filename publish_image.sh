@@ -7,7 +7,7 @@ set -e
 
 . ./role_configrc
 
-CONTAINER="edeploy-roles"
+CONTAINER="sf-images"
 
 trap "rm -f /tmp/swift_hash-*" EXIT
 
