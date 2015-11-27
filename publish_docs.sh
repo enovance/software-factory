@@ -7,7 +7,7 @@ set -e
 
 . ./role_configrc
 
-CONTAINER="sfdocs"
+CONTAINER="sf-docs"
 
 BUILDDIR=$(mktemp -d /tmp/sfdocs_buildXXXXXXX)
 trap "rm -Rf ${BUILDDIR}" EXIT
