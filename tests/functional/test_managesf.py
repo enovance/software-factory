@@ -386,6 +386,7 @@ class TestManageSF(Base):
                                     commit="Adding files 1-10",
                                     files=us_files)
         ggu_us.direct_push_branch(us_clone_dir, "master")
+        ggu_us.add_commit_in_branch(us_clone_dir, "branch1")
 
         # No create a test project with upstream pointing to the above
         upstream_url = "ssh://%s@%s:29418/%s" % (
@@ -393,7 +394,8 @@ class TestManageSF(Base):
         pname = 'p_%s' % create_random_str()
         # create the project as admin
         options = {"upstream": upstream_url,
-                   "upstream-ssh-key": config.ADMIN_PRIV_KEY_PATH}
+                   "upstream-ssh-key": config.ADMIN_PRIV_KEY_PATH,
+                   "add-branches": ""}
         self.create_project(pname, config.ADMIN_USER, options=options)
 
         ggu = GerritGitUtils(config.ADMIN_USER,
