@@ -379,6 +379,10 @@ class GerritGitUtils(Tool):
 
         self.exe('git review -v', clone_dir)
 
+    def get_branches(self, clone_dir):
+        out = self.exe('git branch', clone_dir)
+        return out.split()
+
 
 class JenkinsUtils:
     def __init__(self):
