@@ -189,6 +189,7 @@ function puppet_apply_host {
     echo "[sfconfig] Applying hosts.pp"
     # Update local /etc/hosts
     puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/ -e "include hosts"
+    hostnamectl set-hostname "managesf.${DOMAIN}"
 }
 
 function puppet_apply {
