@@ -21,7 +21,9 @@ sudo yum install -y openstack-packstack puppet libvirt qemu libguestfs erlang-sd
     openstack-nova-cert openstack-nova-common openstack-nova-compute openstack-nova-conductor       \
     openstack-nova-console openstack-nova-novncproxy openstack-nova-scheduler openstack-packstack   \
     openstack-packstack-puppet openstack-puppet-modules openstack-selinux openstack-utils           \
-    python2-django-openstack-auth openstack-swift python-oslo-cache openstack-heat-api
+    python2-django-openstack-auth openstack-swift python-oslo-cache openstack-heat-api              \
+    pm-utils xinetd openstack-swift-account openstack-swift-container openstack-swift-object        \
+    openstack-swift-plugin-swift3 openstack-swift-proxy openstack-heat-engine
 
 sudo yum install -y memcached mariadb-galera-server numpy-f2py tcl tk xorg-x11-font-utils nmap-ncat \
     perl-macros perl-Time-HiRes device-mapper-event device-mapper-event-libs usbredir wxGTK         \
@@ -55,8 +57,6 @@ sudo yum install -y erlang-appmon-R16B erlang-asn1-R16B erlang-common_test-R16B 
 # Install sf requirements
 sudo yum install -y git python-augeas bridge-utils curl lxc wget swig python-devel python-pip graphviz python-yaml openssl-devel libffi-devel pigz mysql-devel openldap-devel qemu-img libvirt-daemon-lxc git-review
 
-sudo pip install flake8 bash8 ansible
-sudo pip install -U tox==1.6.1 Sphinx oslosphinx virtualenv restructuredtext_lint python-swiftclient
 # Temporary DNS fix
 echo "216.58.213.16 gerrit-releases.storage.googleapis.com" | sudo tee -a /etc/hosts
 sudo mkdir -p /var/lib/sf
