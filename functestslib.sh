@@ -83,7 +83,7 @@ function heat_init {
     NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head)
     echo "[+] Starting the stack..."
     heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P \
-        "sf_root_size=5;key_name=id_rsa;domain=tests.dom;image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" \
+        "sf_root_size=5;key_name=id_rsa;domain=${SF_HOST};image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" \
         sf_stack || fail "Heat stack-create failed"
     checkpoint "heat-init"
 }
@@ -120,19 +120,6 @@ function heat_wait {
     [ $RETRY -eq 0 ] && fail "Instance ping failed..."
     echo "ok."
     checkpoint "heat-wait"
-}
-
-function heat_dashboard_wait {
-    echo "[+] Waiting for dashboard to be available at http://${SF_HOST}..."
-    RETRY=100
-    while [ $RETRY -gt 0 ]; do
-        curl http://${SF_HOST} 2> /dev/null | grep -q 'dashboard' && break
-        sleep 6
-        let RETRY--
-    done
-    [ $RETRY -eq 0 ] && fail "Instance dashboard is not available..."
-    echo "ok."
-    checkpoint "heat-dashboard-wait"
 }
 
 function build_image {
