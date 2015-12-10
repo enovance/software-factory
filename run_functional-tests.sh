@@ -18,6 +18,8 @@
 # Then will start the SF in LXC containers
 # Then will run the serverspecs and functional tests
 
+exit 1
+
 source functestslib.sh
 . role_configrc
 
