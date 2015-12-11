@@ -1,0 +1,51 @@
+---
+- name: Reset config
+  command: chdir=config git reset --hard HEAD
+
+- name: Adds jjb project
+  command: >
+    hieraedit.py --yaml config/jobs/projects.yaml --eval 0 "{'project': {'name': 'nodepool-demo',
+        'node': 'base-centos',
+        'jobs': ['{name}-unit-tests']
+      }}"
+
+- name: Adds zuul project
+  command: >
+    hieraedit.py --yaml config/zuul/projects.yaml --eval projects "[{ 'name': 'nodepool-demo', 'check': ['nodepool-demo-unit-tests'] }]"
+
+
+- name: Adds nodepool image
+  command: >
+    hieraedit.py --yaml config/nodepool/images.yaml --eval 0 "{
+        'provider': 'default',
+        'images': [{
+            'name': 'centos7',
+            'base-image': 'sf-C7.0-2.0.4',
+            'username': 'centos',
+            'private-key': '/var/lib/jenkins/.ssh/id_rsa',
+            'setup': 'nodepool_demo.sh',
+            'min-ram': 64
+        }]
+    }"
+
+- name: Adds jjb project
+  command: >
+    hieraedit.py --yaml config/nodepool/labels.yaml --eval labels "[{'name': 'base-centos',
+        'image': 'centos7',
+        'min-ready': 1,
+        'providers': [{'name': 'default'}]
+    }]"
+
+- name: Copy nodepool-demo image script
+  copy: src=files/nodepool_demo.sh dest=config/nodepool/nodepool_demo.sh mode="u=rwx,g=rx,o=rx"
+
+- name: Submit config change
+  command: chdir=config {{ item }}
+  with_items:
+    - git add nodepool/nodepool_demo.sh
+    - git commit -a -m "Adds nodepool-demo projects"
+    - git config --add gitreview.username admin
+    - git review -i
+  environment:
+    GIT_SSH: "/root/ssh_wrapper.sh"
+
