@@ -1,0 +1,26 @@
+---
+- name: Update sfconfig
+  command: >
+    hieraedit.py --yaml /etc/puppet/hiera/sf/sfconfig.yaml --eval nodepool "{ 'disabled': False,
+    'providers': [{
+        'name': 'default',
+        'auth-url': '{{nodepool_auth_url}}',
+        'password': '{{nodepool_password}}',
+        'pool': '{{nodepool_pool}}',
+        'project-id': '{{nodepool_project_id}}',
+        'username': '{{nodepool_username}}',
+        'boot-timeout': 120,
+        'max-servers': 2,
+        'rate': 10.0,
+      }]}"
+
+- name: Restart sfconfig
+  command: sfconfig.sh
+
+- name: Check service is running
+  command: systemctl status nodepool
+  register: daemon
+
+- name: Check for errors
+  fail: msg='Nodepool service is not happy'
+  when: "'Error' in daemon.content"

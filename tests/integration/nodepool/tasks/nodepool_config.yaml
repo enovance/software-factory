@@ -1,0 +1,6 @@
+---
+- name: Update config
+  command: chdir=/root/config {{ item }}
+  with_items:
+    - git reset --hard HEAD^
+    - git pull
