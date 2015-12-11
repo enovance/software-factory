@@ -1,0 +1,7 @@
+---
+- hosts: managesf
+  gather_facts: no
+  vars:
+  tasks:
+      #- include: tasks/nodepool_sfconfig.yaml
+    - include: tasks/nodepool_config.yaml
