@@ -82,6 +82,7 @@ case "${TEST_TYPE}" in
         heat_wait
         run_heat_bootstraps
         run_functional_tests
+        tests/integration/nodepool/run.sh || fail "Nodepool integration test failed"
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"
