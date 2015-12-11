@@ -24,12 +24,9 @@ source functestslib.sh
 REFARCH="${1:-1node-allinone}"
 TEST_TYPE="${2:-functional}"
 
-if [ ${TEST_TYPE} == "openstack" ]; then
-    if [ ! -n "${OS_AUTH_URL}" ]; then
-        echo "Source openrc first"
-        exit 1
-    fi
-    export BUILD_QCOW=1
+if [ ${TEST_TYPE} == "openstack" ] && [ ! -n "${OS_AUTH_URL}" ]; then
+    echo "Source openrc first"
+    exit 1
 fi
 
 ###############
@@ -39,8 +36,17 @@ echo "Running functional-tests with this HEAD"
 display_head
 prepare_artifacts
 checkpoint "Running tests on $(hostname)"
-lxc_stop
-build_image
+
+if [ ${TEST_TYPE} == "openstack" ]; then
+    export BUILD_QCOW=1
+    which ansible-playbook &> /dev/null || sudo pip install ansible
+    heat stack-delete sf_stack &> /dev/null
+    clean_nodepool_tenant
+else
+    lxc_stop
+fi
+
+[ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
 
 # nosetests should run without a proxy, otherwise REST APIs on the LXC env might
 # not be accessible
@@ -53,11 +59,13 @@ case "${TEST_TYPE}" in
         run_bootstraps
         run_serverspec_tests
         run_functional_tests
+        run_it_jenkins_ci
         ;;
     "backup")
         lxc_init
         run_bootstraps
         run_serverspec_tests
+        run_it_jenkins_ci
         run_provisioner
         run_backup_start
         lxc_stop
@@ -70,6 +78,7 @@ case "${TEST_TYPE}" in
         SKIP_GPG=1 ./fetch_image.sh ${SF_PREVIOUS_VER} || fail "Could not fetch ${SF_PREVIOUS_VER}"
         lxc_init ${SF_PREVIOUS_VER}
         run_bootstraps
+        run_it_jenkins_ci
         run_provisioner
         run_upgrade
         run_checker
@@ -82,6 +91,7 @@ case "${TEST_TYPE}" in
         heat_wait
         run_heat_bootstraps
         run_functional_tests
+        run_it_openstack
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"

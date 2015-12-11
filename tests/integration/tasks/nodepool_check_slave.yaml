@@ -1,0 +1,4 @@
+- name: "Check slave is ready"
+  command: nodepool list
+  register: nodes
+  failed_when: "'ready' not in nodes.stdout"
