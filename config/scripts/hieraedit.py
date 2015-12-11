@@ -57,15 +57,21 @@ class MyDumper(yaml.Dumper):
 parser = argparse.ArgumentParser(description='Edit hiera yaml.')
 parser.add_argument('--yaml', help='the path to the hira yaml file',
                     default='/etc/puppet/hieradata/production/common.yaml')
+parser.add_argument('--parent', help='the optional parent key')
 parser.add_argument('key', help='the key')
 parser.add_argument('value', help='the value', nargs='?')
 parser.add_argument('-f', dest='file', help='file to read in as value')
 
 args = parser.parse_args()
 data = yaml.load(open(args.yaml))
+root_data = data
 
 changed = False
+if args.parent:
+    data = data[args.parent]
 if args.value:
+    if args.value in ('True', 'False'):
+        args.value = bool(args.value)
     data[args.key] = args.value
     changed = True
 if args.file:
@@ -76,6 +82,6 @@ if args.file:
 if changed:
     dn = os.path.dirname(args.yaml)
     (out, fn) = tempfile.mkstemp(dir=dn)
-    os.write(out, yaml.dump(data, default_flow_style=False, Dumper=MyDumper))
+    os.write(out, yaml.dump(root_data, default_flow_style=False, Dumper=MyDumper))
     os.close(out)
     os.rename(fn, args.yaml)
