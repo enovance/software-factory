@@ -166,6 +166,20 @@ URL_LIST="$URL_LIST $GRAFANA_URL"
 # pbr
 PBR_VERSION=0.8.2
 
+#---- Use local Swift cache instead -----
+for line in `set -o posix ; set`; do
+    if [[ "${line}" =~ "_URL=" ]]; then
+        array=(${line//=/ })
+        varname=${array[0]}
+        url=${array[1]}
+        filename=`echo "${url}" | sed 's/.*\///'`
+        if [[ ${filename} == *.* ]] ; then  # Only for files
+            declare $varname="http://46.231.133.241:8080/v1/AUTH_sf/cache/${filename}"
+        fi
+    fi
+done
+
+
 #---- URL health check -------
 
 function test_url {
