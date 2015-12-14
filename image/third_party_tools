@@ -1,5 +1,9 @@
 # -*- shell-script -*-
 
+# Cache URL prefix. Can be anything that is public accessible.
+# Make sure there is no trailing slash after the containername
+CACHE_URL="http://46.231.133.241:8080/v1/AUTH_sf/cache"
+
 # puppet
 PUPPET_CODENAME_MAJOR=7
 PUPPET_REPO_VERSION="${PUPPET_CODENAME_MAJOR}-11"
@@ -165,6 +169,24 @@ URL_LIST="$URL_LIST $GRAFANA_URL"
 
 # pbr
 PBR_VERSION=0.8.2
+
+#---- Use local Swift cache instead -----
+for line in `set -o posix ; set`; do
+    if [[ "${line}" =~ "_URL=" ]]; then
+        array=(${line//=/ })
+        varname=${array[0]}
+        url=${array[1]}
+        filename=`echo "${url}" | sed 's/.*\///'`
+        if [[ ${filename} == *.* ]] && [[ ! ${filename} == *.git ]] ; then
+            url="${CACHE_URL}/${filename}"
+            HTTP_CODE=$(curl -o /dev/null --silent --head --write-out '%{http_code}' "$url")
+            if [ $HTTP_CODE -eq 200 ]; then
+                declare $varname="${url}"
+            fi
+        fi
+    fi
+done
+
 
 #---- URL health check -------
 
