@@ -57,6 +57,14 @@ function install_sf {
     do_chroot ${dir} bash -c "cd /var/www/managesf; pip install -r requirements.txt"
     do_chroot ${dir} bash -c "cd /var/www/managesf; python setup.py install"
 
+    # Install python-sfmanager
+    sudo mkdir -p ${dir}/tmp/python-sfmanager
+    sudo cp -Rv ${SFMANAGER_CLONED_PATH}/* ${dir}/tmp/python-sfmanager/
+    # override pysflib version from requirements
+    do_chroot ${dir} sed -i '/pysflib/d' /tmp/python-sfmanager/requirements.txt
+    do_chroot ${dir} bash -c "cd /tmp/python-sfmanager; pip install -r requirements.txt"
+    do_chroot ${dir} bash -c "cd /tmp/python-sfmanager; python setup.py install"
+
     do_chroot ${dir} find /root /var/www -name "*.pyc" -exec rm {} \;
 
     # Install Gerrit hooks
