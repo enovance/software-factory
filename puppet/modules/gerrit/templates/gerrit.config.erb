@@ -13,6 +13,9 @@
     gitBasicAuth = true
     loginUrl = /r/login
     logoutUrl = /auth/logout
+    <% if @fqdn == "sftests.com" %>
+    emailFormat = {0}@sftests.com
+    <% end %>
 [container]
     user = gerrit
     javaHome = /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/jre
