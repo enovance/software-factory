@@ -88,6 +88,8 @@ case "${TEST_TYPE}" in
         heat_wait
         run_heat_bootstraps
         run_functional_tests
+        # Keep the nodepool VM alive to debug the instance
+        sleep 86400
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"
