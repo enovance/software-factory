@@ -98,7 +98,15 @@ def get_cookie(username, password):
                                       'password': password,
                                       'back': '/'},
                          allow_redirects=False)
-    return resp.cookies.get('auth_pubtkt', '')
+    sso_cookie = resp.cookies.get('auth_pubtkt', '')
+
+    # Login once to Gerrit to ensure user exists
+    cookies = dict(auth_pubtkt=sso_cookie)
+    gerrit_url = "%(gateway)s/r/login" % {'gateway': config.GATEWAY_URL}
+    resp = requests.post(url, cookies=cookies)
+    requests.get(gerrit_url, cookies=cookies)
+
+    return sso_cookie
 
 
 class Base(unittest.TestCase):
