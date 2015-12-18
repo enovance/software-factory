@@ -467,3 +467,18 @@ class TestManageSF(Base):
             url = "http://%s%s" % (config.GATEWAY_HOST, path)
             resp = requests.get(url, cookies=cookies)
             self.assertEqual(200, resp.status_code)
+
+    def test_managesf_get_all_project_details(self):
+        """ Check if managesf allow us to fetch projects details
+        """
+        project = 'p_%s' % create_random_str()
+        self.create_project(project, config.USER_2)
+        admin_cookies = dict(
+            auth_pubtkt=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        user2_cookies = dict(
+            auth_pubtkt=config.USERS[config.USER_2]['auth_cookie'])
+        url = "http://%s%s" % (config.GATEWAY_HOST, "/manage/project/")
+        resp = requests.get(url, cookies=admin_cookies)
+        self.assertEqual(200, resp.status_code)
+        resp = requests.get(url, cookies=user2_cookies)
+        self.assertEqual(200, resp.status_code)
