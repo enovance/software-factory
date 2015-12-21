@@ -1,5 +1,23 @@
 # Change Log
 
+## 2.1.0 2016-01-01
+
+### Changed
+
+- Outgoing mail origin changed from managesf.fqdn to fqdn
+- Use hooks REST API from managesf
+- Gerrit upgraded to 2.11.5
+
+### Fixed
+
+- /etc/hosts order now uses aliases instead of duplicate entry for vhost
+- serverspec tests
+- better support of http proxies used by image building
+
+### Removed
+
+- Unused puppet files
+
 ## 2.0.4 2015-12-21
 
 ### Added
