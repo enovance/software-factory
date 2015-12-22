@@ -41,7 +41,7 @@ def migrate_2_0_0():
     update(sfconfig['theme'], ('loginpage_custom_footer', 'topmenu_logo_style',
                                'topmenu_logo_data', 'favicon_data',
                                'topmenu_hide_redmine'))
-    update(sfconfig['backup'], ('os_auth_url', 'os_tenant_name', 'os_username',
+    update(sfconfig['backup'], ('os_auth_url', 'os_auth_version', 'os_tenant_name', 'os_username',
                                 'os_password', 'swift_backup_container',
                                 'swift_backup_max_retention_secs'))
     update(sfconfig['nodepool'], (
