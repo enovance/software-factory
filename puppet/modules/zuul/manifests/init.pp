@@ -102,31 +102,6 @@ class zuul {
     unless    => "/usr/bin/grep ${gerrit_host} /home/zuul/.ssh/known_hosts",
   }
 
-  file {'/usr/share/sf-zuul':
-    ensure => directory,
-    mode   => '0640',
-    owner  => 'root',
-    group  => 'root',
-  }
-
-  file {'/usr/share/sf-zuul/layout.yaml':
-    ensure  => file,
-    mode    => '0640',
-    owner   => 'root',
-    group   => 'root',
-    require => File['/usr/share/sf-zuul'],
-    content => template('zuul/layout.yaml.erb'),
-  }
-
-  file {'/usr/share/sf-zuul/projects.yaml':
-    ensure  => file,
-    mode    => '0640',
-    owner   => 'root',
-    group   => 'root',
-    require => File['/usr/share/sf-zuul'],
-    source  => 'puppet:///modules/zuul/projects.yaml',
-  }
-
   file {'/var/log/zuul/':
     ensure  => directory,
     mode    => '0755',
