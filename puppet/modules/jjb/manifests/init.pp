@@ -22,7 +22,6 @@ class jjb ($gerrit = hiera('gerrit')) {
   $fqdn = hiera('fqdn')
   $auth = hiera('authentication')
   $url = hiera('url')
-  $gerrit_admin_rsa = hiera('gerrit_admin_rsa')
   $gerrit_host = "gerrit.${fqdn}"
 
   $jenkins_password = hiera('creds_jenkins_user_password')
@@ -35,14 +34,6 @@ class jjb ($gerrit = hiera('gerrit')) {
     group   => 'jenkins',
     content => template('jjb/jenkins_jobs.ini.erb'),
     require => User['jenkins'],
-  }
-
-  file {'/root/gerrit_admin_rsa':
-    ensure  => file,
-    mode    => '0400',
-    owner   => 'root',
-    group   => 'root',
-    content => inline_template('<%= @gerrit_admin_rsa %>'),
   }
 
   file {'/usr/bin/sfmanager':
@@ -129,8 +120,7 @@ class jjb ($gerrit = hiera('gerrit')) {
                 File['/usr/share/sf-nodepool/sf_slave_setup.sh'],
                 File['/usr/share/sf-nodepool/images.yaml'],
                 File['/usr/share/sf-nodepool/labels.yaml'],
-                File['/usr/bin/sfmanager'],
-                File['/root/gerrit_admin_rsa']],
+                File['/usr/bin/sfmanager']],
     creates   => '/usr/share/config.init.done',
   }
 
