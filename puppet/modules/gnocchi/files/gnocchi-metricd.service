@@ -1,0 +1,10 @@
+[Unit]
+Description=Run gnocchi-metricd
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/gnocchi-metricd
+
+[Install]
+WantedBy=multi-user.target

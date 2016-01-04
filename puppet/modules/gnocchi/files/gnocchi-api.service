@@ -1,0 +1,10 @@
+[Unit]
+Description=Run gnocchi-api
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/gnocchi-api
+
+[Install]
+WantedBy=multi-user.target
