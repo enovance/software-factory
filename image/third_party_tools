@@ -156,8 +156,10 @@ PASTE_VERSION=beb3ff7e266 # latest commit as of 05 Jun 2015
 GIT_REPO_LIST="$GIT_REPO_LIST $PASTE_URL"
 
 GRAFANA_URL="https://grafanarel.s3.amazonaws.com/builds/grafana-2.5.0-1.x86_64.rpm"
+PUPPET_GNOCCHI_URL="https://github.com/openstack/puppet-gnocchi/archive/master.tar.gz"
+GNOCCHI_PLUGINS_URL="https://github.com/sileht/grafana-plugins-gnocchi"
 
-URL_LIST="$URL_LIST $GRAFANA_URL"
+URL_LIST="$URL_LIST $GRAFANA_URL $GNOCCHI_PLUGINS_URL"
 
 #---- URL health check -------
 
