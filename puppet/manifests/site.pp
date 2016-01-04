@@ -13,7 +13,7 @@ Stage['main'] -> Stage['last']
 
 node default {
   class {'::sfbase': stage => first }
-  class {'::mysql': stage => first }
+  class {'::sfmysql': stage => first }
   class {'::bup': stage => first }
 
   include ::postfix
