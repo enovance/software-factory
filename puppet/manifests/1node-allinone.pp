@@ -47,7 +47,7 @@ node default {
   # jjb also deploys zuul and nodepool
   class {'::jjb': stage => last }
 
-  # graphite, statsd and grafana
-  include ::graphite
+  # gnocchi and grafana
+  include ::gnocchi
   include ::grafana
 }
