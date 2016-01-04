@@ -1,0 +1,1 @@
+INSERT IGNORE INTO `archive_policy` VALUES ('archive',0,'[{\"points\": 2880, \"granularity\": 5.0, \"timespan\": 14400.0}, {\"points\": 10080, \"granularity\": 60.0, \"timespan\": 604800.0}, {\"points\": 8640, \"granularity\": 900.0, \"timespan\": 7776000.0}]','[\"std\", \"count\", \"95pct\", \"min\", \"max\", \"sum\", \"median\", \"mean\"]');
