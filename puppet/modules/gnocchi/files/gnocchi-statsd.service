@@ -1,0 +1,10 @@
+[Unit]
+Description=Run gnocchi-statsd
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/gnocchi-statsd
+
+[Install]
+WantedBy=multi-user.target
