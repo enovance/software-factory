@@ -203,16 +203,12 @@ class TestProjectTestsWorkflow(Base):
 
         # Check whether zuul sets verified to +1 after running the tests
         # let some time to Zuul to update the test result to Gerrit.
-        attempt = 0
-        approvals = self.gu.get_reviewer_approvals(change_id, 'jenkins')
-        while not approvals and approvals.get('Verified') != '+1':
-            if attempt >= 90:
+        for i in range(90):
+            approvals = self.gu.get_reviewer_approvals(change_id, 'jenkins')
+            if approvals and approvals.get('Verified') == '+1':
                 break
             time.sleep(1)
-            attempt += 1
-            approvals = self.gu.get_reviewer_approvals(change_id, 'jenkins')
 
-        self.assertTrue(approvals)
         self.assertEqual(approvals.get('Verified'), "+1")
 
         # review the change
@@ -243,17 +239,16 @@ class TestProjectTestsWorkflow(Base):
 
         # Check whether zuul sets verified to +2 after running the tests
         # let some time to Zuul to update the test result to Gerrit.
-        attempt = 0
-        while self.gu.get_reviewer_approvals(change_id,
-                                             'jenkins')['Verified'] != '+2':
-            if attempt >= 90:
+        for i in range(90):
+            review_approval = self.gu.get_reviewer_approvals(change_id,
+                                                             'jenkins')
+            if review_approval and "+2" == review_approval.get('Verified'):
                 break
             time.sleep(1)
-            attempt += 1
 
-        self.assertEqual(
-            self.gu.get_reviewer_approvals(change_id, 'jenkins')['Verified'],
-            "+2")
+        self.assertEqual("+2",
+                         self.gu.get_reviewer_approvals(change_id,
+                                                        'jenkins')['Verified'])
 
         # verify whether zuul merged the patch
         change = self.gu.get_change('config', 'master', change_id)
@@ -328,21 +323,19 @@ class TestProjectTestsWorkflow(Base):
         change_id = change_ids[0]
 
         # let some time to Zuul to update the test result to Gerrit.
-        attempt = 0
-        while "jenkins" not in self.gu.get_reviewers(change_id):
-            if attempt >= 90:
+        for i in range(90):
+            if "jenkins" in self.gu.get_reviewers(change_id):
                 break
             time.sleep(1)
-            attempt += 1
 
-        attempt = 0
-        while self.gu.get_reviewer_approvals(change_id,
-                                             'jenkins')['Verified'] != '+1':
-            if attempt >= 90:
+        get_reviewer_approvals = self.gu.get_reviewer_approvals
+        for i in range(90):
+            review_approval = self.gu.get_reviewer_approvals(change_id,
+                                                             'jenkins')
+            if review_approval and "+1" == review_approval.get('Verified'):
                 break
             time.sleep(1)
-            attempt += 1
 
-        self.assertEqual(
-            self.gu.get_reviewer_approvals(change_id, 'jenkins')['Verified'],
-            "+1")
+        self.assertEqual("+1",
+                         get_reviewer_approvals(change_id,
+                                                'jenkins').get('Verified'))
