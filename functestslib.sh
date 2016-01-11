@@ -65,14 +65,18 @@ function heat_stop {
 }
 
 function clean_nodepool_tenant {
-    export OS_USERNAME="sfnodepool"; export OS_TENANT_NAME="${OS_USERNAME}"
+    local temp_os_username=${OS_USERNAME}
+    export OS_USERNAME="sfnodepool";
+    export OS_TENANT_NAME="${OS_USERNAME}"
+    echo "[+] Cleaning nodepool tenant"
     for srv in $(openstack  server list -f json | awk '{ print $2 }' | tr ',' ' ' | sed 's/"//g'); do
         openstack server delete $srv
     done
     for image in $(nova image-list | grep template | awk '{ print $2 }'); do
         nova image-delete $image
     done
-    export OS_USERNAME="sfmain"; export OS_TENANT_NAME="${OS_USERNAME}"
+    export OS_USERNAME="${temp_os_username}";
+    export OS_TENANT_NAME="${OS_USERNAME}"
     checkpoint "clean nodepool tenant"
 }
 
@@ -81,16 +85,25 @@ function run_it_jenkins_ci {
         # skip
         return
     fi
-    ./tests/integration/run.py || fail "Basic integration test failed"
+    ./tests/integration/run.py > ${ARTIFACTS_DIR}/integration_tests.txt \
+        || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     checkpoint "run_it_jenkins_ci"
 }
 
 function run_it_openstack {
     it_cmd="./tests/integration/run.py --password ${ADMIN_PASSWORD} --playbook"
-    ${it_cmd} zuul      || fail "Basic integration test failed"
-    ${it_cmd} nodepool --os_base_image "sf-${SF_VER}" --os_user sfnodepool || echo "(non-voting) Nodepool integration test failed"
-    ${it_cmd} swiftlogs || echo "(non-voting) Swift integration test failed"
-    ${it_cmd} alltogether || echo "(non-voting) Alltogether integration test failed"
+    ${it_cmd} zuul >> ${ARTIFACTS_DIR}/integration_tests.txt        \
+        && echo "Basic integration test SUCCESS"                    \
+        || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
+    ${it_cmd} nodepool --os_base_image "sf-${SF_VER}" --os_user sfnodepool &>> ${ARTIFACTS_DIR}/integration_tests.txt \
+        && echo "(non-voting) Notepool integration test SUCCESS"    \
+        || echo "(non-voting) Nodepool integration test failed"
+    ${it_cmd} swiftlogs >> ${ARTIFACTS_DIR}/integration_tests.txt   \
+        && echo "(non-voting) Swift integration test SUCCESS"       \
+        || echo "(non-voting) Swift integration test failed"
+    ${it_cmd} alltogether >> ${ARTIFACTS_DIR}/integration_tests.txt \
+        && echo "(non-voting) Alltogether integration test SUCCESS" \
+        || echo "(non-voting) Alltogether integration test failed"
     checkpoint "run_it_openstack"
 }
 
@@ -156,10 +169,13 @@ function build_image {
     # Make sure subproject are available
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || \
         [ ! -d "${PYSFLIB_CLONED_PATH}" ] || [ ! -d "${SFMANAGER_CLONED_PATH}" ]; then
+        echo "[+] Fetching subprocects"
         ./image/fetch_subprojects.sh
     fi
     if [ -z "${SKIP_BUILD}" ]; then
-        ./build_image.sh ${ARTIFACTS_DIR} || fail "Roles building FAILED"
+        echo "[+] Building image ${IMAGE_PATH}"
+        ./build_image.sh 2>&1 | tee ${ARTIFACTS_DIR}/image_build.log | grep '(STEP'
+        [ "${PIPESTATUS[0]}" == "0" ] || fail "Roles building FAILED" ${ARTIFACTS_DIR}/image_build.log
         checkpoint "build_image"
         prepare_functional_tests_venv
     else
@@ -356,6 +372,7 @@ function run_heat_bootstraps {
 
 function prepare_functional_tests_venv {
     echo "$(date) ======= Prepare functional tests venv ======="
+    # TODO: replace this prepare_functional_tests_venv by a python-sfmanager package
     if [ ! -d /var/lib/sf/venv ]; then
         sudo virtualenv /var/lib/sf/venv
         sudo chown -R ${USER} /var/lib/sf/venv
