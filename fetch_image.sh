@@ -18,7 +18,7 @@
 . ./role_configrc
 [ -n "$DEBUG" ] && set -x
 
-trap "rm -f /tmp/swift_hash-*" EXIT
+trap "rm -f /tmp/swift_description-*" EXIT
 
 function die {
     echo "[ERROR]: $1"
@@ -28,12 +28,12 @@ function die {
 function fetch_prebuilt {
     echo "Fetch prebuilt ${IMG} to ${UPSTREAM}/${IMG}"
     # Check if already synced
-    if [ -f "${UPSTREAM}/${IMG}.hash" ]; then
-        TMP_FILE=$(mktemp /tmp/swift_hash-${IMG}-XXXXXX)
-        curl -o ${TMP_FILE} ${SWIFT_SF_URL}/${IMG}.hash
+    if [ -f "${UPSTREAM}/${IMG}.description" ]; then
+        TMP_FILE=$(mktemp /tmp/swift_description-${IMG}-XXXXXX)
+        curl -o ${TMP_FILE} ${SWIFT_SF_URL}/${IMG}.description
         # Swift does not return 404 but 'Not Found'
         grep -q 'Not Found' $TMP_FILE && die "$IMG does not exist upstream"
-        diff ${TMP_FILE} ${UPSTREAM}/${IMG}.hash 2> /dev/null && {
+        diff ${TMP_FILE} ${UPSTREAM}/${IMG}.description 2> /dev/null && {
             echo "Already synced"
             return
         }
@@ -43,12 +43,10 @@ function fetch_prebuilt {
     sudo curl -o ${UPSTREAM}/${IMG}.tgz ${SWIFT_SF_URL}/${IMG}.tgz || exit -1
     echo "Fetching ${SWIFT_SF_URL}/${IMG}.img.qcow2"
     sudo curl -o ${UPSTREAM}/${IMG}.img.qcow2 ${SWIFT_SF_URL}/${IMG}.img.qcow2
-    echo "Fetching ${SWIFT_SF_URL}/${IMG}.{pip,rpm,digest,hash,hot}"
+    echo "Fetching ${SWIFT_SF_URL}/${IMG}.{digest,description,hot}"
     sudo curl -o ${UPSTREAM}/${IMG}.hot ${SWIFT_SF_URL}/${IMG}.hot
-    sudo curl -o ${UPSTREAM}/${IMG}.pip ${SWIFT_SF_URL}/${IMG}.pip
-    sudo curl -o ${UPSTREAM}/${IMG}.rpm ${SWIFT_SF_URL}/${IMG}.rpm
     sudo curl -o ${UPSTREAM}/${IMG}.digest ${SWIFT_SF_URL}/${IMG}.digest
-    sudo curl -o ${UPSTREAM}/${IMG}.hash ${SWIFT_SF_URL}/${IMG}.hash || exit -1
+    sudo curl -o ${UPSTREAM}/${IMG}.description ${SWIFT_SF_URL}/${IMG}.description || exit -1
     echo "Digests..."
     if [ -z "${SKIP_GPG}" ] && [ "${IMG}" == "softwarefactory-${SF_PREVIOUS_VER}" ]; then
         gpg --list-sigs ${RELEASE_GPG_FINGERPRINT} &> /dev/null || gpg --keyserver keys.gnupg.net --recv-key ${RELEASE_GPG_FINGERPRINT}
@@ -65,7 +63,7 @@ function sync_and_deflate {
     fetch_prebuilt
     SRC=${UPSTREAM}/$2.tgz
     echo "Extracting ${SRC} to ${DST}"
-    diff ${UPSTREAM}/${IMG}.hash ${DST}/../${IMG}.hash 2> /dev/null && {
+    diff ${UPSTREAM}/${IMG}.description ${DST}/../${IMG}.description 2> /dev/null && {
         echo "Already extracted"
         return
     }
@@ -73,9 +71,7 @@ function sync_and_deflate {
     sudo mkdir -p ${DST}
     sudo tar -xzf ${SRC} -C "${DST}" || exit -1
     echo "[+] Copy metadata"
-    sudo cp ${UPSTREAM}/${IMG}.hash ${DST}/../${IMG}.hash
-    sudo cp ${UPSTREAM}/${IMG}.pip ${DST}/../${IMG}.pip
-    sudo cp ${UPSTREAM}/${IMG}.rpm ${DST}/../${IMG}.rpm
+    sudo cp ${UPSTREAM}/${IMG}.description ${DST}/../${IMG}.description
     sudo cp ${UPSTREAM}/${IMG}.digest ${DST}/../${IMG}.digest
 }
 
