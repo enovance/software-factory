@@ -37,7 +37,6 @@ put_lock
 . ./role_configrc
 [ -n "$DEBUG" ] && set -x
 
-BUILD_OUTPUT=/dev/stdout
 if [ ! -z "${1}" ]; then
     ARTIFACTS_DIR=${1}/image_build
     sudo mkdir -p ${ARTIFACTS_DIR}
@@ -67,11 +66,10 @@ function build_cache {
     echo "(STEP1) The local cache needs update (was: [${LOCAL_HASH}])"
     sudo rm -Rf ${CACHE_PATH}*
     sudo mkdir -p ${CACHE_PATH}
-    [ -z "${ARTIFACTS_DIR}" ] || BUILD_OUTPUT=${ARTIFACTS_DIR}/step1_cache_build.log
     (
         set -e
         cd image
-        STEP=1 sudo -E ./softwarefactory.install ${CACHE_PATH} ${SF_VER} &> ${BUILD_OUTPUT}
+        STEP=1 sudo -E ./softwarefactory.install ${CACHE_PATH} ${SF_VER}
         sudo chroot ${CACHE_PATH} pip freeze | sort | sudo tee ${CACHE_PATH}.pip &> /dev/null
         sudo chroot ${CACHE_PATH} rpm -qa | sort | sudo tee ${CACHE_PATH}.rpm &> /dev/null
         echo ${CACHE_HASH} | sudo tee ${CACHE_PATH}.hash > /dev/null
@@ -84,7 +82,7 @@ function build_cache {
 
 function build_image {
     # Image hash is last commit of DEPS and the one that changed content of the image (bootstraps/ docs/ gerrit-hooks/ image/ puppet/)
-    IMAGE_HASH="SF: $(git log --format=oneline -n 1 config/ docs/ image/ puppet/) || CAUTH: $(cd ${CAUTH_CLONED_PATH}; git log --format=oneline -n 1) || PYSFLIB: $(cd ${PYSFLIB_CLONED_PATH}; git log --format=oneline -n 1) || MANAGESF: $(cd ${MANAGESF_CLONED_PATH}; git log --format=oneline -n 1) || SFMANAGER: $(cd ${SFMANAGER_CLONED_PATH}; git log --format=oneline -n 1)"
+    IMAGE_HASH="SF: $(git log --format=oneline -n 1 config/ docs/ image/ puppet/) || CAUTH: $(cd ${CAUTH_CLONED_PATH}; git log --format=oneline -n 1) || PYSFLIB: $(cd ${PYSFLIB_CLONED_PATH}; git log --format=oneline -n 1) || MANAGESF: $(cd ${MANAGESF_CLONED_PATH}; git log --format=oneline -n 1) || SFMANAGER: $(cd ${SFMANAGER_CLONED_PATH}; git log --format=oneline -n 1)"
 
     LOCAL_HASH=$(cat ${IMAGE_PATH}-${SF_VER}.hash 2> /dev/null)
 
@@ -104,8 +102,6 @@ function build_image {
         done
     }
 
-    [ -z "${ARTIFACTS_DIR}" ] || BUILD_OUTPUT=${ARTIFACTS_DIR}/step2_build.log
-
     # Copy the cache
     sudo rsync -a --delete "${CACHE_PATH}/" "${IMAGE_PATH}/"
 
@@ -115,7 +111,7 @@ function build_image {
         STEP=2 DOCDIR=$DOCDIR PYSFLIB_CLONED_PATH=$PYSFLIB_CLONED_PATH \
         CAUTH_CLONED_PATH=$CAUTH_CLONED_PATH MANAGESF_CLONED_PATH=$MANAGESF_CLONED_PATH \
         SFMANAGER_CLONED_PATH=$SFMANAGER_CLONED_PATH \
-        sudo -E ./softwarefactory.install ${IMAGE_PATH} ${SF_VER} &> ${BUILD_OUTPUT}
+        sudo -E ./softwarefactory.install ${IMAGE_PATH} ${SF_VER}
 
         sudo chroot ${IMAGE_PATH} pip freeze | sort | sudo tee ${IMAGE_PATH}-${SF_VER}.pip &> /dev/null
         sudo chroot ${IMAGE_PATH} rpm -qa | sort | sudo tee ${IMAGE_PATH}-${SF_VER}.rpm &> /dev/null
@@ -133,5 +129,6 @@ build_cache
 ./image/fetch_subprojects.sh || exit 1
 build_image
 if [ -n "$BUILD_QCOW" ]; then
+    echo "(STEP3) Building qcow, please wait..."
     build_qcow
 fi

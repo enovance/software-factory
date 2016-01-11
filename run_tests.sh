@@ -18,6 +18,8 @@ source functestslib.sh
 echo "Running unit-tests with this HEAD"
 display_head
 
+bash ./rpm-test-requirements.sh
+
 echo "$(date) - $(hostname)"
 
 echo "FLAKE8 tests"
