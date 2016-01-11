@@ -27,6 +27,13 @@ class jjb ($gerrit = hiera('gerrit')) {
   $jenkins_password = hiera('creds_jenkins_user_password')
   $jenkins_username = 'jenkins'
 
+  file {'/etc/jenkins_jobs':
+    ensure => directory,
+    mode   => '0555',
+    owner  => 'jenkins',
+    group  => 'jenkins',
+  }
+
   file {'/etc/jenkins_jobs/jenkins_jobs.ini':
     ensure  => file,
     mode    => '0400',
