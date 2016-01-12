@@ -2,13 +2,13 @@ var sfDashboard = angular.module('sfDashboard', []);
 
 sfDashboard.filter('projectMembers', function() {
     return function (members, searchMember) {
-	var items;
+        var items;
         var filtered = [];
         var groups;
-	var name;
+        var name;
         // Get all active project members
         if ( typeof members !== 'undefined' ) {
-	    items = members.slice();
+            items = members.slice();
             for ( var i = 0; i < items.length; i++ ) {
                 groups = items[i].groups;
                 if (groups.ptl || groups.core || groups.dev) {
@@ -20,7 +20,7 @@ sfDashboard.filter('projectMembers', function() {
             // Add to the end any users that match the list.
             if ( (typeof searchMember !== 'undefined') && (searchMember.length >= 1) ) {
                 for (var j = 0; j < items.length; j++ ) {
-		    name = items[j].name.toLocaleLowerCase();
+                    name = items[j].name.toLocaleLowerCase();
                     if (name.search(searchMember.toLocaleLowerCase()) !==-1 ){
                         filtered.push(items[j]);
                     }
@@ -37,63 +37,74 @@ function mainController($scope, $http) {
     $scope.testRunning = Object();
     $scope.testLabels = [];
 
-    function initProjects() {
-        $scope.errors = false;
-        $scope.loading = true;
-
-        $http.get('/manage/project/')
+    function initConfig() {
+        $http.get('/manage/config/')
             .success(function(data) {
-                $scope.projects = data;
-            })
-            .error(function(data) {
-                $scope.errors = data;
-            }).finally(function () {
-                $scope.loading = false;
+                $scope.create_project_permission = (data.create_projects != undefined &&
+                                                    data.create_projects == true);
+            }).
+            error(function(data) {
+                $scope.create_project_permission = false;
             });
     };
 
-    function initMembers() {
-        $http.get('/manage/project/membership/')
-            .success( function (data) {
-                $scope.members = data;
-            })
-            .error( function (data) {
-                $scope.errors = data;
-            });
-    };
+    function initProjects() {
+$scope.errors = false;
+$scope.loading = true;
 
-    function initTests() {
-        $http.get('/zuul/status.json')
-            .success( function (data) {
-                var projectName;
-                var tests;
-                var pipelines = data.pipelines;
+$http.get('/manage/project/')
+.success(function(data) {
+$scope.projects = data;
+})
+.error(function(data) {
+$scope.errors = data;
+}).finally(function () {
+$scope.loading = false;
+});
+};
 
-                for ( var i = 0; i < pipelines.length; i++ ) {
-                    // Create the list of test labels 
-                    $scope.testLabels.push(pipelines[i].name);
-                    tests = pipelines[i].change_queues;
+function initMembers() {
+$http.get('/manage/project/membership/')
+.success( function (data) {
+$scope.members = data;
+})
+.error( function (data) {
+$scope.errors = data;
+});
+};
 
-                    for ( var j = 0; j < tests.length; j++  ) {
-                        // Create an entry only if there's a test running
-                        for ( var k = 0; k < tests[j].heads.length; k++ ) {
+function initTests() {
+$http.get('/zuul/status.json')
+.success( function (data) {
+var projectName;
+var tests;
+var pipelines = data.pipelines;
 
-                            for ( var l = 0; l < tests[j].heads[k].length; l++ ) {
-                                projectName = tests[j].heads[k][l].project;
-                            
-                                // Initialize test values of the project. 
-                                if ( !(projectName in $scope.testRunning) ) {
-                                    $scope.testRunning[projectName] = [];
-                                    var z = pipelines.length;
-                                    while (z) $scope.testRunning[projectName][--z] = 0;
-                                }
+for ( var i = 0; i < pipelines.length; i++ ) {
+// Create the list of test labels
+$scope.testLabels.push(pipelines[i].name);
+tests = pipelines[i].change_queues;
 
-                                $scope.testRunning[projectName][i]++;
-                            }
-                        }
-                    } 
-                }
-            })
+for ( var j = 0; j < tests.length; j++  ) {
+// Create an entry only if there's a test running
+                                                    for ( var k = 0; k < tests[j].heads.length; k++ ) {
+
+                                                        for ( var l = 0; l < tests[j].heads[k].length; l++ ) {
+                                                            projectName = tests[j].heads[k][l].project;
+
+                                                            // Initialize test values of the project.
+                                                            if ( !(projectName in $scope.testRunning) ) {
+                                                                $scope.testRunning[projectName] = [];
+                                                                var z = pipelines.length;
+                                                                while (z) $scope.testRunning[projectName][--z] = 0;
+                                                            }
+
+                                                            $scope.testRunning[projectName][i]++;
+                                                        }
+                                                    }
+                                                   }
+            }
+                    })
             .error( function (data) {
                 $scope.errors = data;
             });
@@ -110,10 +121,11 @@ function mainController($scope, $http) {
     };
 
     function init() {
+        initConfig();
         initProjects();
         initMembers();
         initTests();
-	initHtpasswd();
+        initHtpasswd();
     };
 
     $scope.createProject = function() {
@@ -126,7 +138,7 @@ function mainController($scope, $http) {
                 initProjects();
             })
             .error(function(data) {
-            $scope.errors = data;
+                $scope.errors = data;
             }).finally(function () {
                 $scope.loading = false;
             });
@@ -207,8 +219,8 @@ function mainController($scope, $http) {
                                        $scope.selectedMembers[x].groups);
             var selectedMember = $scope.selectedMembers[x];
             var url = '/manage/project/membership/' +
-                    $scope.selectedProjectName + '/' +
-                    selectedMember.email + '/';
+                $scope.selectedProjectName + '/' +
+                selectedMember.email + '/';
 
             for ( key in groups ) {
                 groupName = key + '-group';
@@ -237,26 +249,26 @@ function mainController($scope, $http) {
     };
 
     $scope.htpasswd_disable = function(name) {
-	    $scope.errors = false;
-	    $http.delete('/manage/htpasswd/')
-		    .success(function(data) {
-		        initHtpasswd();
-		    })
-		    .error(function(data) {
-		        $scope.errors = data;
-		    });
+        $scope.errors = false;
+        $http.delete('/manage/htpasswd/')
+            .success(function(data) {
+                initHtpasswd();
+            })
+            .error(function(data) {
+                $scope.errors = data;
+            });
     };
 
     $scope.htpasswd_enable = function(name) {
-	    $scope.errors = false;
-	    $http.put('/manage/htpasswd/')
-		    .success(function(data) {
+        $scope.errors = false;
+        $http.put('/manage/htpasswd/')
+            .success(function(data) {
                 window.confirm('Generated password for Gerrit API: ' + data);
-		        initHtpasswd();
-		    })
-		    .error(function(data) {
-		        $scope.errors = data;
-		    });
+                initHtpasswd();
+            })
+            .error(function(data) {
+                $scope.errors = data;
+            });
     };
 
     init();
