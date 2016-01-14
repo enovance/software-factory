@@ -330,6 +330,7 @@ cd /usr/local/share/sf-ansible
     mkdir group_vars
     ln -s /etc/puppet/hiera/sf/sfconfig.yaml group_vars/all.yaml
 }
+ansible-galaxy install -r requirements.yaml
 ansible-playbook sfmain.yaml || {
     echo "[sfconfig] Ansible playbook failed"
     exit 1

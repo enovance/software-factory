@@ -22,6 +22,4 @@ node default {
   class {'::ssh_keys_jenkins': stage => last }
   class {'::nodepool': stage => last }
   class {'::jenkins': stage => last }
-  # jjb also deploys zuul and nodepool
-  class {'::jjb': stage => last }
 }
