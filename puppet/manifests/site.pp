@@ -43,8 +43,6 @@ node default {
   # Jenkins
   class {'::ssh_keys_jenkins': stage => last }
   class {'::jenkins': stage => last }
-  # jjb also deploys zuul and nodepool
-  class {'::jjb': stage => last }
 }
 
 node /.*allinone.*/ {
@@ -59,7 +57,6 @@ node /.*allinone.*/ {
   # Jenkins
   include ::ssh_keys_jenkins
   include ::jenkins
-  include ::jjb
   include ::zuul
   include ::nodepool
   include ::cauth_client

@@ -1,0 +1,2 @@
+# ansible-role-jenkins-job-builder
+- src: https://github.com/openstack/ansible-role-jenkins-job-builder

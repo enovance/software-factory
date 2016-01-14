@@ -7,6 +7,10 @@
     - include: tasks/create_config_repository.yaml
 - hosts: jenkins
   gather_facts: no
+
+  roles:
+    - ansible-role-jenkins-job-builder
+
   tasks:
     - include: tasks/jenkins_kick.yaml
     - include: tasks/config_nodepool.yaml
