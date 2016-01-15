@@ -35,7 +35,7 @@ wait_for_lock
 put_lock
 
 . ./role_configrc
-[ -n "$DEBUG" ] && set -x
+[ -z "$DEBUG" ] || set -x
 
 if [ ! -z "${1}" ]; then
     ARTIFACTS_DIR=${1}/image_build
@@ -64,7 +64,12 @@ function build_cache {
         return
     fi
     echo "(STEP1) The local cache needs update (was: [${LOCAL_HASH}])"
-    sudo rm -Rf ${CACHE_PATH}*
+    if [ "${USER}" == "jenkins" ]; then
+        echo "(STEP1) Removing ${CACHE_PATH}"
+        sudo umount ${CACHE_PATH}/proc &> /dev/null
+        sudo umount ${CACHE_PATH}/dev &> /dev/null
+        sudo rm -Rf ${CACHE_PATH}*
+    fi
     sudo mkdir -p ${CACHE_PATH}
     (
         set -e
@@ -76,7 +81,7 @@ function build_cache {
     if [ "$?" != "0" ]; then
         echo "(STEP1) FAILED"; sudo rm -Rf ${CACHE_PATH}.description; exit 1;
     fi
-    echo "(STEP1) SUCCESS: ${CACHE_HASH}"
+    echo "(STEP1) SUCCESS ${CACHE_PATH}: ${CACHE_HASH}"
 }
 
 function build_image {
@@ -102,7 +107,8 @@ function build_image {
     }
 
     # Copy the cache
-    sudo rsync -a --delete "${CACHE_PATH}/" "${IMAGE_PATH}/"
+    echo "(STEP2) rsync -a --delete '${CACHE_PATH}/' '${IMAGE_PATH}/'"
+    time sudo rsync -a --delete "${CACHE_PATH}/" "${IMAGE_PATH}/"
 
     (
         set -e
@@ -118,13 +124,14 @@ function build_image {
     if [ "$?" != "0" ]; then
         echo "(STEP2) FAILED"; sudo rm -Rf ${IMAGE_PATH}-${SF_VER}.description; exit 1;
     fi
-    echo "(STEP2) SUCCESS: ${IMAGE_HASH}"
+    echo "(STEP2) SUCCESS ${IMAGE_PATH}: ${IMAGE_HASH}"
 }
 
 prepare_buildenv
-build_cache
 # Make sure subproject are available
+echo "(STEP0) Fetch subprojects..."
 ./image/fetch_subprojects.sh || exit 1
+build_cache
 build_image
 if [ -n "$BUILD_QCOW" ]; then
     echo "(STEP3) Building qcow, please wait..."
