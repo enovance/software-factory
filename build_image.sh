@@ -35,7 +35,7 @@ wait_for_lock
 put_lock
 
 . ./role_configrc
-[ -n "$DEBUG" ] && set -x
+[ -z "$DEBUG" ] || set -x
 
 if [ ! -z "${1}" ]; then
     ARTIFACTS_DIR=${1}/image_build
@@ -64,7 +64,9 @@ function build_cache {
         return
     fi
     echo "(STEP1) The local cache needs update (was: [${LOCAL_HASH}])"
-    sudo rm -Rf ${CACHE_PATH}*
+    if [ "${USER}" == "jenkins" ]; then
+        sudo rm -Rf ${CACHE_PATH}*
+    fi
     sudo mkdir -p ${CACHE_PATH}
     (
         set -e
@@ -124,6 +126,7 @@ function build_image {
 prepare_buildenv
 build_cache
 # Make sure subproject are available
+ech o"(STEP0) Fetch subprojects..."
 ./image/fetch_subprojects.sh || exit 1
 build_image
 if [ -n "$BUILD_QCOW" ]; then

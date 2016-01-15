@@ -16,8 +16,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-set -ex
+set -e
 
+[ -z "$DEBUG" ] || set -x
 # Target dir where the centos images will be built
 dir="$1"
 # Version is SF_VER
@@ -25,6 +26,10 @@ version="$2"
 
 dist="centos"
 CODENAME_MAJOR=7
+
+
+ZUUL_VERSION=fd463c84bfb342701061fe383c6d17e7a1bd4786
+NODEPOOL_VERSION=0.1.1
 
 export LC_ALL=C
 
@@ -54,9 +59,6 @@ bootstrap() {
     local target=$dir
 
     mount_fs
-    if [ -f "${target}/etc/sysctl.conf" ]; then
-        return 0
-    fi
 
     local release_rpm_url=$(add_main_repository)
 
@@ -73,16 +75,18 @@ bootstrap() {
         # of requests are not missed at the cache
         sed -i 's/^#baseurl/baseurl/g' ${target}/etc/yum.repos.d/*
         sed -i 's/^mirrorlist/#mirrorlist/g' ${target}/etc/yum.repos.d/*
-
-        echo -e "[main]\nproxy=${http_proxy}" >> ${target}/etc/yum.conf
-
+        grep -q "^proxy=" ${target}/etc/yum.conf || echo -e "[main]\nproxy=" >> ${target}/etc/yum.conf
+        sed -i "s/^proxy=.*/proxy=${http_proxy}/" ${target}/etc/yum.conf
     fi
 
     cp -f /etc/resolv.conf "$target/etc/"
 
-    rpm --root="$target" --import $(ls $target/etc/pki/rpm-gpg/RPM-GPG-KEY-* | fgrep -v Debug)
-    # We cannot use install_packages since the basesystem isn't yet setup
-    yum --disableplugin=* --installroot $target install -y basesystem yum
+    if [ ! -f "${target}/usr/bin/yum" ]; then
+        echo "(STEP1) [$(date)] Bootstraping..."
+        rpm --root="$target" --import $(ls $target/etc/pki/rpm-gpg/RPM-GPG-KEY-* | fgrep -v Debug)
+        # We cannot use install_packages since the basesystem isn't yet setup
+        yum --disableplugin=* --installroot $target install -y basesystem yum
+    fi
 
     if [ -f  "$target"/root/.rpmdb/Packages ]; then
         mv -f "$target"/root/.rpmdb/*  "$target"/root/.rpmdb/.??* "$target"/var/lib/rpm/
@@ -93,7 +97,7 @@ bootstrap() {
         fake_shadow_utils
     fi
 
-    mkdir -p "$target/var/lib/edeploy/${version}"
+    [ -d "$target/var/lib/edeploy/${version}" ] || mkdir -p "$target/var/lib/edeploy/${version}"
 
     rebuild_db $target
 
@@ -138,34 +142,60 @@ EOF
 }
 
 install_sf_packages() {
-    [ -f "${dir}/etc/yum.repos.d/puppetlabs.repo" ] || install_packages ${dir} ${PUPPET_REPO_URL}
-    [ -f "${dir}/etc/yum.repos.d/epel.repo" ] || install_packages $dir epel-release
-    [ -f "${dir}/etc/yum.repos.d/rdo-release.repo" ] || install_packages $dir https://www.rdoproject.org/repos/rdo-release.rpm
-    http_fetch https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo ${dir}/etc/yum.repos.d/passenger.repo
+    echo "(STEP1) [$(date)] Installing Centos packages..."
+    install_packages ${dir} $CENTOS_PKGS
 
-    install_packages ${dir} $BASE_PKGS
-    install_packages ${dir} $PKGS
-    install_packages ${dir} $DEV_PKGS
-    install_packages ${dir} $RDO_PKGS
-    install_packages ${dir} --enablerepo=epel-testing ${BASE_TESTING_PKGS}
+    echo "(STEP1) [$(date)] Installing EPEL/RDO packages..."
+    [ -f "${dir}/etc/yum.repos.d/epel.repo" ] || install_packages ${dir} epel-release
+    [ -f "${dir}/etc/yum.repos.d/rdo-release.repo" ] || install_packages ${dir} ${RDO_REPO}
+    install_packages ${dir} ${EPEL_PKGS} ${RDO_PKGS}
 
+    if [ ! -f "${dir}/usr/lib64/httpd/modules/mod_passenger.so" ]; then
+        echo "(STEP1) [$(date)] Installing passenger packages..."
+        http_fetch ${PASSENGER_REPO} ${dir}/etc/yum.repos.d/passenger.repo
+        install_packages ${dir} ${PASSENGER_PKGS}
+        rm -f ${dir}/etc/yum.repos.d/passenger.repo
+    fi
+
+    echo "(STEP1) [$(date)] Installing PIP packages..."
     retry do_chroot ${dir} pip install --upgrade pip
     retry do_chroot ${dir} pip install ${PIP_PKGS}
 
-    # don't rename net ifaces
-    rm -f ${target}/etc/udev/rules.d/80-net-name-slot.rules
-    ln -s /dev/null ${target}/etc/udev/rules.d/80-net-name-slot.rules
+    # JJB directory
+    mkdir -p ${dir}/etc/jenkins_jobs
 
-    # tune sshd conf
+    # install zuul_swift_upload.py
+    http_fetch $ZUUL_SWIFT_UPLOAD_URL ${dir}/usr/local/bin/zuul_swift_upload.py
+    chmod +x ${dir}/usr/local/bin/zuul_swift_upload.py
+
+    # don't rename net ifaces
+    net_rules="${target}/etc/udev/rules.d/80-net-name-slot.rules"
+    if [ "$(readlink ${net_rules} 2> /dev/null)" != "/dev/null" ]; then
+        rm -f ${net_rules}
+        ln -s /dev/null ${net_rules}
+    fi
+
+    # install third party puppet modules
+    if [ ! -d "${dir}/etc/puppet/modules/ntp/" ]; then
+        retry do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
+    fi
+
+    [ -d ${dir}/var/lib/grafana ] || install_packages ${dir} ${GRAFANA_URL}
+
+    # tune ssh conf
     grep -q "^UseDNS no" ${target}/etc/ssh/sshd_config || echo UseDNS no >> ${target}/etc/ssh/sshd_config
+    grep -q "^UseRoaming no" ${target}/etc/ssh/ssh_config || echo UseRoaming no >> ${target}/etc/ssh/ssh_config
 }
 
 function install_jenkins {
-    http_fetch http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo ${dir}/etc/yum.repos.d/jenkins.repo
-    chroot $dir rpm --import http://pkg.jenkins-ci.org/redhat-stable/jenkins-ci.org.key
+    chroot ${dir} rpm -q jenkins || {
+        http_fetch http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo ${dir}/etc/yum.repos.d/jenkins.repo
+        chroot $dir rpm --import http://pkg.jenkins-ci.org/redhat-stable/jenkins-ci.org.key
 
-    [ -n "$JENKINS_VERSION" ] && JENKINS_VERSION="-${JENKINS_VERSION}"
-    install_packages $dir jenkins${JENKINS_VERSION}
+        [ -n "$JENKINS_VERSION" ] && JENKINS_VERSION="-${JENKINS_VERSION}"
+        install_packages $dir jenkins${JENKINS_VERSION}
+        rm ${dir}/etc/yum.repos.d/jenkins.repo
+    }
 
     [ -d ${dir}/var/lib/jenkins/plugins ] || mkdir -p ${dir}/var/lib/jenkins/plugins
     do_chroot $dir chown jenkins /var/lib/jenkins /var/lib/jenkins/plugins
@@ -207,13 +237,6 @@ function install_jenkins {
 
     # Jenkins AnsiColor plugin
     http_fetch $JENKINS_ANSI_COLOR_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_ANSI_COLOR_PLUGIN_URL)
-
-    # JJB directory
-    mkdir -p ${dir}/etc/jenkins_jobs
-
-    # install zuul_swift_upload.py
-    http_fetch $ZUUL_SWIFT_UPLOAD_URL ${dir}/usr/local/bin/zuul_swift_upload.py
-    chmod +x ${dir}/usr/local/bin/zuul_swift_upload.py
 
     # make sure jenkins is disabled by default
     rm -Rf ${dir}/etc/rc.d/*/*jenkins*
@@ -394,16 +417,10 @@ EOF
     fi
 }
 
-install_misc() {
-    # install third party puppet modules
-    retry do_chroot $dir puppet module install puppetlabs-ntp --environment=sf
-
-    [ -d ${dir}/var/lib/grafana ] || install_packages ${dir} ${GRAFANA_URL}
-}
-
 image_clean() {
     rm -Rf ${dir}/usr/share/doc
     rm -Rf ${dir}/usr/share/info
+    put_git_mark ${dir}
 }
 
 final_image_clean() {
@@ -427,7 +444,7 @@ if [ "$STEP" == 1 ]; then
     bootstrap
     install_sf_packages
     disable_selinux
-
+    echo "(STEP1) [$(date)] Installing Jenkins, redmine, gerryt, fonts, etherpad..."
     install_jenkins
     install_redmine
     install_gerrit
@@ -437,19 +454,20 @@ if [ "$STEP" == 1 ]; then
     install_serverspec
     install_etherpad
     install_paste
-    install_misc
     install_bup
     install_mod_authpub_tkt
+    echo "(STEP1) [$(date)] Cleaning..."
     image_clean
     check_rpm_packages ${dir} "${RPM_PKGS}"
-    put_git_mark ${dir}
     do_chroot ${dir} passwd -l root
 fi
 
 if [ "$STEP" == 2 ]; then
     mount_fs
     . sf.install
+    echo "(STEP2) [$(date)] Installing SF packages..."
     install_sf
+    echo "(STEP2) [$(date)] Cleaning..."
     image_clean
     final_image_clean
 fi

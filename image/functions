@@ -145,6 +145,7 @@ check_rpm_packages() {
     shift
     local packages=$@
     PKG_MISSING=
+    set +x
     for pkg in $packages; do
         # Some packages are passed with a full URL (ie. hpacucli)
         # We need to retrieve the package name to be able to pass
@@ -153,6 +154,7 @@ check_rpm_packages() {
         package_stripname="${package_name%.rpm}"
         do_chroot $dir rpm -q $package_stripname &>/dev/null || PKG_MISSING="$PKG_MISSING $package_stripname"
     done
+    [ -z "$DEBUG" ] || set -x
     if [ -n "${PKG_MISSING}" ];then
         fatal_error "The following packages are missing: ${PKG_MISSING}"
     fi
