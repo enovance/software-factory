@@ -108,7 +108,7 @@ function run_it_openstack {
         && echo "Basic integration test SUCCESS"                    \
         || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     ${it_cmd} nodepool --os_base_image "sf-${SF_VER}" --os_user sfnodepool &>> ${ARTIFACTS_DIR}/integration_tests.txt \
-        && echo "(non-voting) Notepool integration test SUCCESS"    \
+        && echo "(non-voting) Nodepool integration test SUCCESS"    \
         || echo "(non-voting) Nodepool integration test failed"
     ${it_cmd} swiftlogs >> ${ARTIFACTS_DIR}/integration_tests.txt   \
         && echo "(non-voting) Swift integration test SUCCESS"       \
@@ -208,7 +208,7 @@ function build_image {
         PYSFLIB_LOC=${IMAGE_PATH}/$(sudo chroot ${IMAGE_PATH} pip show pysflib | grep '^Location:' | awk '{ print $2 }')
         echo "SKIP_BUILD: direct copy of ${PYSFLIB_CLONED_PATH}/pysflib/ to ${PYSFLIB_LOC}/pysflib/"
         sudo rsync -a --delete ${PYSFLIB_CLONED_PATH}/pysflib/ ${PYSFLIB_LOC}/pysflib/
-        sudo cp image/edeploy ${IMAGE_PATH}/usr/sbin/edeploy
+        sudo cp image/edeploy/edeploy ${IMAGE_PATH}/usr/sbin/edeploy
         set +e
     fi
 }
