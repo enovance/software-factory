@@ -186,7 +186,7 @@ function build_image {
     fi
     if [ -z "${SKIP_BUILD}" ]; then
         echo "[+] Building image ${IMAGE_PATH}"
-        ./build_image.sh 2>&1 | tee ${ARTIFACTS_DIR}/image_build.log | grep '(STEP'
+        stdbuf -oL -eL ./build_image.sh 2>&1 | tee ${ARTIFACTS_DIR}/image_build.log | grep '(STEP'
         [ "${PIPESTATUS[0]}" == "0" ] || fail "Roles building FAILED" ${ARTIFACTS_DIR}/image_build.log
         checkpoint "build_image"
         prepare_functional_tests_utils
