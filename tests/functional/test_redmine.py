@@ -1,5 +1,6 @@
+#!/bin/env python
 #
-# Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
+# Copyright (C) 2016 Red Hat
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,21 +13,20 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-require 'spec_helper'
 
-describe package('httpd') do
-  it { should be_installed }
-end
-describe file('/etc/httpd/conf.d/redmine.conf') do
-  it { should be_file }
-  it { should contain "Alias /redmine/ /var/www/redmine/public/" }
-end
-describe service('httpd') do
-  it { should be_enabled }
-  it { should be_running }
-end
+import requests
+from utils import Base
+from config import GATEWAY_URL
 
-describe port(80) do
-  it { should be_listening }
-end
 
+class TestRedmineBasic(Base):
+    """ Functional tests to validate redmine availability
+    """
+
+    def test_root_url_for_404(self):
+        """ Test if redmine yield RoutingError
+        """
+        url = "%s/redmine/" % GATEWAY_URL
+        for i in xrange(11):
+            resp = requests.get(url)
+            self.assertNotEquals(resp.status_code, 404)
