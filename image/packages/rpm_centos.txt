@@ -105,11 +105,8 @@ socat
 apr-devel
 apr-util-devel
 httpd-devel
-gcc
-gcc-c++
 libcurl-devel
 libffi-devel
-libxml2-devel
 libxslt-devel
 mariadb-devel
 openldap-devel

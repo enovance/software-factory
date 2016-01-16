@@ -467,7 +467,7 @@ function run_checker {
 
 function run_functional_tests {
     echo "$(date) ======= run_functional_tests"
-    nosetests --with-xunit -v tests/functional > ${ARTIFACTS_DIR}/functional-tests.debug || fail "Functional tests failed" ${ARTIFACTS_DIR}/functional-tests.debug
+    nosetests -s --with-xunit -v tests/functional > ${ARTIFACTS_DIR}/functional-tests.debug || fail "Functional tests failed" ${ARTIFACTS_DIR}/functional-tests.debug
     checkpoint "run_functional_tests"
 }
 
