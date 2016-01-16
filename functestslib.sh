@@ -29,7 +29,7 @@ function prepare_artifacts {
     sudo chown -R $USER:$USER ${ARTIFACTS_DIR}
     sudo chmod -R 755 ${ARTIFACTS_DIR}
     set +x
-    if [ -n ${SWIFT_artifacts_URL} ]; then
+    if [ -n "${SWIFT_artifacts_URL}" ]; then
         echo "Logs will be available here: $SWIFT_artifacts_URL"
     else
         echo "Logs will be available here: ${ARTIFACTS_DIR}"
@@ -108,7 +108,7 @@ function run_it_openstack {
         && echo "Basic integration test SUCCESS"                    \
         || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     ${it_cmd} nodepool --os_base_image "sf-${SF_VER}" --os_user sfnodepool &>> ${ARTIFACTS_DIR}/integration_tests.txt \
-        && echo "(non-voting) Notepool integration test SUCCESS"    \
+        && echo "(non-voting) Nodepool integration test SUCCESS"    \
         || echo "(non-voting) Nodepool integration test failed"
     ${it_cmd} swiftlogs >> ${ARTIFACTS_DIR}/integration_tests.txt   \
         && echo "(non-voting) Swift integration test SUCCESS"       \
@@ -189,6 +189,7 @@ function build_image {
         ./build_image.sh 2>&1 | tee ${ARTIFACTS_DIR}/image_build.log | grep '(STEP'
         [ "${PIPESTATUS[0]}" == "0" ] || fail "Roles building FAILED" ${ARTIFACTS_DIR}/image_build.log
         checkpoint "build_image"
+        [ -f "${IMAGE_PATH}.description_diff" ] && cat ${IMAGE_PATH}.description_diff
         prepare_functional_tests_utils
     else
         echo "SKIP_BUILD: Reusing previously built image, just update source code without re-installing"
@@ -208,7 +209,7 @@ function build_image {
         PYSFLIB_LOC=${IMAGE_PATH}/$(sudo chroot ${IMAGE_PATH} pip show pysflib | grep '^Location:' | awk '{ print $2 }')
         echo "SKIP_BUILD: direct copy of ${PYSFLIB_CLONED_PATH}/pysflib/ to ${PYSFLIB_LOC}/pysflib/"
         sudo rsync -a --delete ${PYSFLIB_CLONED_PATH}/pysflib/ ${PYSFLIB_LOC}/pysflib/
-        sudo cp image/edeploy ${IMAGE_PATH}/usr/sbin/edeploy
+        sudo cp image/edeploy/edeploy ${IMAGE_PATH}/usr/sbin/edeploy
         set +e
     fi
 }
@@ -235,7 +236,7 @@ function configure_network {
     done
     [ $RETRIES -eq 40 ] && fail "Can't connect to $ip"
     echo "[+] Avoid ssh error"
-    cat << EOF > ~/.ssh/config
+    cat << EOF > ${HOME}/.ssh/config
 Host ${SF_HOST}
     Hostname ${ip}
     User root
@@ -252,7 +253,8 @@ function get_logs {
     #in order to not avoid so important logs that can appears some seconds
     #after a failure.
     set +e
-    sudo cp ${IMAGE_PATH}.{rpm,pip} ${ARTIFACTS_DIR}/ &> /dev/null
+    sudo cp ${IMAGE_PATH}.description ${ARTIFACTS_DIR}/image.description &> /dev/null
+    sudo cp ${IMAGE_PATH}.description_diff ${ARTIFACTS_DIR}/image.description_diff &> /dev/null
     ssh sftests.com hostname > /dev/null && {
         echo "Collecting log from test instance"
         sleep 1
@@ -299,7 +301,7 @@ function host_debug {
 
 function display_head {
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    git log -n 1
+    git log -n 1 | cat
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo
 }
@@ -390,6 +392,10 @@ function prepare_functional_tests_utils {
         pip install --user -r ${ARTIFACTS_DIR}/test-requirements.txt || echo "Can't install test-requirements.txt $(cat ${ARTIFACTS_DIR}/test-requirements.txt)"
         cd ${PYSFLIB_CLONED_PATH};   python setup.py install --user
         cd ${SFMANAGER_CLONED_PATH}; python setup.py install --user
+        if [ -f "src/pip-delete-this-directory.txt" ]; then
+            echo "(+) Removing src/ leftovers..."
+            rm -Rvf src
+        fi
     ) &> ${ARTIFACTS_DIR}/test-requirements.install.log || fail "Can't install test-requirements" ${ARTIFACTS_DIR}/test-requirements.install.log
     checkpoint "prepare_utils"
 }
