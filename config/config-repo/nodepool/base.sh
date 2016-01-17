@@ -7,6 +7,8 @@ sudo yum update -y > /dev/null
 # Base requirements
 sudo yum install -y epel-release > /dev/null
 sudo yum install -y python-pip git wget curl patch iproute > /dev/null
+sudo pip install --upgrade pip
+sudo pip install tox
 
 # The jenkins user. Must be able to use sudo without password
 sudo useradd -m jenkins
@@ -36,7 +38,6 @@ sudo yum install -y java
 # Install zuul_swift_upload and zuul-cloner
 # TODO: replace this section by zuul package
 sudo yum install -y python-requests gcc python-devel
-sudo pip install --upgrade pip
 sudo pip install zuul glob2 python-magic
 sudo curl -o /usr/local/bin/zuul_swift_upload.py \
     https://raw.githubusercontent.com/openstack-infra/project-config/master/jenkins/scripts/zuul_swift_upload.py
