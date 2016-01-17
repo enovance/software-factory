@@ -15,7 +15,7 @@
 # under the License.
 
 import requests
-from utils import Base
+from utils import Base, logger
 from config import GATEWAY_URL
 
 
@@ -29,4 +29,5 @@ class TestRedmineBasic(Base):
         url = "%s/redmine/" % GATEWAY_URL
         for i in xrange(11):
             resp = requests.get(url)
+            logger.debug("Calling %s" % url)
             self.assertNotEquals(resp.status_code, 404)
