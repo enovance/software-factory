@@ -4,7 +4,7 @@
   register: usr_share_redmine
 
 - name: Move files from /usr/share/redmine to /var/www/redmine
-  when: "usr_share_redmine.stat.isdir is defined and usr_share_redmine.isdir"
+  when: usr_share_redmine.stat.isdir is defined and usr_share_redmine.isdir
   command: "{{ item }}"
   with_items:
       - mkdir -p /var/www/redmine/log /var/www/redmine/public/plugin_assets
