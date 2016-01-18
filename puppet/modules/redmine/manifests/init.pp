@@ -29,6 +29,7 @@ class redmine {
     require cauth_client
     require hosts
     include ::apache
+    include ::stdlib
 
     file { 'conf_yml':
       ensure  => file,
@@ -138,11 +139,22 @@ class redmine {
       notify      => Exec['chown_redmine'],
     }
 
-    exec {'set_url_root':
-      command => "sed -i '/^.*::relative_url_root =.*/d' /usr/share/redmine/config/environment.rb && echo -e 'Redmine::Utils::relative_url_root = \"/redmine\"\nActionController::Base.relative_url_root = \"/redmine\"' >> /usr/share/redmine/config/environment.rb",
-      path    => '/usr/sbin/:/usr/bin/:/bin/',
+    file_line { 'set_url_root_utils':
+      ensure  => present,
+      path    => '/usr/share/redmine/config/environment.rb',
+      line    => "Redmine::Utils::relative_url_root = /redmine",
+      match   => "^Redmine::Utils::relative_url_root",
       require => Exec['default_data'],
-      unless  => '/usr/bin/grep "relative_url_root = \"/redmine\"" /usr/share/redmine/config/environment.rb',
+      notify  => [Exec['chown_redmine'],
+                  Service['webserver']],
+    }
+
+    file_line { 'set_url_root_base':
+      ensure  => present,
+      path    => '/usr/share/redmine/config/environment.rb',
+      line    => "ActionController::Base.relative_url_root = /redmine",
+      match   => "^ActionController::Base.relative_url_root",
+      require => Exec['default_data'],
       notify  => [Exec['chown_redmine'],
                   Service['webserver']],
     }
