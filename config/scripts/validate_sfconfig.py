@@ -54,7 +54,7 @@ def migrate_2_0_0():
         'swift_logsexport_logserver_prefix', 'swift_logsexport_authurl',
         'swift_logsexport_x_storage_url', 'swift_logsexport_username',
         'swift_logsexport_password', 'swift_logsexport_tenantname',
-        'swift_logsexport_authversion'))
+        'swift_logsexport_authversion', 'swift_logsexport_x_tempurl_key'))
 
     return sfconfig
 
