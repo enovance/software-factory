@@ -54,32 +54,51 @@ auth = {
 }
 
 services = [
+<% if @services.include?('SFRedmine') %>
     'SFRedmine',
+<% end %>
+<% if @services.include?('SFGerrit') %>
     'SFGerrit',
+<% end %>
+<% if @services.include?('jenkins') %>
     'jenkins',
+<% end %>
+<% if @services.include?('etherpad') %>
     'etherpad',
+<% end %>
+<% if @services.include?('lodgeit') %>
     'lodgeit',
+<% end %>
+<% if @services.include?('nodepool') %>
     'nodepool',
+<% end %>
 ]
 
 mysql = {
     'host': 'mysql.<%= @fqdn %>',
 }
+<% if @services.include?('jenkins') %>
 jenkins = {
     'host': 'jenkins.<%= @fqdn %>',
 }
+<% end %>
+<% if @services.include?('etherpad') %>
 etherpad = {
     'host': 'managesf.<%= @fqdn %>',
 }
+<% end %>
+<% if @services.include?('lodgeit') %>
 lodgeit = {
     'host': 'managesf.<%= @fqdn %>',
 }
+<% end %>
 
-
+<% if @services.include?('nodepool') %>
 # fake host, does not matter
 nodepool = {
     'host': 'nodepool.<%= @fqdn %>',
 }
+<% end %>
 
 managesf = {
     'host': 'managesf.<%= @fqdn %>',
@@ -92,6 +111,7 @@ admin = {
     'http_password': '<%= @auth['admin_password'] %>',
 }
 
+<% if @services.include?('SFGerrit') %>
 gerrit = {
     'user': 'gerrit',
     'admin_user': 'admin',
@@ -107,12 +127,15 @@ gerrit = {
     'db_user': '<%= @gerrit_mysql_username %>',
     'db_password': '<%= @gerrit_mysql_password %>'
 }
+<% end %>
 
+<% if @services.include?('SFRedmine') %>
 redmine = {
     'host': 'api-redmine.<%= @fqdn %>',
     'url': '<%= @issues_tracker_api_url %>',
     'api_key': '<%= @issues_tracker_api_key %>',
 }
+<% end %>
 
 sqlalchemy = {
     'url': 'sqlite:////var/lib/managesf/users.db',
