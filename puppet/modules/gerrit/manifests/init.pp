@@ -61,6 +61,13 @@ class gerrit {
     owner   => 'gerrit',
     content => template('gerrit/gerrit.service.erb'),
     require => Exec['gerrit-initial-init'],
+    notify => Exec['reload_unit_gerrit'],
+  }
+
+  exec {'reload_unit_gerrit':
+    command     => '/usr/bin/systemctl daemon-reload',
+    require     => File['/lib/systemd/system/gerrit.service'],
+    refreshonly => true,
   }
 
   file { '/var/www/git/gitweb.cgi':

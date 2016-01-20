@@ -58,6 +58,13 @@ class jenkins {
     owner   => 'jenkins',
     group   => 'jenkins',
     content => template('jenkins/jenkins.service.erb'),
+    notify => Exec['reload_unit_jenkins'],
+  }
+
+  exec {'reload_unit_jenkins':
+    command     => '/usr/bin/systemctl daemon-reload',
+    require     => File['/lib/systemd/system/jenkins.service'],
+    refreshonly => true,
   }
 
   file { '/var/cache/jenkins':

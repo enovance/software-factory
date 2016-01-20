@@ -49,6 +49,13 @@ class zuul {
     owner  => 'root',
     group  => 'root',
     content => template('zuul/zuul.systemd.service.erb'),
+    notify => Exec['reload_unit_zuul'],
+  }
+
+  exec {'reload_unit_zuul':
+    command     => '/usr/bin/systemctl daemon-reload',
+    require     => File['/lib/systemd/system/zuul.service'],
+    refreshonly => true,
   }
 
   file {'zuul_merger_init':
