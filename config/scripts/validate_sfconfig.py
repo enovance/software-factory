@@ -116,5 +116,15 @@ if not d['authentication'].get('launchpad'):
 if "os_auth_version" not in d["backup"]:
     d["backup"]["os_auth_version"] = 1
 
+# add the list of services to run
+if 'services' not in d:
+    d['services'] = ['SFRedmine',
+                     'SFGerrit',
+                     'jenkins',
+                     'etherpad',
+                     'lodgeit',
+                     'nodepool']
+
+
 yaml.dump(d, open(argv[1], "w"), default_flow_style=False)
 exit(0)
