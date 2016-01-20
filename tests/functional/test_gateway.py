@@ -31,13 +31,25 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 307)
         self.assertTrue("/auth/login" in resp.headers['Location'])
 
-    def test_redmine_root_url_for_404(self):
-        """ Test if redmine yield RoutingError
-        """
+    def _redmine_404(self):
         url = "%s/redmine/" % config.GATEWAY_URL
         for i in xrange(11):
             resp = requests.get(url)
             self.assertNotEquals(resp.status_code, 404)
+
+    def test_redmine_root_url_for_404(self):
+        """ Test if redmine yield RoutingError after sfconfig call
+        """
+        self.assertEquals(Popen(["ssh", config.GATEWAY_HOST,
+                                 "sfconfig.sh"]).wait(), 0)
+        self._redmine_404()
+
+    def test_redmine_root_url_for_404_httpd(self):
+        """ Test if redmine yield RoutingError after httpd restart
+        """
+        self.assertEquals(Popen(["ssh", config.GATEWAY_HOST,
+                                 "systemctl", "restart", "httpd"]).wait(), 0)
+        self._redmine_404()
 
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
