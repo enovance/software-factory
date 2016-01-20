@@ -1,0 +1,21 @@
+---
+- name: Add services config section in sfconfig
+  shell: printf "\n\nservices:" >> sf-bootstrap-data/hiera/sfconfig.yaml
+
+- name: Declare redmine service
+  shell: printf "\n\t- SFRedmine" >> sf-bootstrap-data/hiera/sfconfig.yaml
+
+- name: Declare gerrit service
+  shell: printf "\n\t- SFGerrit" >> sf-bootstrap-data/hiera/sfconfig.yaml
+
+- name: Declare jenkins service
+  shell: printf "\n\t- jenkins" >> sf-bootstrap-data/hiera/sfconfig.yaml
+
+- name: Declare etherpad service
+  shell: printf "\n\t- etherpad" >> sf-bootstrap-data/hiera/sfconfig.yaml
+
+- name: Declare lodgeit service
+  shell: printf "\n\t- lodgeit" >> sf-bootstrap-data/hiera/sfconfig.yaml
+
+- name: Declare lodgeit service
+  shell: printf "\n\t- nodepool" >> sf-bootstrap-data/hiera/sfconfig.yaml
