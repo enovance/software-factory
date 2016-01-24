@@ -5,14 +5,6 @@ server=127.0.0.1
 start=true
 log_config=/etc/zuul/gearman-logging.conf
 
-[gerrit]
-server=<%= @gerrit_host %>
-# baseurl is only use to fetch git refs on diff url than server.
-# Using baseurl we cannot modify url zuul report to user
-baseurl=<%= @url['gerrit_pub_url'] %>
-user=jenkins
-sshkey=/var/lib/zuul/.ssh/id_rsa
-
 [zuul]
 layout_config=/etc/zuul/layout.yaml
 log_config=/etc/zuul/logging.conf
@@ -43,6 +35,18 @@ X-Account-Meta-Temp-Url-Key=<%= @logs['swift_logsexport_x_tempurl_key'] %>
 Send-Temp-Url-Key=<%= @logs['swift_logsexport_send_tempurl_key'] %>
 <% end %>
 
+#[connection gerrit]
+#driver=gerrit
+[gerrit]
+server=<%= @gerrit_host %>
+# baseurl is only use to fetch git refs on diff url than server.
+# Using baseurl we cannot modify url zuul report to user
+baseurl=<%= @url['gerrit_pub_url'] %>
+user=jenkins
+sshkey=/var/lib/zuul/.ssh/id_rsa
+
+#[connection smtp]
+#driver=smtp
 [smtp]
 server=localhost
 port=25
