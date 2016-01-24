@@ -6,11 +6,20 @@ STAGING_PKGS=""
 # Without this, managesf fails with ResourceNotFoundError: Requested resource doesn't exist
 STAGING_PIP=""
 
+# Latest version of nodepool/zuul as of Jan24 2016
+NODEPOOL_VERSION=37cdfdd43b1c1866d477361f23041db04e7d5617
+#ZUUL_VERSION=514db293af344e15d7a1f1585c2ac84c3694eb0f
+
+# Last working zuul version, see https://storyboard.openstack.org/#!/story/2000472
+#ZUUL_VERSION=c94afc4605b9eef959723dfc29e4207f683afa7e
+# c94afc failed with KeyError: 'gerrit' from zuul/scheduler.py:270
+ZUUL_VERSION=66c8e52e423c9cfa43e362a0a704e99f73c959cb
+
 function install_nodepool {
     # nodepool
     do_chroot ${dir} virtualenv /srv/nodepool
-    do_chroot ${dir} /srv/nodepool/bin/pip install --upgrade 'pip<8' 'pbr<1.0'
-    do_chroot ${dir} /srv/nodepool/bin/pip install git+git://github.com/openstack-infra/nodepool@${NODEPOOL_VERSION} 'pip<8'
+    do_chroot ${dir} /srv/nodepool/bin/pip install --upgrade 'pbr>=1.3' 'pip<8'
+    do_chroot ${dir} /srv/nodepool/bin/pip install git+git://github.com/openstack-infra/nodepool@${NODEPOOL_VERSION} 'pip<8' 'funcsigs'
     # Install symlink to venv to set correct python path
     for bin in nodepool nodepoold; do
         ln -sf /srv/nodepool/bin/${bin} ${dir}/usr/bin/${bin}
@@ -20,21 +29,23 @@ function install_nodepool {
 function install_zuul {
     # zuul
     do_chroot ${dir} virtualenv /srv/zuul
-    do_chroot ${dir} /srv/zuul/bin/pip install --upgrade 'pip<8' 'pbr<1.0'
     [ -d ${dir}/tmp/zuul ] || retry do_chroot ${dir} git clone ${ZUUL_URL} /tmp/zuul
     do_chroot ${dir} bash -c "cd /tmp/zuul && git checkout -b working ${ZUUL_VERSION}"
     # Apply temp_url_key fix
     http_fetch "https://review.openstack.org/changes/270338/revisions/2cb6df61f35a7a80209fd873d7f1113040c9afb8/patch?download" ${dir}/tmp/zuul.patch
     cat ${dir}/tmp/zuul.patch | base64 -d | do_chroot ${dir} bash -c "cd /tmp/zuul; patch -p1"
+    sudo sed -i 's/^pbr.*//' ${dir}/tmp/zuul/requirements.txt
+    do_chroot ${dir} /srv/zuul/bin/pip install --upgrade 'pbr' 'pip<8'
     do_chroot ${dir} /srv/zuul/bin/pip install 'pip<8' file:///tmp/zuul
     # Manually install swift and keystone client
     do_chroot ${dir} /srv/zuul/bin/pip install 'pip<8' python-swiftclient python-keystoneclient
-    mv ${dir}/tmp/zuul/etc/status/public_html/ ${dir}/var/www/zuul
-    rm -Rf ${dir}/tmp/zuul
     # Install symlink to venv to set correct python path
     for bin in zuul zuul-cloner zuul-merger zuul-server; do
         ln -sf /srv/zuul/bin/${bin} ${dir}/usr/bin/${bin}
     done
+    # Install zuul web virtualhost
+    mv ${dir}/tmp/zuul/etc/status/public_html/ ${dir}/var/www/zuul
+    rm -Rf ${dir}/tmp/zuul
     http_fetch $JQUERY_VISIBILITY_URL ${dir}/var/www/static/js/jquery-visibility.min.js
     http_fetch $JQUERY_GRAPHITE_URL   ${dir}/var/www/static/js/jquery.graphite.js
 }
