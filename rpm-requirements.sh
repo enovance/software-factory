@@ -22,6 +22,6 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 fi
 
 if [ ! -z "${PKGS}" ]; then
-    echo "(+) Installing build requirement..."
+    echo "(+) Installing build requirements..."
     sudo yum install -y $PKGS
 fi
