@@ -102,6 +102,9 @@ if "disabled" not in ldap:
     else:
         ldap['disabled'] = True
 
+d['authentication']['github'].setdefault('disabled', False)
+d['authentication']['openid'].setdefault('disabled', False)
+
 # Make sure backup has os_auth_version (2.0.4 -> 2.1.0)
 if "os_auth_version" not in d["backup"]:
     d["backup"]["os_auth_version"] = 1
