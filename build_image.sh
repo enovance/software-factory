@@ -98,7 +98,7 @@ function build_image {
 
     LOCAL_HASH=$(head -n 1 ${IMAGE_PATH}-${SF_VER}.description 2> /dev/null)
 
-    echo "(STEP2) Image: ${IMAGE_HASH}" | sed 's/||.*//g'
+    echo "(STEP2) Image: ${IMAGE_HASH}"
     if [ "${LOCAL_HASH}" == "${IMAGE_HASH}" ]; then
         echo "(STEP2) Already built, remove ${IMAGE_PATH}-${SF_VER}.description to force rebuild"
         return
