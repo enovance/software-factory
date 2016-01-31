@@ -19,6 +19,9 @@ echo
 echo "# PIP packages versions"
 sudo chroot ${dir} pip freeze | sort | while read pkg; do echo "pip: ${pkg}"; done
 echo
+echo "# Openstack infra pip versions"
+sudo chroot ${dir} /srv/openstack_infra_venv/bin/pip freeze | sort | while read pkg; do echo "o-i: ${pkg}"; done
+echo
 echo "# Gem packages versions"
 sudo chroot ${dir} gem list | grep '^[a-z]' | sort | while read pkg; do echo "gem: ${pkg}"; done
 
