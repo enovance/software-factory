@@ -60,7 +60,7 @@ end
 describe file('/home/gerrit/site_path/lib') do
     it {
         should be_directory
-        should be_owned_by 'gerrit'
+        should be_owned_by 'root'
     }
 end
 
@@ -132,8 +132,8 @@ end
 describe file('/home/gerrit/gerrit.war') do
     it {
         should be_file
-        should be_owned_by 'gerrit'
-        should be_grouped_into 'gerrit'
+        should be_owned_by 'root'
+        should be_grouped_into 'root'
         should be_mode '644'
     }
 end
@@ -141,24 +141,24 @@ end
 describe file('/home/gerrit/site_path/lib/mysql-connector-java-5.1.21.jar') do
     it {
         should be_file
-        should be_owned_by 'gerrit'
-        should be_grouped_into 'gerrit'
+        should be_owned_by 'root'
+        should be_grouped_into 'root'
     }
 end
   
 describe file('/home/gerrit/site_path/lib/bcprov-jdk15on-151.jar') do
     it {
         should be_file
-        should be_owned_by 'gerrit'
-        should be_grouped_into 'gerrit'
+        should be_owned_by 'root'
+        should be_grouped_into 'root'
     }
 end
 
 describe file('/home/gerrit/site_path/lib/bcpkix-jdk15on-151.jar') do
     it {
         should be_file
-        should be_owned_by 'gerrit'
-        should be_grouped_into 'gerrit'
+        should be_owned_by 'root'
+        should be_grouped_into 'root'
     }
 end
 
