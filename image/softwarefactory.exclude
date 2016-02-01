@@ -64,9 +64,13 @@
 # Sf data
 /var/lib/mysql/
 /var/lib/jenkins/
-+ /home/gerrit/site_path/lib/
-+ /home/gerrit/site_path/plugins/
-- /home/gerrit/*
+/home/gerrit/site_path/cache
+/home/gerrit/site_path/data
+/home/gerrit/site_path/etc
+/home/gerrit/site_path/git
+/home/gerrit/site_path/hooks
+/home/gerrit/site_path/index
+/home/gerrit/site_path/logs
 /home/zuul/
 /usr/share/config.init.done
 /srv/cauth_keys/

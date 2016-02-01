@@ -1,0 +1,9 @@
+---
+features:
+  - A build system to compile gerrit and plugins using
+    origin/stable-2.11 branch.
+issues:
+  - Try to stabilize replication plugin that sometimes
+    yield server errors.
+fixes:
+  - Remove binary plugin from puppet modules.
