@@ -36,3 +36,24 @@ you can manage the users through the SFManager command-line utility in the `User
 (except for the default admin user, defined in the sfconfig.yaml file)
 can be done through the SFmanager command-line utility `User management`. This backend allows to have
 a user database locally.
+
+
+Admin user password change
+--------------------------
+
+To change the admin user password, you need to edit /etc/puppet/hiera/sf/sfconfig.yaml and change the value
+of `admin_password`. Then call `sfconfig.sh` to set the password.
+
+
+Redmine API key change
+----------------------
+
+To change the Redmine API key, you need to edit /etc/puppet/hiera/sf/sfcreds.yaml and change the value of
+`creds_issues_tracker_api_key`. Then call `sfconfig.sh` to set the password.
+
+
+Local database access credencials
+---------------------------------
+
+Each service users credencials for mysql database access are stored in /etc/puppet/hiera/sf/sfcreds.yaml.
+You can use the `sf_rotate_mysql_passwords.sh` to replace them all and restart services.
