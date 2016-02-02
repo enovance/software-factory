@@ -21,6 +21,7 @@ from pysflib.sfgerrit import GerritUtils
 
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
+from subprocess import Popen, PIPE
 
 import requests
 
@@ -31,13 +32,25 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 307)
         self.assertTrue("/auth/login" in resp.headers['Location'])
 
-    def test_redmine_root_url_for_404(self):
-        """ Test if redmine yield RoutingError
-        """
+    def _redmine_404(self):
         url = "%s/redmine/" % config.GATEWAY_URL
         for i in xrange(11):
             resp = requests.get(url)
             self.assertNotEquals(resp.status_code, 404)
+
+    def test_redmine_root_url_for_404(self):
+        """ Test if redmine yield RoutingError after sfconfig call
+        """
+        self.assertEquals(Popen(["ssh", config.GATEWAY_HOST,
+                                 "sfconfig.sh"], stdout=PIPE).wait(), 0)
+        self._redmine_404()
+
+    def test_redmine_root_url_for_404_httpd(self):
+        """ Test if redmine yield RoutingError after httpd restart
+        """
+        self.assertEquals(Popen(["ssh", config.GATEWAY_HOST,
+                                 "systemctl", "restart", "httpd"]).wait(), 0)
+        self._redmine_404()
 
     def _url_is_not_world_readable(self, url):
         """Utility function to make sure a url is not accessible"""
