@@ -36,7 +36,11 @@ function install_nodepool {
 function install_zuul {
     # Checkout VERSION in /tmp
     do_chroot ${dir} virtualenv /srv/zuul
-    [ -d ${dir}/tmp/zuul ] || retry do_chroot ${dir} git clone ${ZUUL_URL} /tmp/zuul
+
+    # Cleanup left-overs
+    rm -Rf ${dir}/tmp/zuul*
+
+    retry do_chroot ${dir} git clone ${ZUUL_URL} /tmp/zuul
     do_chroot ${dir} bash -c "cd /tmp/zuul && git checkout -b working ${ZUUL_VERSION}"
 
     # Apply temp_url_key fix
