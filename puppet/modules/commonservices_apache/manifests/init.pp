@@ -86,6 +86,14 @@ class commonservices_apache ($cauth = hiera_hash('cauth', '')) {
     source => 'puppet:///modules/commonservices_apache/menu.js',
   }
 
+  file {'/var/www/static/js/hideci.js':
+    ensure => file,
+    mode   => '0640',
+    owner  => $::httpd_user,
+    group  => $::httpd_user,
+    source => 'puppet:///modules/commonservices_apache/hideci.js',
+  }
+
   file {'/var/www/topmenu.html':
     ensure  => file,
     mode    => '0640',
