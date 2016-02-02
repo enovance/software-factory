@@ -112,4 +112,4 @@ logs:
     # Do not create a new tempurl key, but use the above defined key instead.
     # Zuul will create a random key if not set, that might break other scripts
     # using a tempurl key
-    swift_logsexport_send_tempurl_key: False
+    swift_logsexport_send_tempurl_key: 'False'
