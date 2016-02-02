@@ -28,6 +28,7 @@ from utils import GerritGitUtils
 from utils import JenkinsUtils
 from utils import copytree
 from utils import create_random_str
+from utils import logger
 
 from pysflib.sfgerrit import GerritUtils
 
@@ -83,14 +84,21 @@ class TestProjectTestsWorkflow(Base):
         for dirs in self.dirs_to_delete:
             shutil.rmtree(dirs)
 
-    def assert_reviewer_approvals(self, change_id, value):
+    def assert_reviewer_approvals(self, change_id, value, pname):
         approvals = {}
-        for _ in range(90):
+        for idx in range(90):
             approvals = self.gu.get_reviewer_approvals(change_id,
                                                        'jenkins')
             if approvals and approvals.get('Verified') == value:
                 break
             time.sleep(1)
+        if idx == 89:
+            project = self.gu.get_project(pname)
+            logger.debug("Project details: %s" % project)
+            reviews = self.gu.get_reviewers(change_id)
+            logger.debug("Reviewers %s: %s" % (change_id, str(reviews)))
+            logger.debug("assert_reviewer_approvals: get_reviewer_approvals"
+                         " timeout: %s" % str(approvals))
         self.assertEqual(value, approvals.get('Verified'))
 
     def clone_as_admin(self, pname):
@@ -215,7 +223,7 @@ class TestProjectTestsWorkflow(Base):
 
         # Check whether zuul sets verified to +1 after running the tests
         # let some time to Zuul to update the test result to Gerrit.
-        self.assert_reviewer_approvals(change_id, '+1')
+        self.assert_reviewer_approvals(change_id, '+1', pname)
 
         # review the change
         self.gu2.submit_change_note(change_id, "current", "Code-Review", "2")
@@ -245,7 +253,7 @@ class TestProjectTestsWorkflow(Base):
 
         # Check whether zuul sets verified to +2 after running the tests
         # let some time to Zuul to update the test result to Gerrit.
-        self.assert_reviewer_approvals(change_id, '+2')
+        self.assert_reviewer_approvals(change_id, '+2', pname)
 
         # verify whether zuul merged the patch
         change = self.gu.get_change('config', 'master', change_id)
@@ -325,4 +333,4 @@ class TestProjectTestsWorkflow(Base):
                 break
             time.sleep(1)
 
-        self.assert_reviewer_approvals(change_id, '+1')
+        self.assert_reviewer_approvals(change_id, '+1', pname)
