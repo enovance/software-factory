@@ -28,6 +28,7 @@ from utils import GerritGitUtils
 from utils import JenkinsUtils
 from utils import copytree
 from utils import create_random_str
+from utils import logger
 
 from pysflib.sfgerrit import GerritUtils
 
@@ -85,12 +86,15 @@ class TestProjectTestsWorkflow(Base):
 
     def assert_reviewer_approvals(self, change_id, value):
         approvals = {}
-        for _ in range(90):
+        for idx in range(90):
             approvals = self.gu.get_reviewer_approvals(change_id,
                                                        'jenkins')
             if approvals and approvals.get('Verified') == value:
                 break
             time.sleep(1)
+        if idx == 89:
+            logger.debug("assert_reviewer_approvals: get_reviewer_approvals"
+                         " timeout: %s" % str(approvals))
         self.assertEqual(value, approvals.get('Verified'))
 
     def clone_as_admin(self, pname):
