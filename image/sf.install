@@ -60,6 +60,7 @@ function install_zuul {
     done
 
     # Install zuul web virtualhost
+    rm -Rf ${dir}/var/www/zuul && mkdir -p ${dir}/var/www/zuul
     mv ${dir}/tmp/zuul/etc/status/public_html/ ${dir}/var/www/zuul
     http_fetch $JQUERY_VISIBILITY_URL ${dir}/var/www/static/js/jquery-visibility.min.js
     http_fetch $JQUERY_GRAPHITE_URL   ${dir}/var/www/static/js/jquery.graphite.js
