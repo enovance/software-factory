@@ -43,6 +43,14 @@ sudo curl -o /usr/local/bin/zuul_swift_upload.py \
     https://raw.githubusercontent.com/openstack-infra/project-config/master/jenkins/scripts/zuul_swift_upload.py
 sudo chmod +x /usr/local/bin/zuul_swift_upload.py
 
+# Fetch some tooling for the slave node
+git clone http://softwarefactory-project.io/r/software-factory --depth 1
+(
+    cp software-factory/tools/slaves/wait_for_other_jobs.py /usr/local/bin/wait_for_other_jobs.py
+    chmod +x /usr/local/bin/wait_for_other_jobs.py
+)
+rm -Rf software-factory
+
 # sync FS, otherwise there are 0-byte sized files from the yum/pip installations
 sudo sync
 sudo sync
