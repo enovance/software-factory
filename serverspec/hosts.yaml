@@ -25,14 +25,28 @@ gerrit:
   :username: root
   :hostname: gerrit
 
-jenkins:
+jenkins01:
   :roles:
     - base
     - jenkins
     - postfix
     - ntp
   :username: root
-  :hostname: jenkins
+  :hostname: jenkins01
+
+zuul:
+  :roles:
+    - base
+    - zuul
+  :username: root
+  :hostname: zuul
+
+nodepool:
+  :roles:
+    - base
+    - nodepool
+  :username: root
+  :hostname: nodepool
 
 managesf:
   :roles:

@@ -75,18 +75,14 @@ function heat_stop {
 }
 
 function clean_nodepool_tenant {
-    local temp_os_username=${OS_USERNAME}
-    export OS_USERNAME="sfnodepool";
-    export OS_TENANT_NAME="${OS_USERNAME}"
     echo "[+] Cleaning nodepool tenant"
+    openstack server delete managesf.sftests.com &> /dev/null
     for srv in $(openstack  server list -f json | awk '{ print $2 }' | tr ',' ' ' | sed 's/"//g'); do
         openstack server delete $srv
     done
-    for image in $(nova image-list | grep template | awk '{ print $2 }'); do
+    for image in $(nova image-list | grep 'template\|base_centos-default' | awk '{ print $2 }'); do
         nova image-delete $image
     done
-    export OS_USERNAME="${temp_os_username}";
-    export OS_TENANT_NAME="${OS_USERNAME}"
     checkpoint "clean nodepool tenant"
 }
 
@@ -201,6 +197,7 @@ function build_image {
         sudo rsync -a --delete puppet/hiera/ ${IMAGE_PATH}/etc/puppet/hiera/sf/
         sudo rsync -a --delete config/ansible/ ${IMAGE_PATH}/usr/local/share/sf-ansible/
         sudo rsync -a --delete config/config-repo/ ${IMAGE_PATH}/usr/local/share/sf-config-repo/
+        sudo rsync -a --delete serverspec/ ${IMAGE_PATH}/etc/serverspec/
         sudo cp -Rv config/scripts/* ${IMAGE_PATH}/usr/local/bin/
         sudo cp -Rv config/defaults/* ${IMAGE_PATH}/etc/puppet/hiera/sf/
         echo "SKIP_BUILD: direct copy of ${MANAGESF_CLONED_PATH}/ to ${IMAGE_PATH}/var/www/managesf/"
@@ -237,9 +234,14 @@ function configure_network {
     done
     [ $RETRIES -eq 40 ] && fail "Can't connect to $ip"
     echo "[+] Avoid ssh error"
+    IP_JENKINS=${ip}
+    [ "${REFARCH}" = "2nodes-jenkins" ] && IP_JENKINS=192.168.135.102
     cat << EOF > ${HOME}/.ssh/config
 Host ${SF_HOST}
     Hostname ${ip}
+    User root
+Host jenkins01.${SF_HOST}
+    Hostname ${IP_JENKINS}
     User root
 EOF
     chmod 0600 ~/.ssh/config
