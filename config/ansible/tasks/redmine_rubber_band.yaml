@@ -1,0 +1,10 @@
+- name: Check if redmine returns 404
+  command: curl -I http://redmine.{{ fqdn }}/redmine/
+  register: redmine_status
+- service: name=httpd state=restarted
+  when: redmine_status.stdout.find("404") != -1
+- name: Check if api-redmine returns 404
+  command: curl -I http://api-redmine.{{ fqdn }}:8083/redmine/
+  register: apiredmine_status
+- service: name=httpd state=restarted
+  when: apiredmine_status.stdout.find("404") != -1
