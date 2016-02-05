@@ -30,11 +30,14 @@ function update_sfconfig {
     OUTPUT=${BUILD}/hiera
     # get public ip of managesf
     local localip=$(ip route get 8.8.8.8 | awk '{ print $7 }')
-    local localalias="${DOMAIN}, mysql.${DOMAIN}, mysql, redmine.${DOMAIN}, redmine, api-redmine.${DOMAIN}, api-redmine, gerrit.${DOMAIN}, gerrit, managesf, auth.${DOMAIN}, auth, statsd.${DOMAIN}, statsd"
+    local localalias="${DOMAIN}, mysql.${DOMAIN}, redmine.${DOMAIN}, api-redmine.${DOMAIN}, gerrit.${DOMAIN}, auth.${DOMAIN}, statsd.${DOMAIN}"
+    localalias="${localalias}, zuul.${DOMAIN}, nodepool.${DOMAIN}"
+    # Add shortname for serverspec tests
+    localalias="${localalias}, mysql, redmine, gerrit, zuul, nodepool"
     if [ -n "${IP_JENKINS}" ]; then
-        local jenkins_host="  jenkins.${DOMAIN}:      {ip: ${IP_JENKINS}, host_aliases: [jenkins, nodepool.${DOMAIN}]}"
+        local jenkins_host="  jenkins01.${DOMAIN}:      {ip: ${IP_JENKINS}, host_aliases: [jenkins01], }"
     else
-        localalias="${localalias}, jenkins.${DOMAIN}, jenkins, nodepool.${DOMAIN}"
+        localalias="${localalias}, jenkins01.${DOMAIN}, jenkins01"
     fi
     cat << EOF > ${OUTPUT}/hosts.yaml
 hosts:
@@ -52,8 +55,14 @@ EOF
 [managesf]
 managesf.${DOMAIN}
 
+[zuul]
+zuul.${DOMAIN}
+
+[nodepool]
+nodepool.${DOMAIN}
+
 [jenkins]
-jenkins.${DOMAIN}
+jenkins01.${DOMAIN}
 EOF
 
     # update .ssh/config
@@ -153,17 +162,19 @@ function generate_yaml {
 }
 
 function generate_keys {
+    # Re-entrant method, need to check if file exists first before creating
     OUTPUT=${BUILD}/ssh_keys
 
     # Service key is used to allow root access from managesf to other nodes
-    ssh-keygen -N '' -f ${OUTPUT}/service_rsa > /dev/null
-    ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa > /dev/null
-    ssh-keygen -N '' -f ${OUTPUT}/gerrit_service_rsa > /dev/null
-    ssh-keygen -N '' -f ${OUTPUT}/gerrit_admin_rsa > /dev/null
+    [ -f ${OUTPUT}/service_rsa ]        || ssh-keygen -N '' -f ${OUTPUT}/service_rsa > /dev/null
+    [ -f ${OUTPUT}/jenkins_rsa ]        || ssh-keygen -N '' -f ${OUTPUT}/jenkins_rsa > /dev/null
+    [ -f ${OUTPUT}/gerrit_service_rsa ] || ssh-keygen -N '' -f ${OUTPUT}/gerrit_service_rsa > /dev/null
+    [ -f ${OUTPUT}/gerrit_admin_rsa ]   || ssh-keygen -N '' -f ${OUTPUT}/gerrit_admin_rsa > /dev/null
+
     # generating keys for cauth
     OUTPUT=${BUILD}/certs
-    openssl genrsa -out ${OUTPUT}/privkey.pem 1024
-    openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
+    [ -f ${OUTPUT}/privkey.pem ]        || openssl genrsa -out ${OUTPUT}/privkey.pem 1024
+    [ -f ${OUTPUT}/pubkey.pem ]         || openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
 }
 
 function generate_apache_cert {
@@ -188,19 +199,20 @@ EOF
 }
 
 function wait_for_ssh {
-    local ip=$1
-    echo "[sfconfig][$ip] Waiting for ssh..."
+    local host=$1
+    local host_ip=$(resolveip -s $host)
+    [ "$(resolveip -s ${host_ip})" == "managesf.${DOMAIN}" ] || echo "[sfconfig][$host] Waiting for ssh..."
     [ -d "${HOME}/.ssh" ] || mkdir -m 0700 "${HOME}/.ssh"
     while true; do
-        KEY=`ssh-keyscan -p 22 $ip`
+        KEY=$(ssh-keyscan -p 22 $host 2> /dev/null)
         if [ "$KEY" != ""  ]; then
-            ssh-keyscan $ip | grep ssh-rsa | tee -a "$HOME/.ssh/known_hosts"
-            echo "  -> $ip:22 is up!"
+            ssh-keyscan $host 2> /dev/null | grep ssh-rsa >> "$HOME/.ssh/known_hosts"
+            [ "$(resolveip -s ${host_ip})" == "managesf.${DOMAIN}" ] || echo "  -> $host:22 is up!"
             return 0
         fi
         let RETRIES=RETRIES+1
         [ "$RETRIES" == "40" ] && return 1
-        echo "  [E] ssh-keyscan on $ip:22 failed, will retry in 1 seconds (attempt $RETRIES/40)"
+        echo "  [E] ssh-keyscan on $host:22 failed, will retry in 1 seconds (attempt $RETRIES/40)"
         sleep 1
     done
 }
@@ -210,16 +222,19 @@ function puppet_apply_host {
     # Set /etc/hosts to a known state...
     grep -q localdomain /etc/hosts && echo "127.0.0.1       localhost" > /etc/hosts
     # Update local /etc/hosts
-    puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/:/etc/puppet/modules/ -e "include hosts"
+    puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/:/etc/puppet/modules/ -e "include hosts" 2>&1 \
+        | tee -a /var/log/puppet_apply.log | grep '\(Info:\|Warning:\|Error:\|Notice: Compiled\|Notice: Finished\)' \
+        | grep -v 'Info: Loading facts in'
 }
 
 function puppet_apply {
     host=$1
     manifest=$2
-    echo "[sfconfig][$host] Applying $manifest" | tee -a /var/log/puppet_apply.log
+    echo "[sfconfig][$host] Applying $manifest (full log: /var/log/puppet_apply.log)" | tee -a /var/log/puppet_apply.log
     [ "$host" == "managesf.${DOMAIN}" ] && ssh="" || ssh="ssh -tt root@$host"
     $ssh puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/:/etc/puppet/modules/ $manifest 2>&1 \
-        | tee -a /var/log/puppet_apply.log | grep '\(Info:\|Warning:\|Error:\|Notice: Compiled\|Notice: Finished\)'
+        | tee -a /var/log/puppet_apply.log | grep '\(Info:\|Warning:\|Error:\|Notice: Compiled\|Notice: Finished\)' \
+        | grep -v 'Info: Loading facts in'
     res=$?
     if [ "$res" != 2 ] && [ "$res" != 0 ]; then
         echo "[sfconfig][$host] Failed ($res) to apply $manifest"
@@ -229,6 +244,8 @@ function puppet_apply {
 
 function puppet_copy {
     host=$1
+    host_ip=$(resolveip -s $host)
+    [ "$(resolveip -s ${host_ip})" == "managesf.${DOMAIN}" ] && return 0
     echo "[sfconfig][$host] Copy puppet configuration"
     rsync -a -L --delete /etc/puppet/hiera/ ${host}:/etc/puppet/hiera/
 }
@@ -282,12 +299,12 @@ if [ "$(hostname -f)" != "managesf.${DOMAIN}" ]; then
 fi
 
 # Generate site specifics configuration
+# Make sure sf-bootstrap-data sub-directories exist
+for i in hiera ssh_keys certs; do
+    [ -d ${BUILD}/$i ] || mkdir -p ${BUILD}/$i
+done
+generate_keys
 if [ ! -f "${BUILD}/generate.done" ]; then
-    # Make sure sf-bootstrap-data sub-directories exist
-    for i in hiera ssh_keys certs; do
-        [ -d ${BUILD}/$i ] || mkdir -p ${BUILD}/$i
-    done
-    generate_keys
     generate_apache_cert
     generate_yaml
     touch "${BUILD}/generate.done"
@@ -299,8 +316,11 @@ fi
 
 update_sfconfig
 puppet_apply_host
-wait_for_ssh "managesf.${DOMAIN}"
-wait_for_ssh "jenkins.${DOMAIN}"
+HOSTS=$(grep "\.${DOMAIN}" /etc/ansible/hosts | sort | uniq)
+for host in $HOSTS; do
+    wait_for_ssh $host
+    puppet_copy $host
+done
 echo "[sfconfig] Boostrapping $REFARCH"
 # Apply puppet stuff with good old shell scrips
 case "${REFARCH}" in
@@ -312,11 +332,9 @@ case "${REFARCH}" in
             echo "[sfconfig] Please select another IP_JENKINS than 127.0.0.1 for this REFARCH"
             exit 1
         }
-        puppet_copy jenkins.${DOMAIN}
-
         # Run puppet apply
         puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
-        puppet_apply "jenkins.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
+        puppet_apply "jenkins01.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
         ;;
     *)
         echo "Unknown refarch ${REFARCH}"
@@ -326,10 +344,11 @@ esac
 
 echo "[sfconfig] Ansible configuration"
 cd /usr/local/share/sf-ansible
-[ -d group_vars ] || {
-    mkdir group_vars
-    ln -s /etc/puppet/hiera/sf/sfconfig.yaml group_vars/all.yaml
-}
+[ -d group_vars ]               || mkdir group_vars
+chmod 700 group_vars
+rm -f group_vars/*
+cat /etc/puppet/hiera/sf/* > group_vars/all
+
 ansible-playbook sfmain.yaml || {
     echo "[sfconfig] Ansible playbook failed"
     exit 1

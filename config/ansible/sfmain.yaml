@@ -5,8 +5,18 @@
   tasks:
     - include: tasks/update_knownhosts.yaml
     - include: tasks/create_config_repository.yaml
+    - include: tasks/managesf_authorized_keys.yaml
 - hosts: jenkins
   gather_facts: no
   tasks:
-    - include: tasks/jenkins_kick.yaml
-    - include: tasks/config_nodepool.yaml
+    - include: tasks/jenkins.yaml
+    - include: tasks/jenkins_update.yaml
+- hosts: nodepool
+  gather_facts: no
+  tasks:
+    - include: tasks/nodepool_update.yaml
+- hosts: zuul
+  gather_facts: no
+  tasks:
+    - include: tasks/zuul.yaml
+    - include: tasks/zuul_update.yaml
