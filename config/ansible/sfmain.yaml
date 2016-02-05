@@ -4,6 +4,14 @@
   tasks:
     - template: src=templates/global_known_hosts.j2 dest=/etc/ssh/ssh_known_hosts owner=root group=root mode=0644
 
+# Redmine rubber-band
+- hosts: redmine
+  tasks:
+    - include: tasks/redmine_rubber_band.yaml
+    - include: tasks/redmine_rubber_band.yaml
+    - include: tasks/redmine_rubber_band.yaml
+    - include: tasks/redmine_rubber_band.yaml
+
 - hosts: managesf
   tasks:
     - include: tasks/create_config_repository.yaml
