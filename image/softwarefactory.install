@@ -224,6 +224,9 @@ function install_jenkins {
     # Jenkins AnsiColor plugin
     http_fetch $JENKINS_ANSI_COLOR_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_ANSI_COLOR_PLUGIN_URL)
 
+    # Jenkins IRC plugin
+    http_fetch $JENKINS_IRC_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_IRC_PLUGIN_URL)
+
     # make sure jenkins is disabled by default
     rm -Rf ${dir}/etc/rc.d/*/*jenkins*
 }
