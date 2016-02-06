@@ -45,6 +45,26 @@ hosts:
   managesf.${DOMAIN}:     {ip: ${localip}, host_aliases: [$localalias]}
 EOF
     [ -n "${jenkins_host}" ] && echo "${jenkins_host}" >> ${OUTPUT}/hosts.yaml
+
+    if [ "${REFARCH}" == "distributed" ]; then
+        # Use a static inventory
+        cat << EOF > ${OUTPUT}/hosts.yaml
+hosts:
+  localhost:              {ip: 127.0.0.1}
+  managesf.${DOMAIN}:     {ip: 192.168.135.101, host_aliases: [${DOMAIN}, auth.${DOMAIN}]}
+  jenkins01.${DOMAIN}:    {ip: 192.168.135.102, host_aliases: [jenkins01]}
+  zuul.${DOMAIN}:         {ip: 192.168.135.104, host_aliases: [zuul]}
+  nodepool.${DOMAIN}:     {ip: 192.168.135.105, host_aliases: [nodepool]}
+  gerrit.${DOMAIN}:       {ip: 192.168.135.106, host_aliases: [gerrit]}
+  redmine.${DOMAIN}:      {ip: 192.168.135.107, host_aliases: [redmine, api-redmine.${DOMAIN}]}
+  mysql.${DOMAIN}:        {ip: 192.168.135.108, host_aliases: [mysql]}
+  statsd.${DOMAIN}:       {ip: 192.168.135.109, host_aliases: [statsd]}
+EOF
+    fi
+    git config --global user.name "SF initial configurator"
+    git config --global user.email admin@$DOMAIN
+    git config --global gitreview.username "admin"
+
     hieraedit.py --yaml ${OUTPUT}/sfconfig.yaml fqdn       "${DOMAIN}"
     hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   refarch    "${REFARCH}"
     hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   ip_jenkins "${IP_JENKINS}"
@@ -63,13 +83,26 @@ nodepool.${DOMAIN}
 
 [jenkins]
 jenkins01.${DOMAIN}
+
+[gerrit]
+gerrit.${DOMAIN}
+
+[redmine]
+redmine.${DOMAIN}
+
+[mysql]
+mysql.${DOMAIN}
+
+[statsd]
+statsd.${DOMAIN}
 EOF
 
     # update .ssh/config
     cat << EOF > /root/.ssh/config
 Host ${DOMAIN}
     User admin
-    IdentityFile /root/gerrit_admin_rsa
+    Port 29418
+    IdentityFile /root/sf-bootstrap-data/ssh_keys/gerrit_admin_rsa
 EOF
 }
 
@@ -258,8 +291,8 @@ while getopts ":a:i:h" opt; do
     case $opt in
         a)
             REFARCH=$OPTARG
-            [ $REFARCH != "1node-allinone" -a $REFARCH != "2nodes-jenkins" ] && {
-                    echo "Available REFARCH are: 1node-allinone or 2nodes-jenkins"
+            [ $REFARCH != "1node-allinone" -a $REFARCH != "2nodes-jenkins" -a $REFARCH != "distributed" ] && {
+                    echo "Available REFARCH are: 1node-allinone or 2nodes-jenkins or distributed"
                     exit 1
             }
             ;;
@@ -316,6 +349,7 @@ fi
 
 update_sfconfig
 puppet_apply_host
+
 HOSTS=$(grep "\.${DOMAIN}" /etc/ansible/hosts | sort | uniq)
 for host in $HOSTS; do
     wait_for_ssh $host
@@ -336,6 +370,11 @@ case "${REFARCH}" in
         puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
         puppet_apply "jenkins01.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
         ;;
+    "distributed")
+        for node in mysql statsd gerrit redmine managesf jenkins01 zuul nodepool; do
+            puppet_apply "${node}.${DOMAIN}" /etc/puppet/environments/sf/manifests/node-${node}.pp
+        done
+        ;;
     *)
         echo "Unknown refarch ${REFARCH}"
         exit 1
@@ -343,6 +382,7 @@ case "${REFARCH}" in
 esac
 
 echo "[sfconfig] Ansible configuration"
+[ -d /var/lib/ansible ] || mkdir -p /var/lib/ansible
 cd /usr/local/share/sf-ansible
 [ -d group_vars ]               || mkdir group_vars
 chmod 700 group_vars

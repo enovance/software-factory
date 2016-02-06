@@ -409,7 +409,7 @@ function reset_etc_hosts_dns {
         ip=$2
         grep -q " ${host}" /etc/hosts || {
             # adds to /etc/hosts if not already defined
-            echo "${ip} ${host}" | sudo tee -a /etc/hosts
+            echo "${ip} ${host} mysql.${host}" | sudo tee -a /etc/hosts
         } && {
             # else sed in-place
             sudo sed -i "s/^.* ${host}/${ip} ${host}/" /etc/hosts

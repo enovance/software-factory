@@ -98,22 +98,6 @@ class managesf ($gerrit = hiera('gerrit'), $hosts = hiera('hosts'), $cauth = hie
     require => File['/var/www/managesf/'],
   }
 
-  exec {'update_jenkins_knownhost':
-    command   => "/usr/bin/ssh-keyscan ${jenkins_host} >> /usr/share/httpd/.ssh/known_hosts",
-    logoutput => true,
-    user      => $::httpd_user,
-    require   => File['/usr/share/httpd/.ssh'],
-    unless    => "/usr/bin/grep '${jenkins_host} ' /usr/share/httpd/.ssh/known_hosts",
-  }
-
-  exec {'update_gerrithost_knownhost':
-    command   => "/usr/bin/ssh-keyscan gerrit.${fqdn} >> /usr/share/httpd/.ssh/known_hosts",
-    logoutput => true,
-    user      => $::httpd_user,
-    require   => File['/usr/share/httpd/.ssh'],
-    unless    => "/usr/bin/grep 'gerrit.${fqdn} ' /usr/share/httpd/.ssh/known_hosts",
-  }
-
   file { '/var/www/managesf/sshconfig':
     ensure  => directory,
     owner   => $::httpd_user,
