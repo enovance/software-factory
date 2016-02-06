@@ -1,5 +1,0 @@
----
-- name: "Configure managesf access to gerrit"
-  command: ssh -o StrictHostKeyChecking=no -p 29418 {{ fqdn }}
-  register: gerrit
-  failed_when: gerrit.stderr.find('Welcome to Gerrit Code Review') == -1
