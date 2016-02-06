@@ -1,5 +1,10 @@
 ---
 # This playbook configure sf services
+- hosts: redmine
+  gather_facts: no
+  tasks:
+    - service: name=httpd state=restarted
+
 - hosts: managesf
   gather_facts: no
   tasks:

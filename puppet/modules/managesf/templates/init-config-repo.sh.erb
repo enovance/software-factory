@@ -32,7 +32,7 @@ auth=$admin:$admin_http_password
 
 admin_email="admin@<%= @fqdn %>"
 
-gerrit_ssh_key="/root/gerrit_admin_rsa"
+gerrit_ssh_key="/root/sf-bootstrap-data/ssh_keys/gerrit_admin_rsa"
 jenkins_kick_script="/usr/local/jenkins/slave_scripts/kick.sh"
 
 if [ "$upgrade" = "false" ]; then
@@ -55,7 +55,7 @@ export GIT_SSH="/root/ssh_wrapper.sh"
 export GIT_COMMITTER_NAME=$admin
 export GIT_COMMITTER_EMAIL=$admin_email
 CONF_TMP=$(mktemp -d)
-git clone ssh://$admin@$gh/config ${CONF_TMP}
+git clone ssh://admin@<%= @fqdn %>/config ${CONF_TMP}
 
 if [ "$upgrade" = "false" ]; then
     if [ -d "${CONF_TMP}/jobs" ]; then
