@@ -18,7 +18,7 @@
     </filesystem>
     <interface type='network'>
       <source network='sf-net'/>
-      <target dev='sf-vnet02'/>
+      <target dev='sf-vnet102'/>
       <mac address="00:11:22:33:44:56"/>
       <ip address="192.168.135.102" netmask="255.255.255.0" />
     </interface>

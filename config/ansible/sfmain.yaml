@@ -1,22 +1,34 @@
 ---
-# This playbook configure sf services
+- hosts: all
+  tasks:
+    - template: src=templates/global_known_hosts.j2 dest=/etc/ssh/ssh_known_hosts owner=root group=root mode=0644
+
+# Redmine rubber-band
+- hosts: redmine
+  gather_facts: no
+  tasks:
+    - include: tasks/redmine_rubber_band.yaml
+    - include: tasks/redmine_rubber_band.yaml
+    - include: tasks/redmine_rubber_band.yaml
+    - include: tasks/redmine_rubber_band.yaml
+
 - hosts: managesf
   gather_facts: no
   tasks:
-    - include: tasks/update_knownhosts.yaml
     - include: tasks/create_config_repository.yaml
     - include: tasks/managesf_authorized_keys.yaml
+
 - hosts: jenkins
   gather_facts: no
   tasks:
-    - include: tasks/jenkins.yaml
     - include: tasks/jenkins_update.yaml
+
 - hosts: nodepool
   gather_facts: no
   tasks:
     - include: tasks/nodepool_update.yaml
+
 - hosts: zuul
   gather_facts: no
   tasks:
-    - include: tasks/zuul.yaml
     - include: tasks/zuul_update.yaml
