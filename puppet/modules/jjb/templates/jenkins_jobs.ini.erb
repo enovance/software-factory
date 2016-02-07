@@ -1,4 +1,5 @@
 [jenkins]
 user=<%= @jenkins_username %>
 password=<%= @jenkins_password %>
-url=<%= @url['jenkins_jjb_url'] %>
+# JJB update are ran on each jenkins, thus the "localhost" url
+url=http://localhost:8080/jenkins/

@@ -130,6 +130,7 @@ def stop():
 distributed_nodes = [
     # Node name, ip_suffix
     ("jenkins", 102),
+    ("jenkins2", 103),
     ("zuul", 104),
     ("nodepool", 105),
     ("gerrit", 106),

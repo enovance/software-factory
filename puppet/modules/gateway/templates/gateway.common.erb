@@ -72,6 +72,12 @@
         ProxyPass /api/ <%= @url["gerrit_url"] %> nocanon
         ProxyPassReverse /api/ <%= @url["gerrit_url"] %>
 
+        <% if @refarch == "distributed" %>
+        ProxyPass /jenkins01/ <%= @url["jenkins_url"] %> nocanon retry=0
+        ProxyPassReverse /jenkins01/ <%= @url["jenkins_url"] %>
+        ProxyPass /jenkins02/ <%= @url["jenkins2_url"] %> nocanon retry=0
+        ProxyPassReverse /jenkins02/ <%= @url["jenkins2_url"] %>
+        <% end %>
         ProxyPass /jenkins/ <%= @url["jenkins_url"] %> nocanon retry=0
         ProxyPassReverse /jenkins/ <%= @url["jenkins_url"] %>
 
