@@ -28,6 +28,7 @@ class gateway ($cauth = hiera_hash('cauth', '')) {
   $theme = hiera('theme')
   $sf_version = hiera('sf_version')
   $services = hiera('services')
+  $refarch = hiera('refarch')
 
   file {'gateway_crt':
     ensure  => file,
