@@ -23,7 +23,12 @@
                 <li><a href="/r/" target="_top">Gerrit</a></li>
             <% end %>
             <% if @services.include?('jenkins') %>
+                <% if @refarch == "distributed" %>
+                <li><a href="/jenkins/" target="_top">Jenkins01</a></li>
+                <li><a href="/jenkins02/" target="_top">Jenkins02</a></li>
+                <% else %>
                 <li><a href="/jenkins/" target="_top">Jenkins</a></li>
+                <% end %>
             <% end %>
                 <li><a href="/zuul/" target="_top">Zuul</a></li>
             <% if not @theme["topmenu_hide_redmine"] %>

@@ -53,6 +53,7 @@ hosts:
   localhost:              {ip: 127.0.0.1}
   managesf.${DOMAIN}:     {ip: 192.168.135.101, host_aliases: [${DOMAIN}, auth.${DOMAIN}]}
   jenkins.${DOMAIN}:      {ip: 192.168.135.102, host_aliases: [jenkins]}
+  jenkins2.${DOMAIN}:     {ip: 192.168.135.103, host_aliases: [jenkins02]}
   zuul.${DOMAIN}:         {ip: 192.168.135.104, host_aliases: [zuul]}
   nodepool.${DOMAIN}:     {ip: 192.168.135.105, host_aliases: [nodepool]}
   gerrit.${DOMAIN}:       {ip: 192.168.135.106, host_aliases: [gerrit]}
@@ -82,6 +83,7 @@ gerrit.${DOMAIN}
 
 [jenkins]
 jenkins.${DOMAIN}
+jenkins2.${DOMAIN}
 
 [zuul]
 zuul.${DOMAIN}
@@ -98,6 +100,9 @@ mysql.${DOMAIN}
 [statsd]
 statsd.${DOMAIN}
 EOF
+
+    # If not distributed arch, remove jenkins2 from inventory
+    [ "${REFARCH}" != "distributed" ] && sed -i /etc/ansible/hosts -e 's/jenkins2.*//'
 
     # update .ssh/config
     cat << EOF > /root/.ssh/config
@@ -391,7 +396,7 @@ case "${REFARCH}" in
         puppet_apply "jenkins.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
         ;;
     "distributed")
-        for node in mysql statsd gerrit redmine managesf jenkins zuul nodepool; do
+        for node in mysql statsd gerrit redmine managesf jenkins jenkins2 zuul nodepool; do
             puppet_apply "${node}.${DOMAIN}" /etc/puppet/environments/sf/manifests/node-${node}.pp
         done
         ;;

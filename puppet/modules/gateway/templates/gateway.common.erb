@@ -111,6 +111,10 @@
 
         ProxyPass /jenkins/ <%= @url["jenkins_url"] %> nocanon retry=0
         ProxyPassReverse /jenkins/ <%= @url["jenkins_url"] %>
+        <% if @refarch == "distributed" %>
+        ProxyPass /jenkins02/ <%= @url["jenkins2_url"] %> nocanon retry=0
+        ProxyPassReverse /jenkins02/ <%= @url["jenkins2_url"] %>
+        <% end %>
 
         ProxyPass /zuul/ <%= @url["zuul_url"] %> nocanon retry=0
         ProxyPassReverse /zuul/ <%= @url["zuul_url"] %>
