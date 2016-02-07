@@ -22,7 +22,6 @@ class managesf ($gerrit = hiera('gerrit'), $hosts = hiera('hosts'), $cauth = hie
   $issues_tracker_api_key = hiera('creds_issues_tracker_api_key')
   $issues_tracker_api_url = $url["api_redmine_url"]
   $gerrit_host = "gerrit.${fqdn}"
-  $jenkins_host = "jenkins01.${fqdn}"
   $gerrit_admin_rsa = hiera('gerrit_admin_rsa')
   $service_rsa = hiera('service_rsa')
   $gerrit_mysql_host = "mysql.${fqdn}"

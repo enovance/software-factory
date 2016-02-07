@@ -20,7 +20,7 @@ class nodepool {
   $fqdn = hiera('fqdn')
   $url = hiera('url')
 
-  $jenkins_host = "jenkins01.${fqdn}"
+  $refarch = hiera('refarch')
   $jenkins_password = hiera('creds_jenkins_user_password')
   $nodepool_mysql_address = "mysql.${fqdn}"
   $nodepool_sql_password = hiera('creds_nodepool_sql_pwd')

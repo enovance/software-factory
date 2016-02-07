@@ -20,7 +20,12 @@
             <ul class="nav navbar-nav">
                 <li><a href="/dashboard/" target="_top">Dashboard</a></li>
                 <li><a href="/r/" target="_top">Gerrit</a></li>
+                <% if @refarch == "distributed" %>
+                <li><a href="/jenkins01/" target="_top">Jenkins01</a></li>
+                <li><a href="/jenkins02/" target="_top">Jenkins02</a></li>
+                <% else %>
                 <li><a href="/jenkins/" target="_top">Jenkins</a></li>
+                <% end %>
                 <li><a href="/zuul/" target="_top">Zuul</a></li>
                 <% if not @theme["topmenu_hide_redmine"] %>
                 <li><a href="/redmine/" target="_top">Redmine</a></li>

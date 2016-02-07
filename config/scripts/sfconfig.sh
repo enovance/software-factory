@@ -53,6 +53,7 @@ hosts:
   localhost:              {ip: 127.0.0.1}
   managesf.${DOMAIN}:     {ip: 192.168.135.101, host_aliases: [${DOMAIN}, auth.${DOMAIN}]}
   jenkins01.${DOMAIN}:    {ip: 192.168.135.102, host_aliases: [jenkins01]}
+  jenkins02.${DOMAIN}:    {ip: 192.168.135.103, host_aliases: [jenkins02]}
   zuul.${DOMAIN}:         {ip: 192.168.135.104, host_aliases: [zuul]}
   nodepool.${DOMAIN}:     {ip: 192.168.135.105, host_aliases: [nodepool]}
   gerrit.${DOMAIN}:       {ip: 192.168.135.106, host_aliases: [gerrit]}
@@ -83,6 +84,7 @@ nodepool.${DOMAIN}
 
 [jenkins]
 jenkins01.${DOMAIN}
+jenkins02.${DOMAIN}
 
 [gerrit]
 gerrit.${DOMAIN}
@@ -189,6 +191,7 @@ function generate_yaml {
     ln -sf ${OUTPUT}/sfconfig.yaml /etc/puppet/hiera/sf/sfconfig.yaml
     ln -sf ${OUTPUT}/sfcreds.yaml /etc/puppet/hiera/sf/sfcreds.yaml
     ln -sf ${OUTPUT}/hosts.yaml /etc/puppet/hiera/sf/hosts.yaml
+    ln -sf ${OUTPUT}/sfarch.yaml /etc/puppet/hiera/sf/sfarch.yaml
 
     chown -R root:puppet /etc/puppet/hiera/sf
     chmod -R 0750 /etc/puppet/hiera/sf
@@ -371,7 +374,7 @@ case "${REFARCH}" in
         puppet_apply "jenkins01.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
         ;;
     "distributed")
-        for node in mysql statsd gerrit redmine managesf jenkins01 zuul nodepool; do
+        for node in mysql statsd gerrit redmine managesf jenkins01 jenkins02 zuul nodepool; do
             puppet_apply "${node}.${DOMAIN}" /etc/puppet/environments/sf/manifests/node-${node}.pp
         done
         ;;
