@@ -1,0 +1,8 @@
+- name: Ensure Elasticsearch listen to all addresses
+  lineinfile: dest=/etc/elasticsearch/elasticsearch.yml
+              regexp="^network.host{{':'}} 0.0.0.0"
+              insertafter="^# network.host:"
+              line="network.host{{':'}} elasticsearch.{{ fqdn }}"
+
+- name: Ensure elasticsearch is started
+  service: name=elasticsearch state=started enabled=yes
