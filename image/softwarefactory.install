@@ -127,6 +127,20 @@ EOF
     chmod 0400 ${target}/etc/sysctl.conf
 }
 
+install_elasticsearch() {
+    [ -f "${dir}/etc/yum.repos.d/elasticsearch.repo" ] || cat <<EOF > ${dir}/etc/yum.repos.d/elasticsearch.repo
+[elasticsearch-2.x]
+name=Elasticsearch repository for 2.x packages
+baseurl=http://packages.elastic.co/elasticsearch/2.x/centos
+gpgcheck=1
+gpgkey=http://packages.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+EOF
+    do_chroot ${dir} rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+
+    install_packages ${dir} elasticsearch
+}
+
 install_sf_packages() {
     install_packages ${dir} $CENTOS_PKGS $BUILD_PKGS
     checkpoint "centos rpms installed"
@@ -465,6 +479,8 @@ if [ "$STEP" == 1 ]; then
     checkpoint "redmine installed"
     install_gerrit
     checkpoint "gerrit installed"
+    install_elasticsearch
+    checkpoint "elasticsearch installed"
     install_pygerrit
     install_fonts
     install_edeploy
