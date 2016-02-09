@@ -1,0 +1,10 @@
+[dashboard]
+title = Software Factory
+description = Software Factory and related projects
+foreach = (status:open label:Verified NOT label:Code-Review-2 NOT label:Workflow-1)
+[section "Starred"]
+query = is:starred
+[section "For me"]
+query = reviewer:self
+[section "Related reviews"]
+query = (project:software-factory OR project:cauth OR project:managesf OR project:pysflib OR project:config OR projects:SF OR project:rpmfactory)
