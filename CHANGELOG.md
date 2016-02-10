@@ -1,3 +1,22 @@
+2.1.6-7  2016-02-10
+===================
+
+This is a minor release to fix incorrect 2.1.5 build release (the .tgz file is actually from 2.1.4)
+
+
+New Features
+------------
+
+- Use ansible to update known_hosts
+
+
+Known Issues
+------------
+
+- Fix publish script to remove previous edeploy image
+- Fix gearman service to zuul.fqdn
+
+
 2.1.5-23  2016-02-06
 ====================
 
