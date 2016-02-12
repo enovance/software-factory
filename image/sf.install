@@ -2,9 +2,7 @@
 
 # STEP2 only extra-packages (to avoid cache rebuild)
 STAGING_PKGS=""
-
-# Without this, managesf fails with ResourceNotFoundError: Requested resource doesn't exist
-STAGING_PIP=""
+STAGING_PIP="uritemplate"
 
 # Latest version of nodepool/zuul as of Jan24 2016
 NODEPOOL_VERSION=1fa3ee77791f7c5dd4faa38a2a8012662f6e88a8
