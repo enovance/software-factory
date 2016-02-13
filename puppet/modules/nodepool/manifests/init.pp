@@ -69,11 +69,6 @@ class nodepool {
     content => template('graphite/statsd.environment.erb'),
   }
 
-  file {'/opt/nodepool':
-    ensure => directory,
-    owner  => 'nodepool',
-  }
-
   file { '/etc/nodepool':
     ensure => directory,
     owner  => 'nodepool',
