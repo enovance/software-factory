@@ -44,6 +44,9 @@ node default {
   include ::graphite
   include ::grafana
 
+  # gerritbot
+  include ::gerritbot
+
   class {'::nodepool': stage => last }
   class {'::zuul': stage => last }
 }
