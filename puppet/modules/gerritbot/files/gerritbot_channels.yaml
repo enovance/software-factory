@@ -1,0 +1,9 @@
+channelname:
+    events:
+      - patchset-created
+      - change-merged
+      - comment-added
+    projects:
+      - myproject
+    branches:
+      - master

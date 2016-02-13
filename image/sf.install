@@ -71,6 +71,20 @@ function install_zuul {
     rm -Rf ${dir}/tmp/zuul*
 }
 
+function install_gerritbot {
+    # Checkout VERSION in /tmp
+    rm -Rf ${dir}/tmp/gerritbot
+
+    retry do_chroot ${dir} git clone --depth 1 ${GERRITBOT_URL} /tmp/gerritbot
+    do_chroot ${dir} bash -c "cd /tmp/gerritbot && git checkout -b working ${GERRITBOT_VERSION}"
+
+    # Install
+    do_chroot ${dir} bash -c "cd /tmp/gerritbot && python setup.py install"
+
+    # Cleanup left-overs
+    rm -Rf ${dir}/tmp/gerritbot
+}
+
 function install_sf {
     set -e
     test -n "${CAUTH_CLONED_PATH}"
@@ -100,6 +114,8 @@ function install_sf {
     checkpoint "zuul installed"
     install_nodepool
     checkpoint "nodepool installed"
+    install_gerritbot
+    checkpoint "gerritbot installed"
 
     # Disable postfix and remove configuration to reduce puppet noise
     do_chroot ${dir} systemctl disable postfix

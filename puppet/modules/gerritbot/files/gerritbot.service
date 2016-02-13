@@ -1,0 +1,12 @@
+[Unit]
+Description=Gerrit Service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/gerritbot /etc/gerritbot.conf
+
+[Install]
+WantedBy=multi-user.target

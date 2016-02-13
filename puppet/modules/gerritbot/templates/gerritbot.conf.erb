@@ -1,0 +1,14 @@
+[ircbot]
+nick=sftestbot
+pass=password
+server=irc.freenode.net
+port=6667
+channel_config=/etc/gerritbot_channels.yaml
+pid=/var/run/gerritbot.pid
+log_config=/etc/gerritbot_logging.config
+
+[gerrit]
+user=jenkins
+key=/var/lib/jenkins/.ssh/id_rsa
+host=sftests.com
+port=29418
