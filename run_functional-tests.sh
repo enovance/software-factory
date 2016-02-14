@@ -34,6 +34,12 @@ if [ ${TEST_TYPE} == "openstack" ] && [ ! -n "${OS_AUTH_URL}" ]; then
     echo "Source openrc first"
     exit 1
 fi
+if [ "${REFARCH}" == "distributed" ] && \
+    [ $(df --output=avail -B G /var/lib/sf | sed 's/[^0-9]*//g') -lt 20 ]; then
+    echo "To deploy a distributed architecture, you need at least 20GB " \
+        "of available space in /var/lib/sf."
+    exit 1
+fi
 
 ###############
 # Preparation #
