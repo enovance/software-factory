@@ -45,6 +45,23 @@ hosts:
   managesf.${DOMAIN}:     {ip: ${localip}, host_aliases: [$localalias]}
 EOF
     [ -n "${jenkins_host}" ] && echo "${jenkins_host}" >> ${OUTPUT}/hosts.yaml
+
+    if [ "${REFARCH}" == "distributed" ]; then
+        # Use a static inventory
+        cat << EOF > ${OUTPUT}/hosts.yaml
+hosts:
+  localhost:              {ip: 127.0.0.1}
+  managesf.${DOMAIN}:     {ip: 192.168.135.101, host_aliases: [${DOMAIN}, auth.${DOMAIN}]}
+  jenkins.${DOMAIN}:      {ip: 192.168.135.102, host_aliases: [jenkins]}
+  zuul.${DOMAIN}:         {ip: 192.168.135.104, host_aliases: [zuul]}
+  nodepool.${DOMAIN}:     {ip: 192.168.135.105, host_aliases: [nodepool]}
+  gerrit.${DOMAIN}:       {ip: 192.168.135.106, host_aliases: [gerrit]}
+  redmine.${DOMAIN}:      {ip: 192.168.135.107, host_aliases: [redmine, api-redmine.${DOMAIN}]}
+  mysql.${DOMAIN}:        {ip: 192.168.135.108, host_aliases: [mysql]}
+  statsd.${DOMAIN}:       {ip: 192.168.135.109, host_aliases: [statsd]}
+EOF
+    fi
+
     hieraedit.py --yaml ${OUTPUT}/sfconfig.yaml fqdn       "${DOMAIN}"
     hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   refarch    "${REFARCH}"
     hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   ip_jenkins "${IP_JENKINS}"
@@ -291,8 +308,8 @@ while getopts ":a:i:h" opt; do
     case $opt in
         a)
             REFARCH=$OPTARG
-            [ $REFARCH != "1node-allinone" -a $REFARCH != "2nodes-jenkins" ] && {
-                    echo "Available REFARCH are: 1node-allinone or 2nodes-jenkins"
+            [ $REFARCH != "1node-allinone" -a $REFARCH != "2nodes-jenkins" -a $REFARCH != "distributed" ] && {
+                    echo "Available REFARCH are: 1node-allinone or 2nodes-jenkins or distributed"
                     exit 1
             }
             ;;
@@ -373,6 +390,11 @@ case "${REFARCH}" in
         # Run puppet apply
         puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
         puppet_apply "jenkins.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
+        ;;
+    "distributed")
+        for node in mysql statsd gerrit redmine managesf jenkins zuul nodepool; do
+            puppet_apply "${node}.${DOMAIN}" /etc/puppet/environments/sf/manifests/node-${node}.pp
+        done
         ;;
     *)
         echo "Unknown refarch ${REFARCH}"

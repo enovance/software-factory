@@ -1,0 +1,4 @@
+---
+features:
+  - A new 'distributed' refarch to run functional test
+    using 8 LXC instances.
