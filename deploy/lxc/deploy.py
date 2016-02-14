@@ -127,11 +127,26 @@ def stop():
         execute(['machinectl', 'terminate', machine.split()[0]], silent=True)
 
 
+distributed_nodes = [
+    # Node name, ip_suffix
+    ("jenkins", 102),
+    ("zuul", 104),
+    ("nodepool", 105),
+    ("gerrit", 106),
+    ("redmine", 107),
+    ("mysql", 108),
+    ("statsd", 109),
+]
+
+
 def init(base):
     print "[deploy] Init"
     prepare_role(base, "managesf", "192.168.135.101")
     if args.refarch == "2nodes-jenkins":
         prepare_role(base, "jenkins",  "192.168.135.102")
+    elif args.refarch == "distributed":
+        for node, suffix in distributed_nodes:
+            prepare_role(base, node,  "192.168.135.%d" % suffix)
 
 
 def start():
@@ -143,6 +158,17 @@ def start():
     virsh(["create", "libvirt-managesf.xml"])
     if args.refarch == "2nodes-jenkins":
         virsh(["create", "libvirt-jenkins.xml"])
+    elif args.refarch == "distributed":
+        for node, suffix in distributed_nodes:
+            open("libvirt-distributed-%s.xml" % node, "w").write(
+                open("libvirt-jenkins.xml").read().replace(
+                    # Replace node name
+                    "jenkins", node).replace(
+                    # Replace ip
+                    "102", str(suffix)).replace(
+                    # Replace mac addr
+                    "56", str(suffix - 100)))
+            virsh(["create", "libvirt-distributed-%s.xml" % node])
     port_redirection("up")
     virsh(["list"])
 
@@ -162,7 +188,7 @@ parser.add_argument("--domain", default="sftests.com")
 parser.add_argument("--version")
 parser.add_argument("--workspace", default="/var/lib/sf")
 parser.add_argument("--refarch", choices=[
-    "1node-allinone", "2nodes-jenkins"],
+    "1node-allinone", "2nodes-jenkins", "distributed"],
     default="1node-allinone")
 parser.add_argument("action", choices=[
     "start", "stop", "restart", "init", "destroy"])
