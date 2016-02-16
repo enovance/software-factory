@@ -1,3 +1,20 @@
+2.1.7-3  2016-02-16
+===================
+
+Known Issues
+------------
+
+- Remove redmine base_root_url to fix random 404
+- Pin github3.py to avoid missing requirement error
+
+
+Security Issues
+---------------
+
+- Rebuild image to include CVE-2015-7547 fix
+
+
+
 2.1.6-8  2016-02-10
 ===================
 
@@ -16,6 +33,7 @@ Known Issues
 - Fix publish script to remove previous edeploy image
 - Fix gearman service to zuul.fqdn
 - Include zuul memory leak fix, see https://review.openstack.org/275483
+
 
 
 2.1.5-23  2016-02-06
@@ -66,6 +84,7 @@ Other Notes
 
 - Prevent pip to upgrade to pip-8
 - Openstack integration tests now only need one tenant
+
 
 
 # Legacy Change Log
