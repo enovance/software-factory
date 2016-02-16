@@ -61,6 +61,9 @@ parser.add_argument('--eval', action='store_const', const=True,
                     help='Eval the key value before store')
 parser.add_argument('--append', action='store_const', const=True,
                     help='Append value to key list instead of replace')
+parser.add_argument('--delete', dest='subkey',
+                    help='Delete neested dict from list if subkey match'
+                         ' the value')
 parser.add_argument('key', help='the key')
 parser.add_argument('value', help='the value', nargs='?')
 parser.add_argument('-f', dest='file', help='file to read in as value')
@@ -74,13 +77,18 @@ try:
 except ValueError:
     pass
 
+
 changed = False
 if args.value:
     if args.eval:
         value = eval(args.value)
     else:
         value = args.value
-    if args.append:
+    if args.subkey:
+        data[args.key] = [elm for elm in data[args.key]
+                          if isinstance(elm, dict)
+                          and elm[args.subkey] != args.value]
+    elif args.append:
         if isinstance(args.key, int):
             data.append(value)
         else:
