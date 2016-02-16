@@ -1,0 +1,6 @@
+---
+issues:
+  - Remove redmine base_root_url to fix random 404
+  - Pin github3.py to avoid missing requirement error
+security:
+  - Rebuild image to include CVE-2015-7547 fix
