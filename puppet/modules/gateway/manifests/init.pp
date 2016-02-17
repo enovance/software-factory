@@ -66,6 +66,15 @@ class gateway ($cauth = hiera_hash('cauth', '')) {
     replace => false,
   }
 
+  file {'/etc/httpd/pages_whitelist.txt':
+    ensure  => file,
+    mode    => '0640',
+    owner   => $::httpd_user,
+    group   => $::httpd_user,
+    content => "sftests.com ok",
+    replace => false,
+  }
+
   file {'gateway_conf':
     ensure  => file,
     path    => '/etc/httpd/conf.d/gateway.conf',
