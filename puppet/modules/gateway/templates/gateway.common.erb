@@ -193,10 +193,16 @@
         RequestHeader set Authorization "Basic %{B64}e"
     </LocationMatch>
 
+    RewriteMap whitelist "txt:/etc/httpd/pages_whitelist.txt"
     RewriteMap path2content "txt:/etc/httpd/pages.txt"
     <LocationMatch "^/pages/((?!404.*).)+">
         RewriteEngine On
-        RewriteRule "/pages/([a-zA-Z1-9]*)/(.*$)" "${path2content:$1|<%= @url["gateway_url"] %>/pages/404}/$2" [P]
+        RewriteRule "/pages/([a-zA-Z1-9]*)/(.*$)" "${path2content:$1|<%= @url["gateway_url"] %>/pages/404}/$2" [DPI]
+        RewriteRule "^(.*)://([a-zA-Z0-9\-\.]+)/(.*)$" "$1://$2/$3" [E=host:$2,DPI]
+        RewriteRule "^<%= @url["gateway_url"] %>api/.*" "" [F,L] # Forbid proxy access to /api/
+        RewriteCond ${whitelist:%{ENV:host}} ^ok$
+        RewriteRule "^(.*)" "$1" [P,L] # Proxy the request; without it would be only a redirect
+        RewriteRule "^(.*)" "$1" [F] # Forbid if previous whitelist did not match
     </LocationMatch>
 
     <LocationMatch "^/pages/404/.*">
