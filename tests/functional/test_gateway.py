@@ -346,3 +346,17 @@ class TestGateway(Base):
         self.assertEqual(resp.history[0].status_code, 302)
         self.assertEqual(resp.history[0].url,
                          "http://%s/" % config.GATEWAY_HOST)
+
+    def test_pages_proxy(self):
+        """ Test if /pages/ endpoint works correctly
+        """
+        data = [
+            ("pages/docs/", 200),
+            ("pages/unknown/", 302),
+            ("pages/not-whitelisted-host/", 403),
+            ("pages/api/", 403),
+        ]
+        for path, expected in data:
+            url = config.GATEWAY_URL + path
+            resp = requests.get(url, allow_redirects=False)
+            self.assertEqual(resp.status_code, expected)
