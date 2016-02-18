@@ -5,6 +5,7 @@
   command: chdir=config {{ item }}
   with_items:
     - bash -c "/usr/local/bin/yaml-merger.py zuul | tee /etc/zuul/layout.yaml"
+    - bash -c "cp zuul/*.py /etc/zuul/"
     - bash -c "systemctl status zuul && systemctl reload zuul || systemctl start zuul"
 
 # Reload doesn't start service see: https://github.com/ansible/ansible/issues/4448
