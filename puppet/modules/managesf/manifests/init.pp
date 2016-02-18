@@ -19,6 +19,7 @@ class managesf ($gerrit = hiera('gerrit'), $hosts = hiera('hosts'), $cauth = hie
   $fqdn = hiera('fqdn')
   $url = hiera('url')
   $auth = hiera('authentication')
+  $nodepool = hiera('nodepool')
   $issues_tracker_api_key = hiera('creds_issues_tracker_api_key')
   $issues_tracker_api_url = $url["api_redmine_url"]
   $gerrit_host = "gerrit.${fqdn}"
