@@ -1,0 +1,16 @@
+input {
+  file {
+    path => "/var/lib/jenkins/jobs/*/*/*/log"
+    start_position => "beginning"
+    type => "jenkins_tests"
+    }
+}
+
+filter {
+}
+
+output {
+  elasticsearch {
+    hosts => "elasticsearch.{{ fqdn }}:9200"
+  }
+}
