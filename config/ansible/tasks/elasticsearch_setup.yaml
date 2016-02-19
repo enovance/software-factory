@@ -1,0 +1,19 @@
+- name: Ensure Elasticsearch listen to localhost
+  template: src=templates/elastic_conf.j2
+            dest=/etc/elasticsearch/elasticsearch.yml
+            owner=root
+            group=elasticsearch
+            mode=0644
+
+- name: Elasticsearch started and enabled
+  service: name=elasticsearch state=started enabled=yes
+
+- name: Logstash configuration
+  template: src=templates/logstash_jenkins_tests.j2
+            dest=/etc/logstash/conf.d/jenkins_tests.conf
+            owner=root
+            group=root
+            mode=0644
+
+- name: Logstash started and enabled
+  service: name=logstash state=started enabled=yes
