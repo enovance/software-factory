@@ -4,6 +4,10 @@
   tasks:
     - template: src=templates/global_known_hosts.j2 dest=/etc/ssh/ssh_known_hosts owner=root group=root mode=0644
 
+- hosts: elasticsearch
+  tasks:
+    - include: tasks/elasticsearch_setup.yaml
+
 - hosts: managesf
   tasks:
     - include: tasks/create_config_repository.yaml
