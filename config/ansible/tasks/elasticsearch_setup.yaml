@@ -1,0 +1,27 @@
+- group: name={{ item }}
+  with_items: [elasticsearch, logstash, kibana]
+
+- user: name={{ item }} group={{ item }} shell=/sbin/nologin home=/home/{{ item }}
+  with_items: [elasticsearch, logstash, kibana]
+
+- file: path=/var/run/{{ item }} state=directory mode=0755 owner={{ item }} group={{ item }}
+  with_items: [elasticsearch, logstash, kibana]
+
+- name: Ensure Elasticsearch listen to all addresses
+  lineinfile: dest=/etc/elasticsearch/elasticsearch.yml
+              regexp="^network.host{{':'}} elasticsearch.{{ fqdn }}"
+              insertafter="^# network.host:"
+              line="network.host{{':'}} elasticsearch.{{ fqdn }}"
+
+- name: Elasticsearch started and enabled
+  service: name=elasticsearch state=started enabled=yes
+
+- name: Logstash configuration
+  template: src=templates/logstash_jenkins_tests.j2
+            dest=/etc/logstash/conf.d/jenkins_tests.conf
+            owner=root
+            group=root
+            mode=0644
+
+- name: Logstash started and enabled
+  service: name=logstash state=started enabled=yes

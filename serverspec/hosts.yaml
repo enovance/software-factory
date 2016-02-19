@@ -56,3 +56,9 @@ managesf:
     - ntp
   :username: root
   :hostname: managesf
+
+elasticsearch:
+  :roles:
+    - elasticsearch
+  :username: root
+  :hostname: elasticsearch
