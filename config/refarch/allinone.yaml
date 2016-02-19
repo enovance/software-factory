@@ -20,6 +20,7 @@ inventory:
       - murmur
       - storyboard
       - storyboard-webclient
+      - elasticsearch
     mem: 8
     cpu: 4
     disk: 20
