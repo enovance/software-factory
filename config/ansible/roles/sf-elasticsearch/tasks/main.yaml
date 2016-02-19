@@ -1,0 +1,12 @@
+- name: Create {{ user }} group for ElasticSearch
+  group: name={{ user }}
+- name: Create {{ user }} user for ElasticSearch
+  user: name={{ user }} group={{ user }} shell=/sbin/nologin home=/home/{{ user }}
+- file: path=/var/run/{{ user }} state=directory mode=0755 owner={{ user }} group={{ user }}
+- name: Ensure Elasticsearch listen to all addresses
+  lineinfile: dest=/etc/elasticsearch/elasticsearch.yml
+              regexp="^network.host{{':'}} elasticsearch.{{ fqdn }}"
+              insertafter="^# network.host:"
+              line="network.host{{':'}} elasticsearch.{{ fqdn }}"
+- name: Elasticsearch started and enabled
+  service: name=elasticsearch state=started enabled=yes
