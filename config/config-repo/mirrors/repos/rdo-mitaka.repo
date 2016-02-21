@@ -1,0 +1,6 @@
+[openstack-liberty]
+name=OpenStack Liberty Repository
+baseurl=http://mirror.centos.org/centos/7/cloud/x86_64/openstack-mitaka/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Cloud

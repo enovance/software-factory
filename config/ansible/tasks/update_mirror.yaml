@@ -1,0 +1,8 @@
+---
+- include: update_configrepo.yaml
+
+- synchronize: src=/root/config/mirrors/repos/ dest=/etc/yum.repos.d/
+- synchronize: src=/root/config/mirrors/keys/  dest=/etc/pki/rpm-gpg/
+
+- name: Update mirror
+  include: ../roles/sf-mirror/tasks/update.yml

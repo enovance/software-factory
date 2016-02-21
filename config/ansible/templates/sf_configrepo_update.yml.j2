@@ -25,3 +25,7 @@
   gather_facts: no
   tasks:
     - include: tasks/update_configrepo.yaml
+- hosts: mirror
+  gather_facts: no
+  tasks:
+    - include: tasks/update_mirror.yaml

@@ -1,0 +1,4 @@
+[jenkins-stable]
+name=Jenkins-stable
+baseurl=http://pkg.jenkins-ci.org/redhat-stable
+gpgcheck=1

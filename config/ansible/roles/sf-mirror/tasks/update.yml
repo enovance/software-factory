@@ -1,0 +1,25 @@
+---
+- name: Collect repoid
+  shell: grep '^\[' /root/config/mirrors/repos/*.repo | sed 's/.*\[\(.*\)\]/\1/'
+  register: repoids
+
+- name: Install new repos
+  shell: mv /etc/yum.repos.d /etc/yum.repos.d.orig && ln -s /root/config/mirrors/repos /etc/yum.repos.d
+
+- file: path=/srv/mirrors/{{ item }} state=directory mode=0755
+  with_items: repoids.stdout_lines
+
+- name: Reposync
+  command: chdir=/srv/mirrors reposync -d --repoid={{ item }}
+  with_items: repoids.stdout_lines
+
+- name: Restore old repos
+  shell: rm /etc/yum.repos.d && mv /etc/yum.repos.d.orig /etc/yum.repos.d
+
+- name: Createrepo
+  command: chdir=/srv/mirrors createrepo {{ item }}
+  with_items: repoids.stdout_lines
+
+- name: Swift upload
+  command: sleep 1 # TODO
+  with_items: repoids.stdout_lines

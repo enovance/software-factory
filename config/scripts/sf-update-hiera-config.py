@@ -35,6 +35,16 @@ def update_sfconfig(data):
             'nodepool'
         ]
         dirty = True
+
+    # Make sure mirror is in the conf (2.1.6 -> 2.2.0)
+    if 'mirror' not in data:
+        data['mirror'] = {
+            'disabled': True,
+            'swift_mirror_container': 'sfmirrors',
+            'swift_mirror_authurl': 'http://swift:8080/v1/AUTH_uuid',
+            'swift_mirror_tempurl_key': 'swiftkey'
+        }
+        dirty = True
     return dirty
 
 
