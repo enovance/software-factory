@@ -1,0 +1,19 @@
+- file: path=/srv/mirror/{{ mirror_name }}/rpms/ state=directory mode=0755
+
+- name: Install tool
+  yum: name={{ item }} state=present
+  with_items: [yum-utils, createrepo]
+
+- name: Reposync
+  command: chdir=/srv/mirror reposync --repoid={{ item }}
+  with_items: mirror_sources
+
+- name: Clean repo
+  shell: rm /srv/mirror/{{ mirror_name }}/rpms/*
+
+- name: Merge repo
+  command: chdir=/srv/mirror find {{ item }} -type f -name '*.rpm' -exec ln -s /srv/mirror/{} {{ mirror_name }}/rpms/ ;
+  with_items: mirror_sources
+
+- name: Create repo
+  command: chdir=/srv/mirror/{{ mirror_name }} createrepo .

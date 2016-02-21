@@ -1,0 +1,13 @@
+[Unit]
+Description=devpi server service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=ftp
+Group=ftp
+EnvironmentFile=-/etc/sysconfig/devpi
+ExecStart=/usr/bin/devpi-server
+
+[Install]
+WantedBy=multi-user.target
