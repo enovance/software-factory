@@ -1,0 +1,6 @@
+---
+- file: path=/srv/mirrors/ state=directory mode=0755
+
+- name: Install tool
+  yum: name={{ item }} state=present
+  with_items: [yum-utils, createrepo]

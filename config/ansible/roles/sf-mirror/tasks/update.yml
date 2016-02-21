@@ -1,0 +1,19 @@
+---
+- name: Collect repoid
+  shell: grep '^\[' /root/config/mirrors/repos/*.repo | sed 's/.*\[\(.*\)\]/\1/'
+  register: repoids
+
+- file: path=/srv/mirrors/{{ item }} state=directory mode=0755
+  with_items: repoids.stdout_lines
+
+- name: Reposync
+  command: chdir=/srv/mirrors reposync -d --repoid={{ item }}
+  with_items: repoids.stdout_lines
+
+- name: Createrepo
+  command: chdir=/srv/mirrors createrepo {{ item }}
+  with_items: repoids.stdout_lines
+
+- name: Swift upload
+  command: sleep 1 # TODO
+  with_items: repoids.stdout_lines

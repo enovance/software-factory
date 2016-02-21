@@ -91,6 +91,12 @@ backup:
     swift_backup_container: sfbackups
     swift_backup_max_retention_secs: 864000
 
+mirror:
+    disabled: True
+    swift_mirror_container: sfmirrors
+    swift_mirror_authurl: http://swift:8080/v1/AUTH_uuid
+    swift_mirror_tempurl_key: swiftkey
+
 nodepool:
     disabled: True
     providers:
