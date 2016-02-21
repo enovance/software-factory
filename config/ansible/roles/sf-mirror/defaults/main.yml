@@ -1,0 +1,10 @@
+---
+mirror_name: "sf"
+mirror_sources:
+  - base
+  - epel
+  - jenkins
+  - openstack-liberty
+  - kibana-4.4
+  - logstash-2.2
+  - elasticsearch-2.x

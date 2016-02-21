@@ -148,5 +148,12 @@ if 'mumble' not in d:
 if d['mumble']['super_user_password'] == 'CHANGEME':
     d['mumble']['super_user_password'] = str(uuid.uuid4())
 
+# Make sure mirror is in the conf (2.1.6 -> 2.2.0)
+if 'mirror' not in d:
+    d['mirror'] = {
+        'disabled': True,
+        'mirror_host': 'mirror.%s' % d['fqdn']
+    }
+
 yaml.dump(d, open(argv[1], "w"), default_flow_style=False)
 exit(0)

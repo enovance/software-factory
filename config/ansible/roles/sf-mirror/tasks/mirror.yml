@@ -1,0 +1,8 @@
+- name: Install nginx
+  yum: name=nginx state=present
+
+- name: Configure nginx
+  command: sed -i /etc/nginx/nginx.conf -e "s#root */usr/share/nginx/html#root /srv/mirror#" -e "s#location / {#location / { autoindex on;#"
+
+- name: Start nginx service
+  service: name=nginx state=restarted
