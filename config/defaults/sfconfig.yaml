@@ -91,6 +91,10 @@ backup:
     swift_backup_container: sfbackups
     swift_backup_max_retention_secs: 864000
 
+mirror:
+    disabled: True
+    mirror_host: mirror.sftests.com
+
 nodepool:
     disabled: True
     providers:

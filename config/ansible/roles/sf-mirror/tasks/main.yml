@@ -1,0 +1,9 @@
+---
+
+- copy: src=../../../../config-repo/mirrors/keys/ dest=/etc/pki/rpm-gpg/
+- copy: src=../../../../config-repo/mirrors/sf.repo dest=/etc/yum.repos.d/sf.repo
+
+- include: mirror.yml
+- include: rpm_mirror.yml
+- include: pip_mirror.yml
+- include: squid_mirror.yml

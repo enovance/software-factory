@@ -1,0 +1,6 @@
+---
+- hosts: mirror
+  gather_facts: no
+  sudo: yes
+  roles:
+    - sf-mirror

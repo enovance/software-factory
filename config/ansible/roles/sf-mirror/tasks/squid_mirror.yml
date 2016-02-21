@@ -1,0 +1,4 @@
+- name: Install squid
+  yum: name=squid state=present
+
+# TODO: configuration
