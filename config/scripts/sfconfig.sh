@@ -31,9 +31,9 @@ function update_sfconfig {
     # get public ip of managesf
     local localip=$(ip route get 8.8.8.8 | awk '{ print $7 }')
     local localalias="${DOMAIN}, mysql.${DOMAIN}, redmine.${DOMAIN}, api-redmine.${DOMAIN}, gerrit.${DOMAIN}, auth.${DOMAIN}, statsd.${DOMAIN}"
-    localalias="${localalias}, zuul.${DOMAIN}, nodepool.${DOMAIN}, elasticsearch.${DOMAIN}"
+    localalias="${localalias}, zuul.${DOMAIN}, nodepool.${DOMAIN}, elasticsearch.${DOMAIN}, murmur.${DOMAIN}"
     # Add shortname for serverspec tests
-    localalias="${localalias}, mysql, redmine, gerrit, zuul, nodepool, elasticsearch"
+    localalias="${localalias}, mysql, redmine, gerrit, zuul, nodepool, elasticsearch, murmur"
     if [ -n "${IP_JENKINS}" ]; then
         local jenkins_host="  jenkins.${DOMAIN}:      {ip: ${IP_JENKINS}, host_aliases: [jenkins], }"
     else
@@ -49,6 +49,7 @@ EOF
     hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   refarch    "${REFARCH}"
     hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   ip_jenkins "${IP_JENKINS}"
     echo "sf_version: $(grep ^VERS= /var/lib/edeploy/conf | cut -d"=" -f2 | cut -d'-' -f2)" > /etc/puppet/hiera/sf/sf_version.yaml
+    /usr/local/bin/validate_sfconfig.py ${OUTPUT}/sfconfig.yaml
 
     # set managesf gitconfig
     git config --global user.name "SF initial configurator"
@@ -83,6 +84,9 @@ statsd.${DOMAIN}
 
 [elasticsearch]
 elasticsearch.${DOMAIN}
+
+[murmur]
+murmur.${DOMAIN}
 EOF
 
     # update .ssh/config
