@@ -1,0 +1,18 @@
+database=/var/lib/murmur/murmur.sqlite
+logfile=/var/log/murmur/murmur.log
+pidfile=/var/run/murmur.pid
+port=64738
+welcometext=SF mumble server hosted at {{ fqdn }}
+suggestPushToTalk=true
+
+# Security
+bandwidth=72000
+sendversion=false
+legacyPasswordHash=false
+allowping=false
+users=100
+channelname=[ \\-=\\w\\#\\[\\]\\{\\}\\(\\)\\@\\|]+
+username=[-=\\w\\[\\]\\{\\}\\(\\)\\@\\|\\.]+
+{% if mumble['password'] %}
+serverpassword={{ mumble['password'] }}
+{% endif %}
