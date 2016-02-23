@@ -139,6 +139,10 @@ pages = {
     'maps': '/etc/httpd/pages.txt'
 }
 
+sshconfig = {
+    'hostname': '<%= @url["gateway_url"] %>',
+}
+
 <% if @fqdn == "sftests.com" %>
 project_create_administrator_only = False
 <% end %>
