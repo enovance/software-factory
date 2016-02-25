@@ -18,6 +18,7 @@ node default {
 
   include ::postfix
   include ::monit
+  include ::collectd
 
   # Gerrit
   include ::ssh_keys_gerrit

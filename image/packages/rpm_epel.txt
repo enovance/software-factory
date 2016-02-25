@@ -6,6 +6,7 @@ ruby-augeas
 sshpass
 ssmtp
 statsd
+collectd
 
 # Redmine
 rubygem-rack

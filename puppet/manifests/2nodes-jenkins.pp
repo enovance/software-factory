@@ -16,6 +16,7 @@ node default {
   class {'::bup': stage => first }
   include ::postfix
   include ::monit
+  include ::collectd
   include ::cauth_client
 
   # Jenkins
