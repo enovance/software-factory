@@ -1,0 +1,33 @@
+LoadPlugin syslog
+LoadPlugin cpu
+LoadPlugin csv
+LoadPlugin interface
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin processes
+LoadPlugin statsd
+
+<Plugin csv>
+    DataDir "/var/lib/collectd/csv"
+    StoreRates true
+</Plugin>
+
+<Plugin statsd>
+    Host "statsd.<%= @fqdn %>"
+    Port "8125"
+    DeleteSets true
+    TimerPercentile 90.0
+</Plugin>
+
+<Plugin processes>
+    ProcessMatch "mysql" "/usr/libexec/mysqld"
+    ProcessMatch "Passenger" "Passenger.*"
+    ProcessMatch "Apache" "/usr/sbin/httpd"
+    ProcessMatch "Paste" ".*lodgeit.*"
+    ProcessMatch "Zuul" "/usr/bin/zuul-*"
+    ProcessMatch "Etherpad" ".*ep_etherpad-lite.*"
+    ProcessMatch "Gerrit" ".*gerrit.war.*"
+    ProcessMatch "Jenkins" ".*jenkins/war.*"
+    ProcessMatch "Grafana" "/usr/sbin/grafana-server"
+    ProcessMatch "carbon-cache" "carbon-cache"
+</Plugin>
