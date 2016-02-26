@@ -118,6 +118,40 @@
         ProxyPass /redmine/ <%= @url["redmine_url"] %> nocanon retry=0
         ProxyHTMLURLMap <%= @url["redmine_url"] %> /redmine
 
+        # Make sure redmine links get redirected to redmine server
+        ProxyPass /rb/ <%= @url["redmine_url"] %>rb/ nocanon retry=0
+        ProxyPassReverse /rb/ <%= @url["redmine_url"] %>rb/
+
+        ProxyPass /issues/ <%= @url["redmine_url"] %>issues/ nocanon retry=0
+        ProxyPassReverse /issues/ <%= @url["redmine_url"] %>issues/
+
+        ProxyPass /projects/ <%= @url["redmine_url"] %>projects/ nocanon retry=0
+        ProxyPassReverse /projects/ <%= @url["redmine_url"] %>projects/
+
+        ProxyPass /javascripts/ <%= @url["redmine_url"] %>javascripts/ nocanon retry=0
+        ProxyPassReverse /javascripts/ <%= @url["redmine_url"] %>javascripts/
+
+        ProxyPass /themes/ <%= @url["redmine_url"] %>themes/ nocanon retry=0
+        ProxyPassReverse /themes/ <%= @url["redmine_url"] %>themes/
+
+        ProxyPass /plugin_assets/ <%= @url["redmine_url"] %>plugin_assets/ nocanon retry=0
+        ProxyPassReverse /plugin_assets/ <%= @url["redmine_url"] %>plugin_assets/
+
+        ProxyPass /stylesheets/ <%= @url["redmine_url"] %>stylesheets/ nocanon retry=0
+        ProxyPassReverse /stylesheets/ <%= @url["redmine_url"] %>stylesheets/
+
+        ProxyPass /guide/ <%= @url["redmine_url"] %>guide/ nocanon retry=0
+        ProxyPassReverse /guide/ <%= @url["redmine_url"] %>guide/
+
+        ProxyPass /my/ <%= @url["redmine_url"] %>my/ nocanon retry=0
+        ProxyPassReverse /my/ <%= @url["redmine_url"] %>my/
+
+        ProxyPass /users/ <%= @url["redmine_url"] %>users/ nocanon retry=0
+        ProxyPassReverse /users/ <%= @url["redmine_url"] %>users/
+
+        ProxyPass /projects/ <%= @url["redmine_url"] %>projects/ nocanon retry=0
+        ProxyPassReverse /projects/ <%= @url["redmine_url"] %>projects/
+
         ProxyPass /etherpad/ http://127.0.0.1:9001/ retry=0
         ProxyPassReverse /etherpad/ http://127.0.0.1:9001/
 
