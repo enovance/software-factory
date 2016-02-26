@@ -78,6 +78,7 @@
 /etc/httpd/htpasswd
 /etc/httpd/pages.txt
 /etc/gerritbot/channels.yaml
+/var/lib/gerritbot/
 
 # REMOVEME?
 /usr/lib/systemd/system/etherpad.service
