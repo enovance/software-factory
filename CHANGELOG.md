@@ -1,3 +1,28 @@
+2.1.7-9  2016-02-21
+===================
+
+New Features
+------------
+
+- Add gerritbot
+- Upgrade etherpad to 1.5.7
+- When nodepool is enabled, slaves are now put offline by default to avoid reuse. To keep a slave alive, jobs needs to explicitly use the "set_node_reuse" option.
+
+
+Known Issues
+------------
+
+- Remove redmine base_root_url to fix random 404
+- Pin github3.py to avoid missing requirement error
+
+
+Security Issues
+---------------
+
+- Rebuild image to include CVE-2015-7547 fix
+- Remove default etherpad admin credentials that may be used to reveal internal mysql password and sesion key.
+
+
 2.1.6-8  2016-02-10
 ===================
 
