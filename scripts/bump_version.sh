@@ -1,28 +1,46 @@
-#!/bin/bash
+ #!/bin/bash
 #
 # How-to release a new version of SF:
 #
-#  1/ First edit role_configrc to set new and previous version strings:
-# VER=2.1.6
-# SF_PREVIOUS_VER=C7.0-2.1.5
-#
-#  2/ Commit using 'TaggedRelease: 2.1.5' (the actual release version, not the VER)
+#  1/ First edit role_configrc to set new and previous version strings. In this
+#  example, 2.1.7 is the version to be released, 2.1.6 the last version, and
+#  2.1.8 the current upstream work.
+# VER=2.1.8
+# SF_PREVIOUS_VER=C7.0-2.1.7
+#     Please note: VER is the next version, and SF_PREVIOUS_VER the version to
+#     release now in role_configrc. To avoid confusion, the following commands
+#     will use RELEASE_VER=C7.0-2.1.7 and OLD_RELEASE_VER=C7.0-2.1.6
+#  2/ Commit using 'TaggedRelease: ${RELEASE_VER}'
 #  3/ Run this script to update references
 #  4/ Check subproject history + sf history to update changelog
 #  5/ Generate changelog with "reno report ." and copy the output to the CHANGELOG file
-#     reno use a tag to compute the release version, remember to update version acording 'TaggedRelease' number in the CHANGELOG file.
-#  6/ Commit --amend with all changes and new symlinks
-#  7/ Wait for change to be merged (ask for review, recheck gate)
-#  8/ Test new releases (either deploy or upgrade), in particular the changelog
-#  9/ If published build is good, sign and re-publish the digest
-#     gpg -u release@softwarefactory-project.io --clearsign softwarefactory-C7.0-${VER}.digest
-#     mv softwarefactory-C7.0-${VER}.digest.asc softwarefactory-C7.0-${VER}.digest
-#     publish softwarefactory-C7.0-${VER}.digest to swift
-# 10/ Generate package diff: diff previous_release.description new_release.description
-# 11/ Prepare mail, see previous announcement for template (re-use doug famous introduction from http://lists.openstack.org/pipermail/openstack-announce/)
-# 12/ Tag: git tag -s -a -m "${VER}" ${VER} HEAD
-# 13/ Submit tag: git push --tags gerrit
-# 14/ Send announcement
+#     reno use a tag to compute the release version,
+#  6/ update version acording 'TaggedRelease' number in the CHANGELOG file
+#  7/ Commit --amend with all changes and new symlinks
+#  8/ Wait for change to be merged (ask for review, recheck gate)
+#  9/ Test new releases (either deploy or upgrade), in particular the changelog
+# 10/ If published build is good, sign and re-publish the digest. You need the
+#     passwordstore for this, set it up if not yet done:
+#     sudo yum install -y pass
+#     git clone ssh://cschwede@softwarefactory-project.io:29418/SF_password_store
+#     source SF_password_store/.passrc
+#     pass show sf/release@softwarefactory-project.io/passphrase
+#     pass show sf/release@softwarefactory-project.io | gpg --import
+# 11/ Download the actual digest
+#     swift -A http://${SWIFTIP}:8080/auth/v1.0 -U sf:owner -K ${SWIFTPASS} download sf-images softwarefactory-${RELEASE_VER}.digest
+# 12/ Sign the digest:
+#     gpg -u release@softwarefactory-project.io --clearsign softwarefactory-${RELEASE_VER}.digest
+# 13/ upload the signed digest to Swift:
+#     mv softwarefactory-C7.0-${RELEASE_VER}.digest.asc softwarefactory-${RELEASE_VER}.digest
+#     swift -A http://${SWIFTIP}:8080/auth/v1.0 -U sf:owner -K ${SWIFTPASS} upload sf-images softwarefactory-${RELEASE_VER}.digest
+# 14/ Generate package diff
+#     curl -O http://${SWIFTIP}:8080/v1/AUTH_sf/sf-images/softwarefactory-${OLD_RELEASE_VER}.description
+#     curl -O http://${SWIFTIP}:8080/v1/AUTH_sf/sf-images/softwarefactory-${RELEASE_VER}.description
+#     diff -y --suppress-common-lines softwarefactory-${OLD_RELEASE_VER}.description softwarefactory-${RELEASE_VER}.description
+# 15/ Prepare mail, see previous announcement for template (re-use doug famous introduction from http://lists.openstack.org/pipermail/openstack-announce/)
+# 16/ Tag: git tag -s -a -m "${RELEASE_VER}" ${RELEASE_VER} HEAD
+# 17/ Submit tag: git push --tags gerrit
+# 18/ Send announcement
 #
 . ./role_configrc
 
