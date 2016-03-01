@@ -1,15 +1,14 @@
 ---
 - include: update_configrepo.yaml
 
+- file: path=/etc/zuul/layout.d state=directory
+
 - name: Update zuul layout
-  command: chdir=config {{ item }}
-  with_items:
-    - bash -c "/usr/local/bin/yaml-merger.py zuul | tee /etc/zuul/layout.yaml"
-    - bash -c "cp zuul/*.py /etc/zuul/ || true"
+  command: rsync -a --delete /root/config/zuul/ /etc/zuul/layout.d/
 
 - name: Enable slave reuse when nodepool is not enabled
   when: nodepool.disabled
-  command: sed -i /etc/zuul/layout.yaml -e 's/set_node_options/set_node_reuse/g'
+  command: find /etc/zuul/layout.d/ -name "*.yaml" -exec sed -i {} -e 's/set_node_options/set_node_reuse/g' ;
 
 - name: Start or reload zuul service
   shell: systemctl status zuul && systemctl reload zuul || systemctl start zuul
