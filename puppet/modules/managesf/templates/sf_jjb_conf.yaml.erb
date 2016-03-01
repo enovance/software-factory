@@ -219,9 +219,7 @@
           # JJB needs access to jenkins to test (validate) jobs
           sudo jenkins-jobs test jobs/ -o ../build/
           echo "[+] Checking zuul"
-          /usr/local/bin/yaml-merger.py zuul | tee ../build/zuul/layout.yaml
-          cp zuul/*.py ../build/zuul/ || true
-          zuul-server -c ../build/zuul/zuul.conf -l ../build/zuul/layout.yaml -t
+          zuul-server -c ../build/zuul/zuul.conf -l ./zuul/
           echo "[+] Checking nodepool"
           cp nodepool/*.yaml ../build/nodepool/
           WORKDIR=../build/nodepool/ /usr/local/bin/sf-nodepool-conf-merger.py merged.yaml
