@@ -11,4 +11,4 @@
   wait_for: path=/var/lib/jenkins/jobs/{{ project }}-{{ testname }}
 
 - name: Wait for new zuul layout job
-  wait_for: path=/etc/zuul/layout.yaml search_regex={{ project }}-{{ testname }}
+  wait_for: path=/etc/zuul/layout.d/projects.yaml search_regex={{ project }}-{{ testname }}
