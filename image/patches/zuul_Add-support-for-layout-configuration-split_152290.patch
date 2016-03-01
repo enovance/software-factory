@@ -1,4 +1,4 @@
-From d17706cfb568b5d5f16a8f8cc4b35e70fff0646a Mon Sep 17 00:00:00 2001
+From aa0b5c1c5472ad58aff9f13be1a5bb8b49c8c28d Mon Sep 17 00:00:00 2001
 From: Tristan Cacqueray <tristan.cacqueray@enovance.com>
 Date: Sun, 15 Feb 2015 18:38:28 +0000
 Subject: [PATCH] Add support for layout configuration split
@@ -271,7 +271,7 @@ index 2aca4f2..45a5c53 100755
                              help='do not run as a daemon')
          parser.add_argument('-t', dest='validate', nargs='?', const=True,
 diff --git a/zuul/layoutvalidator.py b/zuul/layoutvalidator.py
-index a01eed3..6379cca 100644
+index a01eed3..600aac2 100644
 --- a/zuul/layoutvalidator.py
 +++ b/zuul/layoutvalidator.py
 @@ -16,7 +16,9 @@
@@ -284,7 +284,7 @@ index a01eed3..6379cca 100644
  
  
  # Several forms accept either a single item or a list, this makes
-@@ -25,6 +27,42 @@
+@@ -25,6 +27,49 @@
      return v.Any([x], x)
  
  
@@ -311,6 +311,13 @@ index a01eed3..6379cca 100644
 +    final_data = {}
 +    for path in paths:
 +        data = yaml.load(open(path))
++        # fix include relative paths
++        for include in data.get('includes', []):
++            for key, fn in include.items():
++                if not os.path.isabs(fn):
++                    base = os.path.dirname(os.path.realpath(path))
++                    fn = os.path.join(base, fn)
++                include[key] = fn
 +        # Merge document
 +        for key in data:
 +            if key in final_data:
