@@ -163,14 +163,6 @@ class zuul {
                 File['/etc/zuul/merger-logging.conf']],
   }
 
-  file {'/etc/zuul/layout.yaml':
-    ensure  => file,
-    mode    => '0644',
-    owner   => 'zuul',
-    group   => 'zuul',
-    require => [File['/etc/zuul']],
-  }
-
   file {'gearman-check':
     ensure => file,
     path   => '/usr/local/bin/gearman-check',
