@@ -441,6 +441,11 @@ function run_upgrade {
     sudo rsync -a --delete ${IMAGE_PATH}/ /var/lib/lxc/${INSTALL_SERVER}/rootfs/${IMAGE_PATH}/ || fail "Could not copy ${SF_VER}"
     echo "[+] Running upgrade"
     ssh ${SF_HOST} "cd software-factory; ./upgrade.sh" || fail "Upgrade failed" "/var/lib/lxc/${INSTALL_SERVER}/rootfs/var/log/upgrade-bootstrap.log"
+    echo "[+] Force config-update (to simulate config-update change review approval)"
+    CMD="cd /root/config && git fetch --all && git reset --hard origin/master -- "
+    CMD+="&& rsync --exclude jobs/projects.yaml --exclude zuul/projects.yaml --exclude nodepool/images.yaml --exclude nodepool/labels.yaml -av /usr/local/share/sf-config-repo/ /root/config/ "
+    CMD+="&& git commit -a -m 'Forced upgrade of config-repo' && /usr/local/bin/submit_and_wait.py --approve"
+    ssh ${SF_HOST} "${CMD}"
     echo "[+] Update sf-bootstrap-data"
     rsync -a -v ${SF_HOST}:sf-bootstrap-data/ ./sf-bootstrap-data/
     checkpoint "run_upgrade"
