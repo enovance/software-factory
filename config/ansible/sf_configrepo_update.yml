@@ -1,18 +1,22 @@
 ---
 # This playbook reconfigure service based on config repo.
+- hosts: localhost
+  tasks:
+    - name: Get config sha1
+      command: git ls-remote -h http://{{ fqdn }}/r/config.git
+      register: configsha
+- hosts: jenkins:zuul:nodepool:managesf
+  tasks:
+    - include: tasks/update_configrepo.yaml
 - hosts: jenkins
-  gather_facts: no
   tasks:
     - include: tasks/jenkins_update.yaml
 - hosts: zuul
-  gather_facts: no
   tasks:
     - include: tasks/zuul_update.yaml
 - hosts: nodepool
-  gather_facts: no
   tasks:
     - include: tasks/nodepool_update.yaml
 - hosts: managesf
-  gather_facts: no
   tasks:
     - include: tasks/update_configrepo.yaml
