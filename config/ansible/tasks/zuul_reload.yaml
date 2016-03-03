@@ -1,0 +1,14 @@
+---
+- name: Update zuul layout
+  command: rsync -a --delete /root/config/zuul/ /etc/zuul/layout.d/
+
+- name: Enable slave reuse when nodepool is not enabled
+  when: nodepool.disabled
+  command: find /etc/zuul/layout.d/ -name "*.yaml" -exec sed -i {} -e 's/set_node_options/set_node_reuse/g' ;
+
+- name: Start or reload zuul service
+  shell: systemctl status zuul && systemctl reload zuul || systemctl start zuul
+
+# Reload doesn't start service see: https://github.com/ansible/ansible/issues/4448
+- service: name=zuul state=started enabled=yes
+- service: name=zuul-merger state=started enabled=yes
