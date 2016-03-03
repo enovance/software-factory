@@ -1,18 +1,19 @@
 ---
-- include: update_configrepo.yaml
-
 - file: path=/etc/zuul/layout.d state=directory
 
-- name: Update zuul layout
-  command: rsync -a --delete /root/config/zuul/ /etc/zuul/layout.d/
+- file: path=/etc/software-factory/zuul_config state=touch
 
-- name: Enable slave reuse when nodepool is not enabled
-  when: nodepool.disabled
-  command: find /etc/zuul/layout.d/ -name "*.yaml" -exec sed -i {} -e 's/set_node_options/set_node_reuse/g' ;
+- name: Check local config
+  command: cat /etc/software-factory/zuul_config
+  register: localconfig
 
-- name: Start or reload zuul service
-  shell: systemctl status zuul && systemctl reload zuul || systemctl start zuul
+- name: Check upstream config
+  command: chdir=/root/config git log --oneline zuul/
+  register: upstreamconfig
 
-# Reload doesn't start service see: https://github.com/ansible/ansible/issues/4448
-- service: name=zuul state=started enabled=yes
-- service: name=zuul-merger state=started enabled=yes
+- include: zuul_reload.yaml
+  when: localconfig.stdout != upstreamconfig.stdout
+
+- name: Write config repo sha1 matching current configuration
+  copy: content="{{ upstreamconfig.stdout }}" dest=/etc/software-factory/zuul_config
+  when: localconfig.stdout != upstreamconfig.stdout
