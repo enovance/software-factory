@@ -3,6 +3,7 @@
 - hosts: all
   tasks:
     - template: src=templates/global_known_hosts.j2 dest=/etc/ssh/ssh_known_hosts owner=root group=root mode=0644
+    - file: path=/etc/software-factory state=directory
 
 - hosts: managesf
   tasks:

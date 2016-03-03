@@ -62,31 +62,31 @@ EOF
 managesf.${DOMAIN}
 
 [gerrit]
-gerrit.${DOMAIN}
+managesf.${DOMAIN}
 
 [jenkins]
-jenkins.${DOMAIN}
+managesf.${DOMAIN}
 
 [zuul]
-zuul.${DOMAIN}
+managesf.${DOMAIN}
 
 [nodepool]
-nodepool.${DOMAIN}
+managesf.${DOMAIN}
 
 [redmine]
-redmine.${DOMAIN}
+managesf.${DOMAIN}
 
 [mysql]
-mysql.${DOMAIN}
+managesf.${DOMAIN}
 
 [statsd]
-statsd.${DOMAIN}
+managesf.${DOMAIN}
 
 [elasticsearch]
-elasticsearch.${DOMAIN}
+managesf.${DOMAIN}
 
 [murmur]
-murmur.${DOMAIN}
+managesf.${DOMAIN}
 EOF
 
     # update .ssh/config
@@ -359,7 +359,7 @@ puppet_apply_host
 # Make sure managesf.${DOMAIN} known_host is set
 add_key_known_hosts "managesf.${DOMAIN}" "$(ssh-keyscan -p 22 managesf.${DOMAIN} 2> /dev/null | grep ssh-rsa)"
 # Configure ssh access to inventory and copy puppet configuration
-HOSTS=$(grep "\.${DOMAIN}" /etc/ansible/hosts | sort | uniq)
+HOSTS=$(cat /etc/hosts | tr ' ' '\n' | tr '\t' '\n' | grep ${DOMAIN} | sort | uniq)
 for host in $HOSTS; do
     wait_for_ssh $host
     puppet_copy $host
