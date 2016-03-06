@@ -43,12 +43,12 @@ function lxc_stop {
 
 function lxc_init {
     ver=${1:-${SF_VER}}
-    (cd deploy/lxc; sudo ./deploy.py init --workspace ${SF_WORKSPACE} --refarch $REFARCH --version ${ver}) || fail "LXC start FAILED"
+    (cd deploy/lxc; sudo ./deploy.py init --workspace ${SF_WORKSPACE} --arch ${REFARCH_FILE} --version ${ver}) || fail "LXC start FAILED"
     checkpoint "lxc-start"
 }
 
 function lxc_start {
-    (cd deploy/lxc; sudo ./deploy.py start --workspace ${SF_WORKSPACE} --refarch $REFARCH) || fail "LXC start FAILED"
+    (cd deploy/lxc; sudo ./deploy.py start --workspace ${SF_WORKSPACE} --arch ${REFARCH_FILE}) || fail "LXC start FAILED"
     checkpoint "lxc-start"
 }
 
@@ -82,10 +82,6 @@ function clean_nodepool_tenant {
 }
 
 function run_it_jenkins_ci {
-    if [ "${REFARCH}" != "1node-allinone" ]; then
-        # skip
-        return
-    fi
     ./tests/integration/run.py > ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "Basic integration test SUCCESS"                        \
         || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
@@ -127,8 +123,9 @@ function heat_init {
     export OS_USERNAME="sfmain"; export OS_TENANT_NAME="${OS_USERNAME}"
     NET_ID=$(neutron net-list | grep 'external_network' | awk '{ print $2 }' | head -n 1)
     echo "[+] Starting the stack..."
-    heat stack-create --template-file ./deploy/heat/softwarefactory.hot -P \
-        "sf_root_size=5;key_name=id_rsa;domain=${SF_HOST};image_id=${GLANCE_ID};ext_net_uuid=${NET_ID};flavor=m1.medium" \
+    (cd deploy/heat; ./deploy --arch ${REFARCH_FILE} render)
+    heat stack-create --template-file ./deploy/heat/sf-$(basename ${REFARCH_FILE} .yaml).hot -P \
+        "key_name=id_rsa;domain=${SF_HOST};image_id=${GLANCE_ID};ext_net_uuid=${NET_ID}" \
         sf_stack || fail "Heat stack-create failed"
     checkpoint "heat-init"
 }
@@ -188,8 +185,8 @@ function build_image {
         echo "            To update requirements and do a full installation, do not use SKIP_BUILD"
         set -e
         sudo rsync -a --delete --no-owner puppet/ ${IMAGE_PATH}/etc/puppet/environments/sf/
-        sudo rsync -a --delete --no-owner config/defaults/ ${IMAGE_PATH}/etc/puppet/hiera/sf/
-        sudo rsync -a --delete --no-owner config/ansible/ ${IMAGE_PATH}/usr/local/share/sf-ansible/
+        sudo rsync -L -a --delete --no-owner config/defaults/ ${IMAGE_PATH}/etc/puppet/hiera/sf/
+        sudo rsync -a --delete --no-owner config/ansible/ ${IMAGE_PATH}/etc/ansible/
         sudo rsync -a --delete --no-owner config/config-repo/ ${IMAGE_PATH}/usr/local/share/sf-config-repo/
         sudo rsync -a --delete --no-owner serverspec/ ${IMAGE_PATH}/etc/serverspec/
         sudo rsync -a config/scripts/ ${IMAGE_PATH}/usr/local/bin/
@@ -315,7 +312,7 @@ function fail {
     [ -z "$SWIFT_artifacts_URL" ] && {
         get_logs
     }
-    echo "$0 ${REFARCH} ${TEST_TYPE}: FAILED"
+    echo "$0 ${TEST_TYPE}: FAILED (${REFARCH_FILE})"
     exit 1
 }
 
@@ -337,8 +334,7 @@ function run_bootstraps {
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
-    [ "${REFARCH}" = "2nodes-jenkins" ] && OPTIONS="-i 192.168.135.102"
-    ssh -A -tt ${SF_HOST} sfconfig.sh -a ${REFARCH} ${OPTIONS} 2>&1 | tee ${ARTIFACTS_DIR}/sfconfig.log
+    ssh -A -tt ${SF_HOST} sfconfig.sh 2>&1 | tee ${ARTIFACTS_DIR}/sfconfig.log
     res=${PIPESTATUS[0]}
     kill -9 $SSH_AGENT_PID
     [ "$res" != "0" ] && fail "Bootstrap fails" ${ARTIFACTS_DIR}/bootstraps.log
@@ -445,7 +441,7 @@ function run_upgrade {
     sudo mkdir -p /var/lib/lxc/managesf/rootfs/${IMAGE_PATH}/ || fail "Could not copy ${SF_VER}"
     sudo rsync -a --delete ${IMAGE_PATH}/ /var/lib/lxc/managesf/rootfs/${IMAGE_PATH}/ || fail "Could not copy ${SF_VER}"
     echo "[+] Running upgrade"
-    ssh ${SF_HOST} "cd software-factory; ./upgrade.sh ${REFARCH}" || fail "Upgrade failed" "/var/lib/lxc/managesf/rootfs/var/log/upgrade-bootstrap.log"
+    ssh ${SF_HOST} "cd software-factory; ./upgrade.sh" || fail "Upgrade failed" "/var/lib/lxc/managesf/rootfs/var/log/upgrade-bootstrap.log"
     # copy changes to sfcreds.yaml back to original to account for new service user (unneeded after 2.0.4)
     scp ${SF_HOST}:sf-bootstrap-data/hiera/sfcreds.yaml sf-bootstrap-data/hiera/
     checkpoint "run_upgrade"

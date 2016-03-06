@@ -1,0 +1,22 @@
+description: "Minimal 3 nodes sample deployment"
+inventory:
+  - name: install-server
+    roles:
+      - install-server
+      - mysql
+      - auth
+      - gateway
+      - managesf
+      - redmine
+      - statsd
+    mem: 8
+    cpu: 4
+    disk: 20
+  - name: jenkins
+    roles:
+      - zuul
+      - nodepool
+      - jenkins
+  - name: review
+    roles:
+      - gerrit

@@ -21,33 +21,13 @@
 
 # Defaults
 DOMAIN=$(cat /etc/puppet/hiera/sf/sfconfig.yaml | grep "^fqdn:" | cut -d: -f2 | sed 's/ //g')
-REFARCH=1node-allinone
 BUILD=/root/sf-bootstrap-data
 HOME=/root
 
 
 function update_sfconfig {
     OUTPUT=${BUILD}/hiera
-    # get public ip of managesf
-    local localip=$(ip route get 8.8.8.8 | awk '{ print $7 }')
-    local localalias="${DOMAIN}, mysql.${DOMAIN}, redmine.${DOMAIN}, api-redmine.${DOMAIN}, gerrit.${DOMAIN}, auth.${DOMAIN}, statsd.${DOMAIN}"
-    localalias="${localalias}, zuul.${DOMAIN}, nodepool.${DOMAIN}, elasticsearch.${DOMAIN}, murmur.${DOMAIN}"
-    # Add shortname for serverspec tests
-    localalias="${localalias}, mysql, redmine, gerrit, zuul, nodepool, elasticsearch, murmur"
-    if [ -n "${IP_JENKINS}" ]; then
-        local jenkins_host="  jenkins.${DOMAIN}:      {ip: ${IP_JENKINS}, host_aliases: [jenkins], }"
-    else
-        localalias="${localalias}, jenkins.${DOMAIN}, jenkins"
-    fi
-    cat << EOF > ${OUTPUT}/hosts.yaml
-hosts:
-  localhost:              {ip: 127.0.0.1}
-  managesf.${DOMAIN}:     {ip: ${localip}, host_aliases: [$localalias]}
-EOF
-    [ -n "${jenkins_host}" ] && echo "${jenkins_host}" >> ${OUTPUT}/hosts.yaml
     hieraedit.py --yaml ${OUTPUT}/sfconfig.yaml fqdn       "${DOMAIN}"
-    hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   refarch    "${REFARCH}"
-    hieraedit.py --yaml ${OUTPUT}/sfarch.yaml   ip_jenkins "${IP_JENKINS}"
     echo "sf_version: $(grep ^VERS= /var/lib/edeploy/conf | cut -d"=" -f2 | cut -d'-' -f2)" > /etc/puppet/hiera/sf/sf_version.yaml
     /usr/local/bin/validate_sfconfig.py ${OUTPUT}/sfconfig.yaml
 
@@ -55,39 +35,6 @@ EOF
     git config --global user.name "SF initial configurator"
     git config --global user.email admin@$DOMAIN
     git config --global gitreview.username "admin"
-
-    # update inventory
-    cat << EOF > /etc/ansible/hosts
-[managesf]
-managesf.${DOMAIN}
-
-[gerrit]
-gerrit.${DOMAIN}
-
-[jenkins]
-jenkins.${DOMAIN}
-
-[zuul]
-zuul.${DOMAIN}
-
-[nodepool]
-nodepool.${DOMAIN}
-
-[redmine]
-redmine.${DOMAIN}
-
-[mysql]
-mysql.${DOMAIN}
-
-[statsd]
-statsd.${DOMAIN}
-
-[elasticsearch]
-elasticsearch.${DOMAIN}
-
-[murmur]
-murmur.${DOMAIN}
-EOF
 
     # update .ssh/config
     cat << EOF > /root/.ssh/config
@@ -119,6 +66,7 @@ function generate_yaml {
     mv /etc/puppet/hiera/sf/sfconfig.yaml ${OUTPUT}/ || exit -1
     mv /etc/puppet/hiera/sf/sfcreds.yaml ${OUTPUT}/
     mv /etc/puppet/hiera/sf/sfarch.yaml ${OUTPUT}/
+    mv /etc/puppet/hiera/sf/hosts.yaml ${OUTPUT}/
     # MySQL password for services + service user
     MYSQL_ROOT_SECRET=$(generate_random_pswd 32)
     REDMINE_MYSQL_SECRET=$(generate_random_pswd 32)
@@ -201,6 +149,9 @@ function generate_keys {
     OUTPUT=${BUILD}/certs
     [ -f ${OUTPUT}/privkey.pem ]        || openssl genrsa -out ${OUTPUT}/privkey.pem 1024
     [ -f ${OUTPUT}/pubkey.pem ]         || openssl rsa -in ${OUTPUT}/privkey.pem -out ${OUTPUT}/pubkey.pem -pubout
+
+    [ -d "${HOME}/.ssh" ] || mkdir -m 0700 "${HOME}/.ssh"
+    [ -f "${HOME}/.ssh/known_hosts" ] || touch "${HOME}/.ssh/known_hosts"
 }
 
 function generate_apache_cert {
@@ -224,28 +175,12 @@ EOF
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=${DOMAIN}" -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt -extensions v3_req -config openssl.cnf
 }
 
-function add_key_known_hosts {
-    local host=$1
-    local key=$2
-    [ -d "${HOME}/.ssh" ] || mkdir -m 0700 "${HOME}/.ssh"
-    [ -f "${HOME}/.ssh/known_hosts" ] || touch "${HOME}/.ssh/known_hosts"
-
-    grep -q ${host} ${HOME}/.ssh/known_hosts && return 0
-    echo $key >> $HOME/.ssh/known_hosts
-}
-
 function wait_for_ssh {
     local host=$1
-    local host_ip=$(resolveip -s $host)
-    if [ "$(resolveip -s ${host_ip})" == "managesf.${DOMAIN}" ]; then
-        # Virtual domain hosted on localhost, no need to wait_for_ssh
-        add_key_known_hosts "${host}" "$(grep managesf.${DOMAIN} ~/.ssh/known_hosts | sed "s/managesf.${DOMAIN}/${host}/")"
-        return 0
-    fi
     while true; do
         KEY=$(ssh-keyscan -p 22 $host 2> /dev/null | grep ssh-rsa)
         if [ "$KEY" != ""  ]; then
-            add_key_known_hosts "${host}" "${KEY}"
+            grep -q ${host} ${HOME}/.ssh/known_hosts || (echo $KEY >> $HOME/.ssh/known_hosts)
             echo "  -> $host:22 is up!"
             return 0
         fi
@@ -266,76 +201,11 @@ function puppet_apply_host {
         | grep -v 'Info: Loading facts in'
 }
 
-function puppet_apply {
-    host=$1
-    manifest=$2
-    echo "[sfconfig][$host] Applying $manifest (full log: /var/log/puppet_apply.log)" | tee -a /var/log/puppet_apply.log
-    [ "$host" == "managesf.${DOMAIN}" ] && ssh="" || ssh="ssh -tt root@$host"
-    $ssh puppet apply --test --environment sf --modulepath=/etc/puppet/environments/sf/modules/:/etc/puppet/modules/ $manifest 2>&1 \
-        | tee -a /var/log/puppet_apply.log | grep '\(Info:\|Warning:\|Error:\|Notice: Compiled\|Notice: Finished\)' \
-        | grep -v '\(Info: Loading facts in\|Gnocchi.*Scheduling refresh\|Warning: You cannot collect exported resources without storeconfigs\)' # Hide some puppet verbose outputs
-    res=$?
-    if [ "$res" != 2 ] && [ "$res" != 0 ]; then
-        echo "[sfconfig][$host] Failed ($res) to apply $manifest"
-        exit 1
-    fi
-}
 
-function puppet_copy {
-    host=$1
-    host_ip=$(resolveip -s $host)
-    [ "$(resolveip -s ${host_ip})" == "managesf.${DOMAIN}" ] && return 0
-    echo "[sfconfig][$host] Copy puppet configuration"
-    rsync -a -L --delete /etc/puppet/hiera/ ${host}:/etc/puppet/hiera/
-}
 
 # -----------------
 # End of functions
 # -----------------
-
-while getopts ":a:i:h" opt; do
-    case $opt in
-        a)
-            REFARCH=$OPTARG
-            [ $REFARCH != "1node-allinone" -a $REFARCH != "2nodes-jenkins" ] && {
-                    echo "Available REFARCH are: 1node-allinone or 2nodes-jenkins"
-                    exit 1
-            }
-            ;;
-        i)
-            IP_JENKINS=$OPTARG
-            ;;
-        h)
-            echo ""
-            echo "Usage:"
-            echo ""
-            echo "If run without any options sfconfig script will use defaults:"
-            echo "REFARCH=1node-allinone"
-            echo ""
-            echo "Use the -a option to specify the REFARCH."
-            echo ""
-            echo "If REFARCH is 2nodes-jenkins then is is expected you pass"
-            echo "the ip of the node where the CI system will be installed"
-            echo "via the -i option."
-            echo ""
-            exit 0
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-        :)
-            echo "Option -$OPTARG requires an argument." >&2
-            exit 1
-            ;;
-    esac
-done
-
-# Make sure hostname is correct
-if [ "$(hostname -f)" != "managesf.${DOMAIN}" ]; then
-    echo "[sfconfig][$(hostname -f)] Changing hostname to managesf.${DOMAIN}"
-    hostnamectl set-hostname "managesf.${DOMAIN}"
-fi
 
 # Generate site specifics configuration
 # Make sure sf-bootstrap-data sub-directories exist
@@ -347,56 +217,32 @@ if [ ! -f "${BUILD}/generate.done" ]; then
     generate_apache_cert
     generate_yaml
     touch "${BUILD}/generate.done"
-else
-    # During upgrade or another sfconfig run, reuse the same refarch and jenkins ip
-    REFARCH=$(cat ${BUILD}/hiera/sfarch.yaml | sed 's/ //g' | grep "^refarch:" | cut -d: -f2)
-    IP_JENKINS=$(cat ${BUILD}/hiera/sfarch.yaml | sed 's/ //g' | grep "^jenkins_ip:" | cut -d: -f2)
 fi
 
 update_sfconfig
+
+echo "[sfconfig] Generate Ansible inventory"
+/usr/local/bin/sf-ansible-generate-inventory.py
+
 puppet_apply_host
 
-# Make sure managesf.${DOMAIN} known_host is set
-add_key_known_hosts "managesf.${DOMAIN}" "$(ssh-keyscan -p 22 managesf.${DOMAIN} 2> /dev/null | grep ssh-rsa)"
-# Configure ssh access to inventory and copy puppet configuration
+# Configure ssh access to inventory
 HOSTS=$(grep "\.${DOMAIN}" /etc/ansible/hosts | sort | uniq)
 for host in $HOSTS; do
     wait_for_ssh $host
-    puppet_copy $host
 done
 
-echo "[sfconfig] Boostrapping $REFARCH"
-# Apply puppet stuff with good old shell scrips
-case "${REFARCH}" in
-    "1node-allinone")
-        puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/1node-allinone.pp
-        ;;
-    "2nodes-jenkins")
-        [ "$IP_JENKINS" == "127.0.0.1" ] && {
-            echo "[sfconfig] Please select another IP_JENKINS than 127.0.0.1 for this REFARCH"
-            exit 1
-        }
-        # Run puppet apply
-        puppet_apply "managesf.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-sf.pp
-        puppet_apply "jenkins.${DOMAIN}" /etc/puppet/environments/sf/manifests/2nodes-jenkins.pp
-        ;;
-    *)
-        echo "Unknown refarch ${REFARCH}"
-        exit 1
-        ;;
-esac
+echo "[sfconfig] Starting configuration"
 
-echo "[sfconfig] Ansible configuration"
-[ -d /var/lib/ansible ] || mkdir -p /var/lib/ansible
-cd /usr/local/share/sf-ansible
-[ -d group_vars ] || mkdir group_vars
-cat /etc/puppet/hiera/sf/*.yaml > group_vars/all.yaml
-chmod 0700 group_vars
-
-ansible-playbook sfmain.yaml || {
-    echo "[sfconfig] Ansible playbook failed"
+time ansible-playbook /etc/ansible/sf_main.yml || {
+    echo "[sfconfig] sfpuppet playbook failed"
     exit 1
 }
 
-echo "SUCCESS ${REFARCH}"
+time ansible-playbook /etc/ansible/sf_initialize.yml || {
+    echo "[sfconfig] sfmain playbook failed"
+    exit 1
+}
+
+echo "${DOMAIN}: SUCCESS"
 exit 0

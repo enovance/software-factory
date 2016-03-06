@@ -1,0 +1,18 @@
+description: "All in one instance architecture"
+inventory:
+  - name: allinone
+    roles:
+      - install-server
+      - mysql
+      - gateway
+      - auth
+      - statsd
+      - managesf
+      - gerrit
+      - zuul
+      - nodepool
+      - jenkins
+      - redmine
+    mem: 8
+    cpu: 4
+    disk: 20

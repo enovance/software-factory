@@ -1,0 +1,224 @@
+heat_template_version: 2013-05-23
+
+description: >
+  {{ description }}
+
+parameters:
+  key_name:
+    type: string
+    description:  Name of the KeyPair to enable SSH access to the SF instance
+    default: id_rsa
+  domain:
+    type: string
+    description: Domain name of deployment
+    default: sftests.com
+  image_id:
+    type: string
+    description: Glance image ID of the SF image
+  ext_net_uuid:
+    type: string
+    description: The UUID of the external net
+  sg_admin_cidr:
+    type: string
+    description: Ip range authorized for shell access
+    default: 0.0.0.0/0
+  sg_user_cidr:
+    type: string
+    description: Ip range authorized for SF service access
+    default: 0.0.0.0/0
+  nameservers:
+    type: comma_delimited_list
+    description: Nameserver IPs used by VMs
+    default: "8.8.8.8"
+
+resources:
+  admin_password:
+    type: OS::Heat::RandomString
+    properties:
+      length: 16
+
+  slave_net:
+    type: OS::Neutron::Net
+
+  slave_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: slave_net }
+      cidr: "10.8.1.0/24"
+      dns_nameservers: [ "8.8.8.8", "8.8.4.4" ]
+      ip_version: 4
+
+  slave_router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info:
+        network: { get_param: ext_net_uuid }
+
+  slave_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: slave_router }
+      subnet: { get_resource: slave_subnet }
+
+  sf_net:
+    type: OS::Neutron::Net
+
+  sf_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: sf_net }
+      cidr: 192.168.240.0/24
+      enable_dhcp: true
+      dns_nameservers: { get_param: nameservers }
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info:
+        network: { get_param: ext_net_uuid }
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_resource: sf_subnet }
+
+  sf_secgroup_admin:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules: [
+        {remote_ip_prefix: { get_param: sg_admin_cidr },
+         protocol: tcp,
+         port_range_min: 22,
+         port_range_max: 22,},
+        {remote_ip_prefix: { get_param: sg_admin_cidr },
+         protocol: icmp,}
+        ]
+
+{% for service, ports in (
+    ('gateway', (('tcp', 80), ('tcp', 443))),
+    ('swarm', (('tcp', 8080), ('tcp', 45452))),
+    ('gerrit', (('tcp', 29418),)),
+    ('murmur', (('tcp', 64738), ('udp', 64738)))
+    ) %}
+  sf_secgroup_{{ service }}:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules: [
+{% for port in ports %}
+        {remote_ip_prefix: { get_param: sg_user_cidr },
+         protocol: {{ port[0] }},
+         port_range_min: {{ port[1] }},
+         port_range_max: {{ port[1] }},},
+{% endfor %}
+        ]
+
+{% endfor %}
+{% for host in inventory %}
+  sf_{{ host['name'] }}_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_resource: sf_net }
+      security_groups: [ { get_resource: sf_secgroup_gerrit },
+                         { get_resource: sf_secgroup_murmur },
+                         { get_resource: sf_secgroup_gateway },
+                         { get_resource: sf_secgroup_swarm },
+                         { get_resource: sf_secgroup_admin },
+                         ]
+
+  sf_{{ host['name'] }}_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      port_id: { get_resource: sf_{{ host['name'] }}_port }
+      floating_network_id: { get_param: ext_net_uuid }
+
+  sf_{{ host['name'] }}_volume:
+    type: OS::Cinder::Volume
+    properties:
+      image : { get_param: image_id }
+      size  : {{ host['disk'] }}
+
+  sf_{{ host['name'] }}_instance:
+    type: OS::Nova::Server
+    properties:
+      name:
+        str_replace:
+          template: {{ host['name'] }}.domain
+          params: {domain: {get_param: domain}}
+      block_device_mapping: [{ device_name: "vda", volume_id : { get_resource : sf_{{ host['name'] }}_volume } }]
+      flavor: {{ host['flavor'] }}
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: sf_{{ host['name'] }}_port }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+            #cloud-config
+            output: {all: '| tee -a /var/log/cloud-init-output.log'}
+            write_files:
+            - content: |
+               #!/bin/bash
+               set -x
+{% if 'install-server' in host['roles'] %}
+               sed -i 's/admin_password:.*/admin_password: adminpwd/' /etc/puppet/hiera/sf/sfconfig.yaml
+               sed -i 's/^fqdn:.*/fqdn: domain/' /etc/puppet/hiera/sf/sfconfig.yaml
+               cat << EOF > /etc/puppet/hiera/sf/sfarch.yaml
+               {{ arch_raw.replace('\n', '\n               ') }}
+               EOF
+               cat << EOF > /etc/puppet/hiera/sf/hosts.yaml
+               hosts:
+                 localhost:
+                   ip: 127.0.0.1
+{% for host in inventory %}
+                 {{ host['hostname'] }}
+                   ip: IP_{{ host['name'] }}_
+                   host_alias:
+                     - {{ host['name'] }}
+{% for role in host['roles'] %}
+                     - {{ role }}.{{ domain }}
+{% if role == 'redmine' %}
+                     - api-redmine.{{ domain }}
+{% endif %}{% if role == 'gateway' %}
+                     - {{ domain }}
+{% endif %}
+{% endfor %}{% endfor %}
+               EOF
+               sfconfig.sh
+{% endif %}
+              path: /root/startup.sh
+            runcmd:
+              - chmod +x /root/startup.sh
+              - /root/startup.sh
+              - rm -f /root/startup.sh
+          params:
+            domain: {get_param: domain}
+            adminpwd: {get_attr: [admin_password, value]}
+{% if 'install-server' in host['roles'] %}{% for host in inventory %}
+            IP_{{ host['name'] }}_: {get_attr: [sf_{{ host['name'] }}_floating_ip, floating_ip_address]}
+{% endfor %}{% endif %}
+
+
+{% endfor %}
+outputs:
+  sf_public_address:
+    description: Public address of SF
+    value:
+      str_replace:
+        template: "Public address of the SF instance: host"
+        params:
+          host: { get_attr: [sf_{% for host in inventory %}{% if 'gateway' in host['roles'] %}{{ host['name'] }}{% endif %}{% endfor %}_floating_ip, floating_ip_address] }
+  administrator_password:
+    description: SF administrator password
+    value:
+      str_replace:
+        template: "Administrator password for SF services: passwd"
+        params:
+          passwd: {get_attr: [admin_password, value]}
+  slave_network:
+    description: slave network
+    value:
+      str_replace:
+        template: "Nodepool slave network: netname"
+        params:
+          netname: { get_attr: [slave_net, name] }

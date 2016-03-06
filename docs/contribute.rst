@@ -44,17 +44,17 @@ to run functional and unit tests locally first:
 
 .. code-block:: bash
 
-  ./run_tests.sh               # unittests
-  ./run_functional-tests.sh    # functional tests
+  ./run_tests.sh                      # unittests
+  ./run_functional-tests.sh           # functional tests
+  ./run_functional-tests.sh upgrade   # upgrade tests
 
-Two reference architectures are currently supported and tested with functional,
-backup and restore tests: 1node-allinone and 2nodes-jenkins
+Different architectures can be tested using the SF_ARCH environment variable:
 
 .. code-block:: bash
 
-  ./run_functional-tests.sh 1node-allinone          # functional tests
-  ./run_functional-tests.sh 2nodes-jenkins upgrade  # upgrade tests
-  ./run_functional-tests.sh 1node-allinone backup   # backup tests
+  export SF_ARCH=$(pwd)/config/refarch/distributed.yaml
+  ./run_functional-tests.sh
+
 
 The functional tests will start LXC container(s) on the local VM to simulate
 as close as possible a real deployment.
