@@ -167,7 +167,7 @@ Multi-node deployment without LXC or HEAT
 
 When system are deployed manually, you need to reference IP address of all instances.
 
-* Edit /etc/puppet/hiera/sf/sfarch.yaml to distribute services accross multiple system
+* Edit /etc/puppet/hiera/sf/arch.yaml to distribute services accross multiple system
 * Edit /etc/puppet/hiera/sf/hosts.yaml to set ip address of remote hosts
 
 
