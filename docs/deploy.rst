@@ -38,6 +38,29 @@ digest are signed with gpg, install the key and verify content with:
  $ gpg --verify softwarefactory-C7.0-2.0.0.digest && sha256sum -c softwarefactory-C7.0-2.0.0.digest
 
 
+Architecture
+------------
+
+SF architecture is modular and defined by a single file called refarch::
+
+.. code-block:: yaml
+
+  inventory:
+    - name: node01
+      roles:
+        - install-server
+        - mysql
+    - name: node02
+      roles:
+        - gerrit
+      mem: 8
+
+Heat and Lxc based deployment autoconfigure dns. Manual deployments needs to edits the
+/etc/puppet/hiera/sf/hosts.yaml to set hostname and ip address of other node.
+
+See config/refarch directory for example architectures.
+
+
 OpenStack based deployment
 --------------------------
 
@@ -56,9 +79,9 @@ SF image needs to be uploaded to Glance:
 Deploy with Heat
 ................
 
-A Heat template is available to automate the deployment process.
+Heat templates are available to automate the deployment process of different reference architecture.
 
-It requires:
+They all requires:
 
 * the SF image UUID
 * the external Neutron network UUID
@@ -139,15 +162,14 @@ Done! The webinterface is enabled on port 80, and the Gerrit git server on port
 29418.
 
 
-Multi-node deployment (WIP)
----------------------------
+Multi-node deployment without LXC or HEAT
+-----------------------------------------
 
-Multi-node deployment is still a work in progress. However all services are configured in
-virtual domains and are designed to run independently. Integration tests are currently
-testing two types of deployments (called reference architectures):
+When system are deployed manually, you need to reference IP address of all instances.
 
-* 1node-allinone: all services run on the same instance.
-* 2nodes-jenkins: CI components (jenkins/zuul/nodepool) run on another instance.
+* Edit /etc/puppet/hiera/sf/sfarch.yaml to distribute services accross multiple system
+* Edit /etc/puppet/hiera/sf/hosts.yaml to set ip address of remote hosts
+
 
 Configuration and reconfiguration
 ---------------------------------
