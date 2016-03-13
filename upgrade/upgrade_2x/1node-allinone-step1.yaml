@@ -13,3 +13,5 @@
   - include: tasks/new_creds.yml sf_secret_name=service_user_pwd
   # Etherpad
   - include: tasks/new_creds.yml sf_secret_name=etherpad_admin_key
+  # 2.0.0: Remove hosts.yaml hiera
+  - file: path=/etc/puppet/hiera/sf/hosts.yaml state=absent
