@@ -56,10 +56,21 @@ function initAuth() {
     displaySignIn();
 };
 
-/** Init function 
+function initOptionsMenu() {
+  $("#navbar-options").hide();
+  $(".toggle-navbar-options").click( function() {
+    $("#navbar-options").fadeToggle();
+  });
+};
+
+/** Init function
  */
 if (document.body) {
-    initAuth();
+  initAuth();
+  initOptionsMenu();
 } else {
-    document.onload = function() {initAuth();};
+  document.onload = function() {
+    initAuth();
+    initOptionsMenu();
+  };
 }
