@@ -136,4 +136,9 @@ class managesf ($gerrit = hiera('gerrit'), $cauth = hiera('cauth')) {
     group   => 'root',
     content => template('managesf/layout.yaml.erb'),
   }
+  bup::scripts{ 'managesf_scripts':
+    name           => 'managesf',
+    backup_script  => 'managesf/backup.sh.erb',
+    restore_script => 'managesf/restore.sh.erb',
+  }
 }

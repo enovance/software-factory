@@ -121,4 +121,9 @@ class cauth ($cauth = hiera('cauth'), $gerrit = hiera('gerrit')) {
     content => template('cauth/login.html.erb'),
     require => File['/var/www/cauth/cauth/templates'],
   }
+  bup::scripts{ 'cauth_scripts':
+    name           => 'cauth',
+    backup_script  => 'cauth/backup.sh.erb',
+    restore_script => 'cauth/restore.sh.erb',
+  }
 }
