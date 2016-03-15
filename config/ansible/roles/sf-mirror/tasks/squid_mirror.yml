@@ -1,4 +1,15 @@
 - name: Install squid
   yum: name=squid state=present
 
-# TODO: configuration
+- name: Set squid maximum object size
+  lineinfile: dest=/etc/squid/squid.conf regexp=^maximum_object_size line=maximum_object_size 100 MB
+
+- name: Enable squid disk cache
+  lineinfile: dest=/etc/squid/squid.conf regexp=^cache_dir line=cache_dir ufs /var/spool/squid 2000 16 256
+
+– name: Add nodepool subnets to squid localnet
+  lineinfile:
+    dest=/etc/squid/squid.conf
+    regexp="{{ item }}"
+    line="{{ item }}"
+  with_items: nodepool_subnets

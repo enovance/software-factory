@@ -8,3 +8,8 @@ mirror_sources:
   - kibana-4.4
   - logstash-2.2
   - elasticsearch-2.x
+nodepool_subnets:
+  - 46.231.128.0/22
+  - 46.231.132.0/22
+  - 94.143.112.0/22
+  - 94.143.116.0/22
