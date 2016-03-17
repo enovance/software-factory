@@ -3,6 +3,8 @@
   tasks:
   - name: Restart the configuration script
     shell: sfconfig.sh > /var/log/upgrade-bootstrap.log
+  - name: reprovision users if necessary
+    shell: /usr/local/bin/reprovision-users.py provision
 - hosts: jenkins
   gather_facts: no
   tasks:
