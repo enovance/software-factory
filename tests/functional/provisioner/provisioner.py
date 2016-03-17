@@ -95,6 +95,12 @@ class SFProvisioner(object):
         # TODO
         pass
 
+
+    def simple_login(self, user):
+        """log as user to make the user listable"""
+        utils.get_cookie(user, config.USERS[user]['password'])
+
+
     def create_review(self, project, issue):
         """Very basic review creator for statistics and restore tests
         purposes."""
@@ -105,6 +111,9 @@ class SFProvisioner(object):
         self.ggu.review_push_branch(self.clone_dir, 'branch_' + issue)
 
     def provision(self):
+        for u in self.resources['users']:
+            print "log in as %s" % u['name']
+            self.simple_login(u['name'])
         for project in self.resources['projects']:
             print "Create user datas for %s" % project['name']
             self.create_project(project['name'])
