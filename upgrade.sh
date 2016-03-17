@@ -23,6 +23,9 @@ cp ${DST} ${DST}.orig
 
 ./config/scripts/validate_sfconfig.py ${DST} || exit -1
 
+# dump users
+./config/scripts/reprovision_users.py dump ${DST} || exit -1
+
 # fix rsyncd install dir
 [ -d /var/lib/debootstrap ] || mkdir /var/lib/debootstrap
 [ -e /var/lib/debootstrap/install ] && rm -Rf /var/lib/debootstrap/install
@@ -48,5 +51,8 @@ ansible-playbook -i ${REFARCH}-hosts ${REFARCH}-step2.yaml
 STEP2_RETURN_CODE=$?
 echo "Ansible return code is : ${STEP2_RETURN_CODE}"
 [ ${STEP2_RETURN_CODE} != "0" ] && exit -1
+
+# reprovision users
+./config/scripts/reprovision_users.py provision ${DST} || exit -1
 
 exit 0
