@@ -11,3 +11,4 @@
   - include: tasks/SFServiceUser.yml
   - include: tasks/etherpad.yml
   - include: tasks/new_creds.yml sf_secret_name=mumble_ice_secret
+  - shell: /usr/local/bin/reprovision_users.py dump
