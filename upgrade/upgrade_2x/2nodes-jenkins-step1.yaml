@@ -5,6 +5,7 @@
   - include: tasks/fetchupstream.yml
   - include: tasks/SFServiceUser.yml
   - include: tasks/fix_redmine.yml
+  - shell: /usr/local/bin/reprovision_users.py dump
 - hosts: instances
   gather_facts: no
   tasks:
