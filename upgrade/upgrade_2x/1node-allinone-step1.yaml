@@ -11,3 +11,5 @@
   - include: tasks/SFServiceUser.yml
   - include: tasks/etherpad.yml
   - include: tasks/new_creds.yml sf_secret_name=mumble_ice_secret
+  - include: tasks/new_creds.yml sf_secret_name=cauth_sql_pwd
+  - include: tasks/new_creds.yml sf_secret_name=managesf_sql_pwd

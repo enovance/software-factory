@@ -25,6 +25,8 @@ class sfmysql {
     $creds_lodgeit_sql_pwd = hiera('creds_lodgeit_sql_pwd')
     $creds_grafana_sql_pwd = hiera('creds_grafana_sql_pwd')
     $creds_gnocchi_sql_pwd = hiera('creds_gnocchi_sql_pwd')
+    $creds_cauth_sql_pwd = hiera('creds_cauth_sql_pwd')
+    $creds_managesf_sql_pwd = hiera('creds_managesf_sql_pwd')
 
     $mysql = 'mariadb'
     $provider = 'systemd'
