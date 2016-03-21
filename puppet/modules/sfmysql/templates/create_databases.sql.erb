@@ -17,4 +17,8 @@ GRANT ALL PRIVILEGES ON grafana.* TO 'grafana'@'statsd.<%= @fqdn %>' IDENTIFIED 
 CREATE DATABASE IF NOT EXISTS gnocchi CHARACTER SET utf8 COLLATE utf8_general_ci;
 GRANT ALL PRIVILEGES ON gnocchi.* TO 'gnocchi'@'managesf.<%= @fqdn %>' IDENTIFIED BY "<%= @creds_gnocchi_sql_pwd %>";
 GRANT ALL PRIVILEGES ON gnocchi.* TO 'gnocchi'@'statsd.<%= @fqdn %>' IDENTIFIED BY "<%= @creds_gnocchi_sql_pwd %>";
+CREATE DATABASE IF NOT EXISTS cauth CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON cauth.* TO 'cauth'@'managesf.<%= @fqdn %>' IDENTIFIED BY "<%= @creds_cauth_sql_pwd %>";
+CREATE DATABASE IF NOT EXISTS managesf CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON managesf.* TO 'managesf'@'managesf.<%= @fqdn %>' IDENTIFIED BY "<%= @creds_managesf_sql_pwd %>";
 FLUSH PRIVILEGES;
