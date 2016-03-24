@@ -468,7 +468,7 @@ class TestManageSF(Base):
 
     def test_basic_ops_project_namespace(self):
         """ Check if a project named with a / (namespace) is handled
-        correclty by managesf
+        correctly on basic ops by managesf
         """
         pname = 'skydive/%s' % create_random_str()
         self.create_project(pname, config.USER_2)
@@ -476,12 +476,31 @@ class TestManageSF(Base):
         if is_present("SFRedmine"):
             # TODO this conversion should be done in pysflib directly
             self.assertTrue(self.rm.project_exists(pname.replace('/', '_')))
+        self.assertTrue(self.gu.group_exists('%s-ptl' % pname))
+        if is_present("SFRedmine"):
+            self.assertTrue(self.rm.project_exists(pname.replace('/', '_')))
+        # Try to clone
+        ggu = GerritGitUtils(config.ADMIN_USER,
+                             config.ADMIN_PRIV_KEY_PATH,
+                             config.USERS[config.ADMIN_USER]['email'])
+        url = "ssh://%s@%s:29418/%s" % (config.ADMIN_USER,
+                                        config.GATEWAY_HOST, pname)
+        clone_dir = ggu.clone(url, pname.split('/')[-1])
+        self.dirs_to_delete.append(os.path.dirname(clone_dir))
+        # Test that the clone is a success
+        self.assertTrue(os.path.isdir(clone_dir))
+        # Verify master own the .gitreview file
+        self.assertTrue(os.path.isfile(os.path.join(clone_dir,
+                                                    '.gitreview')))
+        # Delete the project from SF
         self.msu.deleteProject(pname, config.ADMIN_USER)
         self.assertFalse(self.gu.project_exists(pname))
         self.assertFalse(self.gu.group_exists('%s-ptl' % pname))
         if is_present("SFRedmine"):
             self.assertFalse(self.rm.project_exists(pname))
         self.assertFalse(self.gu.group_exists('%s-core' % pname))
+
+        # Clean local clone directory
         self.projects.remove(pname)
 
     # For now listing users comes from Redmine
