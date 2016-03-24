@@ -62,7 +62,7 @@ class TestZuulOps(Base):
         # zuul-demo - test project used exclusively to test zuul installation
         # The necessary project descriptions are already declared in Jenkins
         # and zuul
-        pname = 'zuul-demo'
+        pname = 'demo/zuul-demo'
         self.create_project(pname, config.ADMIN_USER)
         un = config.ADMIN_USER
         gu = GerritUtils(
