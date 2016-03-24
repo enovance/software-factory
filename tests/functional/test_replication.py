@@ -64,7 +64,7 @@ class TestProjectReplication(Base):
         file(wrapper_path, 'w').write(ssh_wrapper)
         os.chmod(wrapper_path, stat.S_IRWXU)
         self.mt.env['GIT_SSH'] = wrapper_path
-        self.pname = 'test-replication'
+        self.pname = 'test/replication'
 
     def tearDown(self):
         self.deleteConfigSection(self.un, self.pname)
