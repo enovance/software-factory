@@ -158,7 +158,7 @@ class TestProjectTestsWorkflow(Base):
             self.config_clone_dir, "zuul/projects.yaml")).read()
         file(os.path.join(
             self.config_clone_dir, "zuul/projects.yaml"), 'w').write(
-            ycontent.replace("zuul-demo", pname),
+            ycontent.replace("demo/zuul-demo", pname),
         )
         ycontent2 = load(file(os.path.join(
             self.config_clone_dir, "jobs/projects.yaml")).read())
