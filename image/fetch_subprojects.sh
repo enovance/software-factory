@@ -53,6 +53,9 @@ for PROJECT in "PYSFLIB" "CAUTH" "MANAGESF" "SFMANAGER"; do
             (cd $PROJECT_CLONED_PATH && git checkout $PROJECT_REV && git clean -fd) &> /dev/null || { echo "Fail to checkout rev:$PROJECT_REV" && exit 1; }
         else
             echo "(Forced) Use local source from $PROJECT_CLONED_PATH"
+            [ -d "$PROJECT_CLONED_PATH/build" ] && {
+                echo "(Warn) A previous build directory exists in $PROJECT_CLONED_PATH/build. You should clean it to avoid include non expected verion in the image."
+            }
         fi
     else
         echo "Use local source from $PROJECT_CLONED_PATH"
