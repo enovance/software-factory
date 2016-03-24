@@ -60,7 +60,7 @@ class TestProjectMembership(Base):
     def test_admin_manage_project_members(self):
         """ Test admin can add and delete users from all project groups
         """
-        pname = 'p_%s' % create_random_str()
+        pname = 'p/%s' % create_random_str()
         self.create_project(pname, config.ADMIN_USER)
         # Gerrit part
         self.assertTrue(self.gu.project_exists(pname))
