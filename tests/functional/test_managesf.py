@@ -598,3 +598,21 @@ class TestManageSF(Base):
         self.assertEqual(self.msu.get_project_page(config.USER_2,
                                                    project).strip(),
                          "")
+
+    @skipIfServiceMissing('SFRedmine')
+    def test_create_colliding_projects_from_namespace(self):
+        """Test that ns/pj and ns_pj can be created without trouble
+        """
+        # the rationale here is that projects with a namespace like ns/pj
+        # are created in redmine as "ns_pj". So what happens when we
+        # want to create a project with such a name ?
+        prj = create_random_str()
+        ns_proj = 'ns/%s' % prj
+        hacky_proj = 'ns_%s' % prj
+        self.create_project(ns_proj, config.ADMIN_USER)
+        self.create_project(hacky_proj, config.ADMIN_USER)
+        # Gerrit part
+        # we don't really care about the Redmine part given the use case of
+        # the namespaces at this point in time.
+        self.assertTrue(self.gu.project_exists(ns_proj))
+        self.assertTrue(self.gu.project_exists(hacky_proj))
