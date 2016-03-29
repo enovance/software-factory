@@ -1,0 +1,86 @@
+---
+- hosts: managesf
+  gather_facts: False
+  remote_user: root
+  tasks:
+  - include_vars: rename-rules.yaml
+  - name: "Copy rename-project.sh script"
+    copy: src=rename-project.sh dest=/tmp/rename-project.sh mode=755
+  - name: "Copy rename-groups.sh script"
+    copy: src=rename-groups.sh dest=/tmp/rename-groups.sh mode=755
+  - name: "Stop zuul"
+    shell: systemctl stop zuul
+  - name: "Stop zuul-merger"
+    shell: systemctl stop zuul-merger
+  - name: "Stop gerrit"
+    shell: systemctl stop gerrit
+  - wait_for: port=29418 state=absent
+
+  - name: "Copy Gerrit SQL commands"
+    copy:
+      content='
+        update account_project_watches set project_name = "{{ item.new }}" where project_name = "{{ item.old }}";
+        update changes set dest_project_name = "{{ item.new }}", created_on = created_on where dest_project_name = "{{ item.old }}";'
+      dest=/tmp/gerrit.sql
+      mode=755
+    with_items: repos
+
+  - name: "Copy Redmine SQL commands"
+    copy:
+      content='update projects set name = "{{ item.new }}", identifier = "{{ item.new }}" where name = "{{ item.old }}";'
+      dest=/tmp/redmine.sql
+      mode=755
+    with_items: repos
+
+  - name: "Rename project in DB"
+    mysql_db: state=import name={{ item}} target=/tmp/{{ item }}.sql
+    with_items:
+      - gerrit
+      - redmine
+
+  - file: path=/home/gerrit/site_path/git/ state=directory mode=0755 owner=gerrit recurse=yes
+
+  - name: Check if git directory exists
+    stat: path=/home/gerrit/site_path/git/{{ item.old }}.git
+    with_items: repos
+    register: gitdir
+
+  - name: Rename git directory
+    command: mv /home/gerrit/site_path/git/{{ item.old }}.git /home/gerrit/site_path/git/{{ item.new }}.git
+    with_items: repos
+    when: gitdir.results[0].stat.exists is defined and gitdir.results[0].stat.exists == true
+
+  - name: Update projectname in /home/gerrit/site_path/etc/replication.config
+    replace:
+      dest=/home/gerrit/site_path/etc/replication.config
+      regexp='(.*){{ item.old }}(.*)'
+      replace='\1{{ item.new }}\2'
+      backup=yes
+    with_items: repos
+  - name: Update projectname in /home/gerrit/.ssh/config
+    replace:
+      dest=/home/gerrit/.ssh/config
+      regexp='(.*){{ item.old }}(.*)'
+      replace='\1{{ item.new }}\2'
+      backup=yes
+    with_items: repos
+  - name: Check if there is a SSH replication key to rename
+    stat: path=/home/gerrit/.ssh/alias_gh_{{ item.old }}.key
+    with_items: repos
+    register: sshkeyfile
+  - name: Rename replication SSH key
+    command: mv /home/gerrit/.ssh/alias_gh_{{ item.old }}.key /home/gerrit/.ssh/alias_gh_{{ item.new }}.key
+    with_items: repos
+    when: sshkeyfile.results[0].stat.exists is defined and sshkeyfile.results[0].stat.exists == true
+  - name: "Start re-index"
+    shell: java -jar /home/gerrit/site_path/bin/gerrit.war reindex -d /home/gerrit/site_path
+  - name: "Start gerrit"
+    shell: systemctl start gerrit
+  - wait_for: port=29418 state=present
+  - name: "Start rename project groups for {{ item.new }}"
+    shell: "/tmp/rename-groups.sh {{ item.old }} {{ item.new }}"
+    with_items: repos
+  - name: "Start zuul"
+    shell: systemctl start zuul
+  - name: "Start zuul merger"
+    shell: systemctl start zuul-merger
