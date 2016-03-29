@@ -1,0 +1,54 @@
+---
+- hosts: managesf
+  gather_facts: False
+  remote_user: root
+  tasks:
+  - include_vars: rename-rules.yaml
+  - name: "Copy rename-project.sh script"
+    copy: src=rename-project.sh dest=/tmp/rename-project.sh mode=755
+  - name: "Copy rename-groups.sh script"
+    copy: src=rename-groups.sh dest=/tmp/rename-groups.sh mode=755
+  - name: "Stop zuul"
+    shell: systemctl stop zuul
+  - name: "Stop zuul-merger"
+    shell: systemctl stop zuul-merger
+  - name: "Stop gerrit"
+    shell: systemctl stop gerrit
+  - wait_for: port=29418 state=absent
+  - name: "Start rename project {{ item.old }} to {{ item.new }}"
+    shell: "/tmp/rename-project.sh {{ item.old }} {{ item.new }}"
+    with_items: repos
+  - name: Update projectname in /home/gerrit/site_path/etc/replication.config
+    replace:
+      dest=/home/gerrit/site_path/etc/replication.config
+      regexp='(.*){{ item.old }}(.*)'
+      replace='\1{{ item.new }}\2'
+      backup=yes
+    with_items: repos
+  - name: Update projectname in /home/gerrit/.ssh/config
+    replace:
+      dest=/home/gerrit/.ssh/config
+      regexp='(.*){{ item.old }}(.*)'
+      replace='\1{{ item.new }}\2'
+      backup=yes
+    with_items: repos
+  - name: Check if there is a SSH replication key to rename
+    stat: path=/home/gerrit/.ssh/alias_gh_{{ item.old }}.key
+    with_items: repos
+    register: sshkeyfile
+  - name: Rename replication SSH key
+    command: mv /home/gerrit/.ssh/alias_gh_{{ item.old }}.key /home/gerrit/.ssh/alias_gh_{{ item.new }}.key
+    with_items: repos
+    when: sshkeyfile.results[0].stat.exists is defined and sshkeyfile.results[0].stat.exists == true
+  - name: "Start re-index"
+    shell: java -jar /home/gerrit/site_path/bin/gerrit.war reindex -d /home/gerrit/site_path
+  - name: "Start gerrit"
+    shell: systemctl start gerrit
+  - wait_for: port=29418 state=present
+  - name: "Start rename project groups for {{ item.new }}"
+    shell: "/tmp/rename-groups.sh {{ item.old }} {{ item.new }}"
+    with_items: repos
+  - name: "Start zuul"
+    shell: systemctl start zuul
+  - name: "Start zuul merger"
+    shell: systemctl start zuul-merger
