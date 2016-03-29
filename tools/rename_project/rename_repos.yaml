@@ -1,0 +1,32 @@
+---
+- hosts: managesf
+  gather_facts: False
+  remote_user: root
+  tasks:
+  - include_vars: rename-rules.yaml
+  - name: "Copy rename-project.sh script"
+    copy: src=rename-project.sh dest=/tmp/rename-project.sh mode=755
+  - name: "Copy rename-groups.sh script"
+    copy: src=rename-groups.sh dest=/tmp/rename-groups.sh mode=755
+  - name: "Stop zuul"
+    shell: systemctl stop zuul
+  - name: "Stop zuul-merger"
+    shell: systemctl stop zuul-merger
+  - name: "Stop gerrit"
+    shell: systemctl stop gerrit
+  - wait_for: port=29418 state=absent
+  - name: "Start rename project {{ item.old }} to {{ item.new }}"
+    shell: "/tmp/rename-project.sh {{ item.old }} {{ item.new }}"
+    with_items: repos
+  - name: "Start re-index"
+    shell: java -jar /home/gerrit/site_path/bin/gerrit.war reindex -d /home/gerrit/site_path
+  - name: "Start gerrit"
+    shell: systemctl start gerrit
+  - wait_for: port=29418 state=present
+  - name: "Start rename project groups for {{ item.new }}"
+    shell: "/tmp/rename-groups.sh {{ item.old }} {{ item.new }}"
+    with_items: repos
+  - name: "Start zuul"
+    shell: systemctl start zuul
+  - name: "Start zuul merger"
+    shell: systemctl start zuul-merger
