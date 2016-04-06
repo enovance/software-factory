@@ -35,6 +35,21 @@ users:
  - name: user2
  - name: user3
 commands:
-  - cmd: hostname -f
+  - cmd: hieraedit.py --yaml /etc/puppet/hiera/sf/sfcreds.yaml safekey pc_test
+  - cmd: hieraedit.py --yaml /etc/puppet/hiera/sf/sfconfig.yaml safekey pc_test
+  - cmd: echo "admin:OpPzvAQ.RbXb6" > /etc/httpd/managesf_htpasswd
+  - cmd: git config -f /home/gerrit/site_path/etc/replication.config remote.name pc_test
+  - cmd: git config -f /home/gerrit/.ssh/config remote.name pc_test
+  - cmd: sed -i /home/gerrit/site_path/etc/replication.config -e 's#/home/gerrit/site_path/git/#/home/gerrit/git/#'
+  - cmd: echo "pc_test fake key" > /home/gerrit/.ssh/id_rsa_pc_test.key
 checksum:
-  - file: /etc/hostname
+  - file: /etc/puppet/hiera/sf/sfcreds.yaml
+  - file: /etc/puppet/hiera/sf/sfconfig.yaml
+  - file: /var/lib/jenkins/credentials.xml
+  - file: /var/lib/jenkins/secret.key
+  - file: /etc/httpd/managesf_htpasswd
+  - file: /home/gerrit/site_path/etc/ssh_host_rsa_key.pub
+  - file: /home/gerrit/site_path/etc/ssh_host_rsa_key
+  - file: /home/gerrit/site_path/etc/replication.config
+  - file: /home/gerrit/.ssh/config
+  - file: /home/gerrit/.ssh/id_rsa_pc_test.key
