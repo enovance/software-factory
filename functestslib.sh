@@ -401,7 +401,8 @@ function reset_etc_hosts_dns {
 
 function run_provisioner {
     echo "$(date) ======= run_provisioner"
-    ./tests/functional/provisioner/provisioner.py 2>> ${ARTIFACTS_DIR}/provisioner.debug || fail "Provisioner failed" ${ARTIFACTS_DIR}/provisioner.debug
+    flag=${1:-backup}
+    ./tests/functional/provisioner/provisioner.py $flag 2>> ${ARTIFACTS_DIR}/provisioner.debug || fail "Provisioner failed" ${ARTIFACTS_DIR}/provisioner.debug
     checkpoint "run_provisioner"
 }
 
@@ -448,7 +449,8 @@ function run_upgrade {
 
 function run_checker {
     echo "$(date) ======= run_checker"
-    ./tests/functional/provisioner/checker.py 2>> ${ARTIFACTS_DIR}/checker.debug || fail "Backup checker failed" ${ARTIFACTS_DIR}/checker.debug
+    flag=${1:-backup}
+    ./tests/functional/provisioner/checker.py $flag 2>> ${ARTIFACTS_DIR}/checker.debug || fail "Backup checker failed" ${ARTIFACTS_DIR}/checker.debug
     checkpoint "run_checker"
 }
 

@@ -126,15 +126,18 @@ class SFProvisioner(object):
             return out.split()[0]
 
     def provision(self):
-        for cmd in self.resources['commands']:
-            print "Execute command %s" % cmd['cmd']
-            print self.command(cmd['cmd'])
-        checksum_list = {}
-        for checksum in self.resources['checksum'] :
-            print "Compute checksum for file %s" % checksum['file']
-            checksum_list[checksum['file']] = self.compute_checksum(
-                checksum['file'])
-        yaml.dump(checksum_list, file('/tmp/pc_checksums.yaml', 'w'))
+        if sys.argv[1] != "upgrade":
+            # Only run this part for the real backup/restore test
+            # As this can break functionnal test started after that
+            for cmd in self.resources['commands']:
+                print "Execute command %s" % cmd['cmd']
+                print self.command(cmd['cmd'])
+            checksum_list = {}
+            for checksum in self.resources['checksum'] :
+                print "Compute checksum for file %s" % checksum['file']
+                checksum_list[checksum['file']] = self.compute_checksum(
+                    checksum['file'])
+            yaml.dump(checksum_list, file('/tmp/pc_checksums.yaml', 'w'))
         for user in self.resources['local_users']:
             print "Create local user %s" % user['username']
             self.create_local_user(user['username'],

@@ -151,7 +151,10 @@ class SFchecker:
                 sys.exit(1)
 
     def checker(self):
-        self.check_checksums()
+        if sys.argv[1] != "upgrade":
+            # Only run this part for the real backup/restore test
+            # As this can break functionnal test started after that
+            self.check_checksums()
         self.check_users_list()
         for project in self.resources['projects']:
             print "Check user datas for %s" % project['name']

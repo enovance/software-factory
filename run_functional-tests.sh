@@ -82,9 +82,9 @@ case "${TEST_TYPE}" in
         ./fetch_image.sh ${SF_PREVIOUS_VER} || fail "Could not fetch ${SF_PREVIOUS_VER}"
         lxc_init ${SF_PREVIOUS_VER}
         run_bootstraps
-        run_provisioner
+        run_provisioner "upgrade"
         run_upgrade
-        run_checker
+        run_checker "upgrade"
         run_serverspec_tests
         run_functional_tests
         ;;
