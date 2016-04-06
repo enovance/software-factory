@@ -35,6 +35,8 @@ users:
  - name: user2
  - name: user3
 commands:
-  - cmd: hostname -f
+  - cmd: hieraedit.py --yaml /etc/puppet/hiera/sf/sfcreds.yaml safekey pc_test
+  - cmd: hieraedit.py --yaml /etc/puppet/hiera/sf/sfconfig.yaml safekey pc_test
 checksum:
-  - file: /etc/hostname
+  - file: /etc/puppet/hiera/sf/sfcreds.yaml
+  - file: /etc/puppet/hiera/sf/sfconfig.yaml
