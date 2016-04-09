@@ -3,6 +3,7 @@
 import yaml
 import os
 import sys
+import subprocess
 
 from jinja2 import FileSystemLoader
 from jinja2.environment import Environment
@@ -15,6 +16,12 @@ required_roles = (
     "mysql",
     "gerrit",
 )
+
+
+def get_public_ip():
+    return subprocess.Popen(
+        ["ip", "route", "get", "8.8.8.8"],
+        stdout=subprocess.PIPE).stdout.read().split()[6]
 
 
 def fail(msg):
@@ -35,8 +42,11 @@ def load_refarch(filename, domain=None):
     ip_prefix = None
     hostid = 10
     for host in arch["inventory"]:
-        if "ip" not in host:
+        if "install-server" in host["roles"]:
+            host["ip"] = get_public_ip()
+        elif "ip" not in host:
             host["ip"] = "192.168.135.1%d" % hostid
+
         if not ip_prefix:
             ip_prefix = '.'.join(host["ip"].split('.')[0:3])
         elif ip_prefix != '.'.join(host["ip"].split('.')[0:3]):
