@@ -476,6 +476,14 @@ EOF
     rm -Rf ${dir}/srv/lodgeit/lodgeit/.git
 }
 
+function install_ansible2 {
+    do_chroot ${dir} virtualenv /srv/ansible2
+    do_chroot ${dir} /srv/ansible2/bin/pip install 'ansible>2'
+    for bin in ansible ansible-playbook; do
+        ln -sf /srv/ansible2/bin/${bin} ${dir}/usr/bin/${bin}
+    done
+}
+
 function install_nodepool {
     # Checkout VERSION in /tmp
     do_chroot ${dir} virtualenv /srv/nodepool
@@ -611,6 +619,8 @@ if [ "$STEP" == 1 ]; then
     checkpoint "nodepool installed"
     install_gerritbot
     checkpoint "gerritbot installed"
+    install_ansible2
+    checkpoint "ansible2 installed"
     install_murmurd
     install_pygerrit
     install_fonts
