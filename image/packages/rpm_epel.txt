@@ -15,7 +15,6 @@ rubygem-bundler
 mod_proxy_html
 
 # Python stuff
-ansible
 dib-utils
 diskimage-builder
 GitPython

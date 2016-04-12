@@ -2,5 +2,6 @@
 - include: /etc/ansible/tasks/puppet.yml puppet_statement="include ::socat_gerrit"
   when: groups['gerrit'] != groups['gateway']
 
-- service: name=socat_gerrit enabled=no state=stopped
-  when: groups['gerrit'] == groups['gateway']
+# ansible-2 fails with 'systemd could not find the requested service' when service isn't installed
+#- service: name=socat_gerrit enabled=no state=stopped
+#  when: groups['gerrit'] == groups['gateway']
