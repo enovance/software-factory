@@ -487,6 +487,23 @@ EOF
     rm -Rf ${dir}/srv/lodgeit/lodgeit/.git
 }
 
+function install_ansible2 {
+    # Install
+    do_chroot ${dir} virtualenv /srv/ansible2
+    do_chroot ${dir} /srv/ansible2/bin/pip install 'ansible>2'
+
+    # Manually share libselinux-python and policycoreutils-python between host and venv (to avoid pip install)
+    for lib in selinux sepolicy sepolgen policycoreutils semanage.py _semanage.so IPy.py; do
+        ln -sf /usr/lib64/python2.7/site-packages/${lib} ${dir}/srv/ansible2/lib64/python2.7/site-packages/
+    done
+    ln -s /usr/lib/python2.7/site-packages/seobject ${dir}/srv/ansible2/lib64/python2.7/site-packages/
+
+    # Install symlink to venv
+    for bin in ansible ansible-playbook; do
+        ln -sf /srv/ansible2/bin/${bin} ${dir}/usr/bin/${bin}
+    done
+}
+
 function install_nodepool {
     # Checkout VERSION in /tmp
     do_chroot ${dir} virtualenv /srv/nodepool
@@ -622,6 +639,8 @@ if [ "$STEP" == 1 ]; then
     checkpoint "nodepool installed"
     install_gerritbot
     checkpoint "gerritbot installed"
+    install_ansible2
+    checkpoint "ansible2 installed"
     install_murmurd
     install_pygerrit
     install_fonts
