@@ -53,7 +53,7 @@
           sudo service neutron-server restart
 
           echo "[+] Allow external access from vm"
-          gw=$('ip' 'route' 'get' '8.8.8.8' | awk '{ print $5 }' | tr '\n' ' ' )
+          gw=$(/sbin/ip route get 8.8.8.8 | awk '{ print $5 }' | tr '\n' ' ' )
           sudo iptables -I POSTROUTING -t nat -s 192.168.42.1/24 -o $gw -j MASQUERADE
           sudo iptables -I FORWARD -i br-ex -o $gw -j ACCEPT
           sudo iptables -I FORWARD -o br-ex -i $gw -j ACCEPT
@@ -70,7 +70,7 @@
                 --gateway=192.168.42.1 external_network 192.168.42.0/24 > /dev/null
           neutron router-create external_gw > /dev/null
           neutron router-gateway-set external_gw external_network > /dev/null
-          sudo ip a add 192.168.42.1/24 dev br-ex
+          sudo /sbin/ip a add 192.168.42.1/24 dev br-ex
 
           echo "[+] Install cirros"
           wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img &> /dev/null
