@@ -80,7 +80,7 @@
   - name: Update section name in /home/gerrit/site_path/etc/replication.config
     replace:
       dest=/home/gerrit/site_path/etc/replication.config
-      regexp='(\[remote .){{ item.old | regex_replace('/', '_') }}(.*)'
+      regexp='(\[remote "){{ item.old | regex_replace('/', '_') }}("\])'
       replace='\1{{ item.new | regex_replace('/', '_') }}\2'
       backup=yes
     with_items: repos
@@ -91,8 +91,8 @@
   - name: Update alias name in url /home/gerrit/site_path/etc/replication.config
     replace:
       dest=/home/gerrit/site_path/etc/replication.config
-      regexp='(url = git@alias_gh_){{ item.old | regex_replace('/', '_') }}(.*)'
-      replace='\1{{ item.new | regex_replace('/', '_') }}\2'
+      regexp='(url = git@alias_gh_){{ item.old | regex_replace('/', '_') }}(:.*/)\$\{name\}(.git$)'
+      replace='\1{{ item.new | regex_replace('/', '_') }}\2{{ item.new | basename }}\3'
       backup=yes
     with_items: repos
     tags:
@@ -101,8 +101,8 @@
   - name: Update project name in /home/gerrit/site_path/etc/replication.config
     replace:
       dest=/home/gerrit/site_path/etc/replication.config
-      regexp='(projects = ){{ item.old }}(.*)'
-      replace='\1{{ item.new }}\2'
+      regexp='(projects = ){{ item.old }}$'
+      replace='\1{{ item.new }}'
       backup=yes
     with_items: repos
     tags:
@@ -111,10 +111,22 @@
   - name: Check if .ssh/config exists
     stat: path=/home/gerrit/.ssh/config
     register: sshconfig
-  - name: Update projectname in /home/gerrit/.ssh/config
+
+  - name: Update project name in /home/gerrit/.ssh/config
     replace:
       dest=/home/gerrit/.ssh/config
-      regexp='(.*alias_gh_){{ item.old | regex_replace('/', '_') }}(.*)'
+      regexp='(.*alias_gh_){{ item.old | regex_replace('/', '_') }}("$)'
+      replace='\1{{ item.new | regex_replace('/', '_') }}\2'
+      backup=yes
+    with_items: repos
+    when: sshconfig.stat.exists == true 
+    tags:
+      - replication_project_rename
+
+  - name: Update project keypath in /home/gerrit/.ssh/config
+    replace:
+      dest=/home/gerrit/.ssh/config
+      regexp='(.*alias_gh_){{ item.old | regex_replace('/', '_') }}(.key$)'
       replace='\1{{ item.new | regex_replace('/', '_') }}\2'
       backup=yes
     with_items: repos
@@ -137,6 +149,8 @@
       - replication_project_rename
 
   - name: "Start re-index"
+    become: yes
+    become_user: gerrit
     shell: java -jar /home/gerrit/site_path/bin/gerrit.war reindex -d /home/gerrit/site_path
     tags:
       - project_rename
@@ -179,7 +193,7 @@
     tags:
       - test_triggers_rename
   - name: Rename Zuul triggers
-    replace: "dest=/tmp/config/zuul/projects.yaml regexp='name: {{ item.old }}' replace='name: {{ item.new }}'"
+    replace: "dest=/tmp/config/zuul/projects.yaml regexp='name: {{ item.old }}$' replace='name: {{ item.new }}'"
     with_items: repos
     tags:
       - test_triggers_rename
