@@ -1,18 +1,11 @@
 #!/bin/bash
 
-set -xe
+set -ex
 
-export PATH=/bin:/sbin:/usr/bin:/usr/sbin/:/usr/local/bin:/usr/local/sbin
-
-sudo yum update -y > /dev/null
+sudo dnf update -y
 
 # Base requirements
-sudo yum install -y epel-release > /dev/null
-sudo yum install -y python-pip git wget curl patch iproute libffi-devel \
-                    java python-requests gcc python-devel mariadb-devel \
-                    openssl-devel > /dev/null
-sudo pip install --upgrade 'pip<8'
-sudo pip install tox
+sudo dnf install -y python-pip git wget curl patch iproute
 
 # The jenkins user. Must be able to use sudo without password
 sudo useradd -m jenkins
@@ -36,11 +29,25 @@ sudo restorecon -R -v /home/jenkins/.ssh/authorized_keys
 cloud_user=$(egrep " name:" /etc/cloud/cloud.cfg | awk '{print $2}')
 cat /opt/nodepool-scripts/authorized_keys | sudo tee -a /home/$cloud_user/.ssh/authorized_keys
 
+# Install java (required by Jenkins)
+sudo dnf install -y java
+
 # Install zuul_swift_upload and zuul-cloner
 # TODO: replace this section by zuul package
-sudo pip install zuul glob2 python-magic 'paramiko<2'
+sudo dnf install -y python-requests gcc python-devel python-cffi python-magic \
+                    python-cryptography python-statsd python-glob2 python-paramiko \
+                    PyYAML python-paste python-webob GitPython python-daemon \
+                    python-extras python-voluptuous python-gear python-tox \
+                    python-prettytable python-babel python-six
+sudo pip install zuul 'paramiko<2'
+
+# Copy slave tools
 sudo cp -v /opt/nodepool-scripts/*.py /usr/local/bin/
+
+# sync FS, otherwise there are 0-byte sized files from the dnf/pip installations
+sudo sync
+sudo sync
 
 sudo cat /home/jenkins/.ssh/authorized_keys
 
-echo "Base setup done."
+echo "SUCCESS: bare-fedora-23 done."
