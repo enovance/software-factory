@@ -1,6 +1,14 @@
+pip
+
 bash8
-tox
+mock
 nose
 nose-timer
-selenium
+python-redmine
 pyvirtualdisplay
+pyyaml
+requests[security]
+selenium
+six
+-e git+https://github.com/redhat-cip/pysflib.git#egg=pysflib
+-e git+https://github.com/morucci/pygerrit.git#egg=pygerrit
