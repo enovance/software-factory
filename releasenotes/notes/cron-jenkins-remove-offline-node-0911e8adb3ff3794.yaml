@@ -1,0 +1,4 @@
+---
+features:
+  - A script is available for shell admin user to remove
+    jenkins slave that are offline.

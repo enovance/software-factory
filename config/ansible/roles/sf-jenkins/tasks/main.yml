@@ -1,0 +1,6 @@
+---
+- file: path=/usr/local/share/sf-jenkins-slave-tools/ state=directory mode=0755
+- copy: src=remove-offline-node.groovy dest=/usr/local/share/sf-jenkins-slave-tools/remove-offline-node.groovy mode=0444
+
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+- template: src=cron-jenkins-remove-offline-node.sh.j2 dest=/root/cron-jenkins-remove-offline-node.sh mode=0500
