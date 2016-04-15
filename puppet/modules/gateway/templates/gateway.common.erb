@@ -5,7 +5,7 @@
     RewriteMap base64helper "prg:/usr/local/sbin/base64helper"
 
     # Don't login to Redmine itself, use cauth instead
-    <LocationMatch "/redmine/login">
+    <LocationMatch "/redmine/(?!(login|account/register))">
 	RewriteEngine On
 	RewriteRule ^(.*)$ <%= @cauth['signin_url'] %> [R,NC,L]
     </LocationMatch>
