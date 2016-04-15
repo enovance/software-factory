@@ -207,6 +207,14 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200,
                          "%s returned status %s" % (url, resp.status_code))
 
+        # Check if requests to /redmine/login and /redmine/account/register are
+        # properly forwarded to /auth/login
+        url = config.GATEWAY_URL + "/redmine/login"
+        self._auth_required(url)
+
+        url = config.GATEWAY_URL + "/redmine/account/register"
+        self._auth_required(url)
+
     def test_etherpad_accessible(self):
         """ Test if Etherpad is accessible on gateway host
         """
