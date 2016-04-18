@@ -212,26 +212,6 @@ class ManageSfUtils(Tool):
         cmd = cmd % (user, passwd, name)
         self.exe(cmd)
 
-    def replicationModifyConfig(self, user, cmd, section,
-                                setting=None, value=None):
-        passwd = config.USERS[user]['password']
-        cmd = self.base_cmd % (user, passwd) \
-            + " replication configure %s --section %s " % (cmd, section)
-        if setting:
-            cmd = cmd + " " + setting
-        if value:
-            cmd = cmd + " " + value
-        self.exe(cmd)
-
-    def replicationTrigger(self, user, project=None, url=None):
-        passwd = config.USERS[user]['password']
-        cmd = self.base_cmd % (user, passwd) + " replication trigger "
-        if project:
-            cmd = cmd + " --project " + project
-        if url:
-            cmd = cmd + " --url " + url
-        self.exe(cmd)
-
     def addUsertoProjectGroups(self, auth_user, project, new_user, groups):
         passwd = config.USERS[auth_user]['password']
         umail = config.USERS[new_user]['email']
