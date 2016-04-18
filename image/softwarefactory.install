@@ -286,7 +286,7 @@ function install_gerrit {
 function install_pygerrit {
     # Pygerrit
     if [ ! -d "${dir}/usr/lib/python2.7/site-packages/pygerrit" ]; then
-        retry do_chroot ${dir} git clone https://github.com/morucci/pygerrit.git /srv/pygerrit
+        retry do_chroot ${dir} git clone https://github.com/sonyxperiadev/pygerrit.git /srv/pygerrit
         do_chroot ${dir} bash -c 'cd /srv/pygerrit && python setup.py install'
         rm -Rf ${dir}/srv/pygerrit
     fi
