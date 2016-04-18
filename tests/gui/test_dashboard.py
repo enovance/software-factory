@@ -15,6 +15,7 @@
 # under the License.
 
 import unittest
+from pyvirtualdisplay import Display
 from selenium import webdriver
 # from selenium.webdriver.common.keys import Keys
 
@@ -25,6 +26,8 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
 
     def setUp(self):
         self.driver = webdriver.Firefox()
+        self.display = Display(visible=0, size=(1280, 800))
+        self.display.start()
 
     def _internal_login(self, driver, user, password):
         u = driver.find_element_by_id("username")
@@ -43,3 +46,4 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
 
     def tearDown(self):
         self.driver.close()
+        self.display.stop()
