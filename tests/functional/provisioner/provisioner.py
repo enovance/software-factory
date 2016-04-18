@@ -122,6 +122,7 @@ class SFProvisioner(object):
 
     def compute_checksum(self, f):
         out = self.command("md5sum %s" % f)[0]
+        print self.command("cat %s" % f)
         if out:
             return out.split()[0]
 
