@@ -1,0 +1,5 @@
+---
+- include: update_configrepo.yaml
+
+- name: Update Gerrit replication.config
+  command: cp /root/config/gerrit/replication.config /home/gerrit/site_path/etc/
