@@ -14,17 +14,44 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
+import os
 import unittest
 from pyvirtualdisplay import Display
 from selenium import webdriver
 # from selenium.webdriver.common.keys import Keys
+from pyvirtualdisplay import Display
 
 import config
 
 
+display = Display(visible=0, size=(1280, 800))
+display.start()
+
+
 class TestSoftwareFactoryDashboard(unittest.TestCase):
 
+    def snapshot_if_failure(func):
+        @functools.wraps(func)
+        def f(self, *args, **kwargs):
+            try:
+                func(self, *args, **kwargs)
+            except Exception as e:
+                path = '/tmp/gui/'
+                if not os.path.isdir(path):
+                    os.makedirs(path)
+                screenshot = os.path.join(path,
+                                          '%s.png' % func.__name__)
+                self.driver.save_screenshot(screenshot)
+                raise e
+        return f
+
     def setUp(self):
+        # close existing driver if any
+	try:
+            self.driver.quit()
+        except AttributeError:
+            pass
         self.driver = webdriver.Firefox()
         self.display = Display(visible=0, size=(1280, 800))
         self.display.start()
@@ -36,6 +63,7 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
         p.send_keys(password)
         p.submit()
 
+    @snapshot_if_failure
     def test_admin_login(self):
         driver = self.driver
         driver.get(config.GATEWAY_URL)
@@ -43,7 +71,3 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
         self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
         self.assertTrue("Project" in driver.page_source)
         self.assertTrue("Open Reviews" in driver.page_source)
-
-    def tearDown(self):
-        self.driver.quit()
-        self.display.stop()
