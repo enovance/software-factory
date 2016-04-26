@@ -86,3 +86,20 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
         driver.switch_to.default_content()
         self.assertTrue("Log in with Github" in driver.page_source)
         self.assertTrue("Internal Login" in driver.page_source)
+
+    def test_topmenu_maximum_display(self):
+        # Test for maximum screen size
+        driver = self.driver
+        driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+        assert driver.find_element_by_id("login-btn")
+        self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
+        assert driver.find_element_by_id("logout-btn")
+
+    def test_topmenu_minimum_display(self):
+        # Test the minimum screen size (220px width)
+        driver = self.driver
+        driver.set_window_size(1200, 220)
+        driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+        assert driver.find_element_by_id("login-btn")
+        self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
+        assert driver.find_element_by_id("logout-btn")
