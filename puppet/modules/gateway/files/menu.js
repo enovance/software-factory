@@ -56,10 +56,26 @@ function initAuth() {
     displaySignIn();
 };
 
+
+function initTopMenu() {
+  $("#navbar-workflow").hide();
+  $("#navbar-collaboration").hide();
+  $("#navbar-workflow-btn").click( function() {
+    $("#navbar-workflow").fadeToggle();
+  });
+  $("#navbar-collaboration-btn").click( function() {
+    $("#navbar-collaboration").fadeToggle();
+  });
+};
+
 /** Init function 
  */
 if (document.body) {
-    initAuth();
+  initAuth();
+  initTopMenu();
 } else {
-    document.onload = function() {initAuth();};
+  document.onload = function() {
+    initAuth();
+    initTopMenu();
+  };
 }
