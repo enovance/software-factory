@@ -65,8 +65,7 @@ class TestGateway(Base):
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
         """
-        subpaths = ["/r/", "/jenkins/",
-                    "/zuul/", "/etherpad/", "/paste/", "/docs/"]
+        subpaths = ["/r/", "/zuul/", "/etherpad/", "/paste/"]
         if has_issue_tracker():
             tracker = get_issue_tracker_utils(
                 auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
