@@ -56,10 +56,46 @@ function initAuth() {
     displaySignIn();
 };
 
+function toggle_visibility(id) {
+  var e = document.getElementById(id);
+  if(e.style.display == 'block')
+    e.style.display = 'none';
+  else
+    e.style.display = 'block';
+};
+
+function closeNavbar() {
+  document.getElementById("navbar-workflow").style.display = "none";
+  document.getElementById("navbar-collaboration").style.display = "none";
+};
+
+function initTopMenu() {
+  closeNavbar();
+  document.getElementById("navbar-workflow-btn").onclick = function(event) {
+    toggle_visibility("navbar-workflow");
+    event.stopPropagation();
+  };
+  document.getElementById("navbar-collaboration-btn").onclick = function(event) {
+    toggle_visibility("navbar-collaboration");
+    event.stopPropagation();
+  };
+  var btns = document.getElementsByClassName("close-navbar");
+  for (var i=0; i<btns.length; i++){
+    btns[i].onclick = function(event) {
+      closeNavbar();
+      event.stopPropagation();
+    }
+  }
+};
+ 
 /** Init function 
  */
 if (document.body) {
-    initAuth();
+  initAuth();
+  initTopMenu();
 } else {
-    document.onload = function() {initAuth();};
+  document.onload = function() {
+    initAuth();
+    initTopMenu();
+  };
 }
