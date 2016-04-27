@@ -149,6 +149,8 @@ class SFchecker:
             else:
                 print "Expected checksum (%s) for %s is WRONG (%s)." % (
                     checksum, f, c)
+                print "New file is:"
+                print "  %s" % self.command("cat %s" % f).replace("\n", "\n  ")
                 mismatch = True
         if "checksum_warn_only" not in sys.argv and mismatch:
             sys.exit(1)
