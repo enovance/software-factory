@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  description: Metrics collection service
+  description: OpenStack Gnocchi service
   company: Red Hat
   license: Apache
   min_ansible_version: 1.9
@@ -10,5 +10,3 @@ galaxy_info:
     - 7
   galaxy_tags:
     - software-factory
-dependencies:
-  - { role: sf-gnocchi }
