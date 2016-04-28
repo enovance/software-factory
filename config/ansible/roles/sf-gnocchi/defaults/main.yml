@@ -1,0 +1,7 @@
+archive_policy:
+    name: "archive"
+    back_window: "0"
+    definition:
+      - {granularity: "5s", timespan: "4 hours"}
+      - {granularity: "60s", timespan: "1 week"}
+      - {granularity: "900s", timespan: "90 days"}

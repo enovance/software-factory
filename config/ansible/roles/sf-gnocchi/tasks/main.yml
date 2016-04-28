@@ -1,0 +1,40 @@
+---
+- group: name=gnocchi
+
+- user: name=gnocchi group=gnocchi home=/var/lib/gnocchi shell=/sbin/nologin
+
+- file: path=/var/lib/gnocchi state=directory owner=gnocchi group=gnocchi mode=0750
+
+- name: Copy api-paste.ini to remove keystone auth
+  copy: src=../files/api-paste.ini dest=/etc/gnocchi/api-paste.ini
+
+- name: Disable policy
+  command: 'sed -i /etc/gnocchi/policy.json -e "s/:.*$/: \"\",/"'
+
+- name: Update config
+  ini_file: dest=/etc/gnocchi/gnocchi.conf section={{ item.section }} option={{ item.option }} value={{ item.value }}
+  with_items:
+    - {section: "DEFAULT", option: "log_dir", value: "/var/log/gnocchi"}
+    - {section: "indexer", option: "url", value: "mysql://gnocchi:{{ creds_gnocchi_sql_pwd }}@managesf.{{ fqdn }}/gnocchi"}
+    - {section: "statsd", option: "resource_id", value: "f66370ee-be2a-451e-bf5d-45b9a554ce03"}
+    - {section: "statsd", option: "user_id", value: "487cd2da-03e6-408a-8075-39f9df3f1707"}
+    - {section: "statsd", option: "project_id", value: "7815b28f-6322-4c1b-ade4-e071ef8c8045"}
+    - {section: "statsd", option: "archive_policy_name", value: "archive"}
+    - {section: "statsd", option: "flush_delay", value: "5.0"}
+  register: conf
+
+- command: gnocchi-upgrade
+  when: conf.changed
+
+- name: Restart service if conf changed
+  when: conf.changed
+  service: name=openstack-gnocchi-{{ item }} state=restarted enabled=yes
+  with_items: [api, metricd, statsd]
+
+- name: Wait for api (10 second max)
+  when: conf.changed
+  wait_for: port=8041 connect_timeout=1 timeout=10
+
+- name: Update archive policy
+  when: conf.changed
+  command: 'curl -X POST "http://statsd.{{ fqdn }}:8041/v1/archive_policy" -H "Content-Type: application/json" -d ''{{ archive_policy | to_json }}'''
