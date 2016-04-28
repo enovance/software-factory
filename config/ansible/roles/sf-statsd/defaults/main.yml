@@ -1,3 +1,2 @@
 puppet_modules:
-  - sfgnocchi
   - grafana
