@@ -234,13 +234,6 @@ class gerrit {
     content => template('gerrit/change-merged.erb'),
     require => File['/home/gerrit/site_path/hooks'],
   }
-  file { '/home/gerrit/gerrit.war':
-    ensure => file,
-    owner  => 'gerrit',
-    group  => 'gerrit',
-    mode   => '0644',
-    source => '/root/gerrit_data_source/gerrit.war',
-  }
 
   # Here we setup file based on templates
   file { '/home/gerrit/site_path/etc/gerrit.config':
@@ -325,8 +318,8 @@ class gerrit {
   # Gerrit first initialization, must be run only when gerrit.war changes
   exec { 'gerrit-initial-init':
     user        => 'gerrit',
-    command     => '/usr/bin/java -jar /home/gerrit/gerrit.war init -d /home/gerrit/site_path --batch --no-auto-start',
-    require     => [File['/home/gerrit/gerrit.war'],
+    command     => '/usr/bin/java -jar /home/gerrit/site_path/bin/gerrit.war init -d /home/gerrit/site_path --batch --no-auto-start',
+    require     => [
                   File['/home/gerrit/site_path/plugins/replication.jar'],
                   File['/home/gerrit/site_path/plugins/avatars-gravatar.jar'],
                   File['/home/gerrit/site_path/plugins/delete-project.jar'],
@@ -342,7 +335,6 @@ class gerrit {
                   File['/root/gerrit-firstuser-init.sh'],
                   File['/root/gerrit-set-default-acl.sh'],
                   File['/root/gerrit-set-jenkins-user.sh']],
-    subscribe   => File['/home/gerrit/gerrit.war'],
     refreshonly => true,
     logoutput   => on_failure,
   }
@@ -350,9 +342,8 @@ class gerrit {
   # Gerrit reindex after first initialization
   exec { 'gerrit-reindex':
     user        => 'gerrit',
-    command     => '/usr/bin/java -jar /home/gerrit/gerrit.war reindex -d /home/gerrit/site_path',
+    command     => '/usr/bin/java -jar /home/gerrit/site_path/bin/gerrit.war reindex -d /home/gerrit/site_path',
     require     => [Exec['gerrit-initial-init']],
-    subscribe   => File['/home/gerrit/gerrit.war'],
     refreshonly => true,
     logoutput   => on_failure,
   }
@@ -382,8 +373,7 @@ class gerrit {
     subscribe   => Exec['gerrit-init-firstuser'],
     require     => [Service['gerrit'], Exec['wait4gerrit'],
                     File['/root/gerrit_data_source/project.config'],
-                    File['/root/gerrit_data_source/ssh_wrapper.sh'],
-                    File['/home/gerrit/gerrit.war']],
+                    File['/root/gerrit_data_source/ssh_wrapper.sh']],
     refreshonly => true,
   }
   exec {'gerrit-init-jenkins':
@@ -404,10 +394,9 @@ class gerrit {
     require    => [Exec['gerrit-initial-init'],
                     File['gerrit_init'],
                     File['/var/www/git/gitweb.cgi']],
-    subscribe  => [File['/home/gerrit/gerrit.war'],
-                    File['/home/gerrit/site_path/etc/gerrit.config'],
-                    File['/root/gerrit-firstuser-init.sql'],
-                    File['/home/gerrit/site_path/etc/secure.config']],
+    subscribe  => [File['/home/gerrit/site_path/etc/gerrit.config'],
+                   File['/root/gerrit-firstuser-init.sql'],
+                   File['/home/gerrit/site_path/etc/secure.config']],
   }
 
   # Ensure mount point exists

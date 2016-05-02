@@ -1,0 +1,4 @@
+---
+- group: name=gerrit
+- user: name=gerrit group=gerrit shell=/sbin/nologin home=/home/gerrit
+- file: path=/home/gerrit state=directory mode=0700 owner=gerrit group=gerrit
