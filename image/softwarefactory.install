@@ -275,7 +275,9 @@ function install_jenkins {
 function install_gerrit {
     # Gerrit
     [ -d "${dir}/root/gerrit_data_source/" ] || mkdir ${dir}/root/gerrit_data_source/
-    http_fetch $GERRIT_URL ${dir}/root/gerrit_data_source/gerrit.war
+    http_fetch http://46.231.133.241:8080/v1/AUTH_sf/rpms/gerrit-2.11.5-1.noarch.rpm ${dir}/tmp/gerrit-2.11.5-1.noarch.rpm
+    install_packages $dir /tmp/gerrit-2.11.5-1.noarch.rpm
+
     http_fetch $MYSQLJAVA_URL ${dir}/root/gerrit_data_source/mysql-connector-java.jar
     http_fetch $BCPROVJAVA_URL ${dir}/root/gerrit_data_source/bcprov.jar
     http_fetch $BCPKIXJAVA_URL ${dir}/root/gerrit_data_source/bcpkix.jar
