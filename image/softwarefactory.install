@@ -196,7 +196,6 @@ install_sf_packages() {
 
 function install_jenkins {
     [ -d ${dir}/var/lib/jenkins/plugins ] || mkdir -p ${dir}/var/lib/jenkins/plugins
-    do_chroot $dir chown jenkins /var/lib/jenkins /var/lib/jenkins/plugins
 
     # Jenkins Swarm client
     swarm_client=$(basename $JENKINS_SWARM_CLIENT_URL)
