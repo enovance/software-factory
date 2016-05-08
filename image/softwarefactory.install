@@ -130,7 +130,7 @@ EOF
     cat > ${target}/etc/yum.repos.d/sf.repo <<EOF
 [sf]
 name=SF repository for various packages
-baseurl=http://46.231.133.241:8080/v1/AUTH_sf/rpms
+baseurl=http://46.231.133.241:8080/v1/AUTH_sf/rpms_beta
 gpgcheck=0
 enabled=1
 EOF
