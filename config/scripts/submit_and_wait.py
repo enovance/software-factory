@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--abandon", action="store_const", const=True)
     parser.add_argument("--approve", action="store_const", const=True)
     parser.add_argument("--failure", action="store_const", const=True)
+    parser.add_argument("--review-id", type=int, default=0)
     args = parser.parse_args()
     os.chdir(args.repository)
 
@@ -63,12 +64,16 @@ def main():
     if "username" not in open("%s/.gitconfig" % os.environ["HOME"]).read():
         execute("git config --global gitreview.username admin")
 
-    # Submit change
-    if "Change-Id:" in execute("git log -n 1"):
-        print execute("git review -y")
+    if args.review_id:
+        print execute("git review -d %s" % args.review_id)
+        sha = execute("git log -n1 --pretty=format:%H")
     else:
-        print execute("git review -yi")
-    sha = open(".git/refs/heads/master").read()
+        # Submit change
+        if "Change-Id:" in execute("git log -n 1"):
+            print execute("git review -y")
+        else:
+            print execute("git review -yi")
+        sha = open(".git/refs/heads/master").read()
 
     # Give Jenkins some time to start test
     time.sleep(2)
