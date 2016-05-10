@@ -7,7 +7,7 @@ VER=2.2.1
 SF_PREVIOUS_VER=C7.0-2.2.0
 
 # Set this variable to 1 if we tag and set it back to 0 the commit after the tag
-TAGGED_RELEASE=1
+TAGGED_RELEASE=0
 REL_VER=$(git log --simplify-merges -n 1 | grep -i 'TaggedRelease:' | awk '{ print $2 }')
 if [ ! -z "${REL_VER}" ]; then
     echo "This is release: ${REL_VER}."
