@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8">
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <style>html, body {background: transparent;}</style>
     <base target="_parent" />
   </head>
   <body>
@@ -10,13 +13,19 @@
         <% if @theme["topmenu_logo_data"] %>
           <div class="navbar-header">
               <a class="navbar-brand" href="/"><img src="data:image/png;base64,<%= @theme["topmenu_logo_data"] %>" style="<%= @theme["topmenu_logo_style"] %>" alt="Software Factory" title="Software Factory" /></a>
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
           </div>
         <% else %>
           <div class="navbar-header">
             <a class="navbar-brand" href="/">Software Factory</a>
           </div>
         <% end %>
-        <div class="collapse navbar-collapse">
+        <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/dashboard/" target="_top">Dashboard</a></li>
             <% if @services.include?('SFGerrit') %>
