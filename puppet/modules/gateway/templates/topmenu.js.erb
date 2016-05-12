@@ -2,7 +2,6 @@ function loadTopmenu() {
         var iframe = document.createElement("iframe");
         iframe.setAttribute("src", "/topmenu.html");
         iframe.setAttribute("width", "100%");
-        iframe.setAttribute("height", "51px");
         iframe.frameBorder = 0;
         <% if @theme["favicon_data"] %>
             var favicon = document.createElement("link");
@@ -13,6 +12,8 @@ function loadTopmenu() {
         <% end %>
         document.body.insertBefore(iframe, document.body.firstChild);
         document.title += ' [SF <%= @sf_version %>]';
+	var head = document.getElementsByTagName('head')[0].innerHTML;
+	document.getElementsByTagName('head')[0].innerHTML = head + '<style> iframe { height:51px; }\n iframe:hover { height:102px; }</style>'
 };
 
 if (document.addEventListener) {
