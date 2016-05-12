@@ -19,7 +19,6 @@ import os
 import unittest
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-# from selenium.webdriver.common.keys import Keys
 
 import config
 
@@ -31,25 +30,23 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
         def f(self, *args, **kwargs):
             try:
                 func(self, *args, **kwargs)
-            except Exception:
+            except Exception as e:
                 path = '/tmp/gui/'
                 if not os.path.isdir(path):
                     os.makedirs(path)
                 screenshot = os.path.join(path,
                                           '%s.png' % func.__name__)
                 self.driver.save_screenshot(screenshot)
-                raise
+                raise e
         return f
 
     def setUp(self):
-        # close existing driver if any
-        try:
-            self.driver.quit()
-        except AttributeError:
-            pass
         self.driver = webdriver.Firefox()
         self.driver.maximize_window()
         self.driver.implicitly_wait(15)
+
+    def tearDown(self):
+        self.driver.quit()
 
     def _internal_login(self, driver, user, password):
         u = driver.find_element_by_id("username")
@@ -103,4 +100,31 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
         driver.find_element_by_link_text("Zuul")
         driver.find_element_by_link_text("Jenkins")
         driver.find_element_by_link_text("Gerrit")
-        driver.find_element_by_link_text("Dashboard")
+
+    @snapshot_if_failure
+    def test_topmenu_maximum_display(self):
+        # Test for maximum screen size
+        driver = self.driver
+        driver.get(config.GATEWAY_URL)
+        driver.maximize_window()
+        driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+        assert driver.find_element_by_id("login-btn")
+        driver.switch_to.default_content()
+        driver.get("%s/r/login" % config.GATEWAY_URL)
+        self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
+        driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+        assert driver.find_element_by_id("logout-btn")
+
+    @snapshot_if_failure
+    def test_topmenu_minimum_display(self):
+        # Test the minimum screen size (800px width)
+        driver = self.driver
+        driver.get(config.GATEWAY_URL)
+        driver.set_window_size(800, 800)
+        driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+        assert driver.find_element_by_id("login-btn")
+        driver.switch_to.default_content()
+        driver.get("%s/r/login" % config.GATEWAY_URL)
+        self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
+        driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+        assert driver.find_element_by_id("logout-btn")
