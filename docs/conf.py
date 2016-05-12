@@ -48,10 +48,21 @@ copyright = u'2016, Red Hat'
 # built documents.
 #
 # The short X.Y version.
-version = filter(
-    lambda x: x.startswith("VER="),
-    open("../role_configrc").readlines()
-)[0].strip().split('=')[1]
+import subprocess
+import shlex
+# First try to determine the TaggedRelease version via the commit message
+version = subprocess.check_output(
+    shlex.split("git log --simplify-merges -n 1")).splitlines()
+try:
+    version = [l for l in version if l.strip().startswith('TaggedRelease:')][0]
+    version = version.split(':')[1].strip()
+except IndexError:
+    # Fall back to fetch VER in role_config.rc
+    version = filter(
+        lambda x: x.startswith("VER="),
+        open("../role_configrc").readlines()
+    )[0].strip().split('=')[1]
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
