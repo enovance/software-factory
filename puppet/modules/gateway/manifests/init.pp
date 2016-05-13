@@ -115,14 +115,6 @@ class gateway ($cauth = hiera_hash('cauth', '')) {
     content => template('gateway/hideci.js.erb'),
   }
 
-  file {'/var/www/topmenu.html':
-    ensure  => file,
-    mode    => '0640',
-    owner   => 'apache',
-    group   => 'apache',
-    content => template('gateway/topmenu.html.erb'),
-  }
-
   file {'/var/www/dashboard':
     ensure  => directory,
     recurse => true,

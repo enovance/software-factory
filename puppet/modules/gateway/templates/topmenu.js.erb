@@ -1,9 +1,46 @@
 function loadTopmenu() {
-        var iframe = document.createElement("iframe");
-        iframe.setAttribute("src", "/topmenu.html");
-        iframe.setAttribute("width", "100%");
-        iframe.setAttribute("height", "51px");
-        iframe.frameBorder = 0;
+        var head = document.getElementsByTagName('head')[0];
+        var head_html = head.innerHTML;
+        var head_addon = '<link type="text/css" rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">';
+        head_addon += '<style>#topmenu {border: 1px solid red;height: 51px;z-index:1000;}</style>';
+        document.getElementsByTagName('head')[0].innerHTML = head_html + head_addon;
+
+        var topmenu_div = document.createElement("div");
+        topmenu_div.setAttribute("id", "topmenu");
+        topmenu_div.innerHTML = '<div class="navbar navbar-default navbar-fixed-top" role="navigation"> \
+        <% if @theme["topmenu_logo_data"] %> \
+          <div class="navbar-header"> \
+              <a class="navbar-brand" href="/"><img src="data:image/png;base64,<%= @theme["topmenu_logo_data"] %>" style="<%= @theme["topmenu_logo_style"] %>" alt="Software Factory" title="Software Factory" /></a> \
+          </div> \
+        <% else %> \
+          <div class="navbar-header"> \
+            <a class="navbar-brand" href="/">Software Factory</a> \
+          </div> \
+        <% end %> \
+        <div class="collapse navbar-collapse"> \
+            <ul class="nav navbar-nav"> \
+                <li><a href="/dashboard/" target="_top">Dashboard</a></li> \
+                <li><a href="/r/" target="_top">Gerrit</a></li> \
+                <li><a href="/jenkins/" target="_top">Jenkins</a></li> \
+                <li><a href="/zuul/" target="_top">Zuul</a></li> \
+                <li><a href="/redmine/" target="_top">Redmine</a></li> \
+                <li><a href="/etherpad/" target="_top">Etherpad</a></li> \
+                <li><a href="/paste/" target="_top">Paste</a></li> \
+                <li><a href="mumble://<%= @fqdn %>/?version=1.2.0">Mumble</a></li> \
+            </ul> \
+            <ul class="nav navbar-nav pull-right"> \
+                <%= @theme["topmenu_custom_entry"] %> \
+		<li><p class="navbar-text" id="login-msg"></p></li> \
+                <li><p class="navbar-btn"> \
+		    <a id="logout-btn" href="/r/logout" target="_top" class="btn btn-danger">Logout</a> \
+		    <a id="login-btn" href="/r/login" target="_top" class="btn btn-primary">Login</a> \
+		</p></li> \
+		<li>&nbsp;</li> \
+            </ul> \
+        </div> \
+    </div>';
+        document.body.insertBefore(topmenu_div, document.body.firstChild);
+
         <% if @theme["favicon_data"] %>
             var favicon = document.createElement("link");
             favicon.setAttribute("type", "image/x-icon");
@@ -11,7 +48,6 @@ function loadTopmenu() {
             favicon.setAttribute("rel", "icon");
             document.getElementsByTagName("head")[0].appendChild(favicon);
         <% end %>
-        document.body.insertBefore(iframe, document.body.firstChild);
         document.title += ' [SF <%= @sf_version %>]';
 };
 
