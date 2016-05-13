@@ -60,16 +60,6 @@ bootstrap() {
 
     sed -i 's/$releasever/7/g' ${target}/etc/yum.repos.d/*
 
-    if [ ! -z "${http_proxy}" ]; then
-        echo "Using proxies ${http_proxy} and ${https_proxy}" 1>&2
-        # Do not use a mirror; these might change between builds and thus a lot
-        # of requests are not missed at the cache
-        sed -i 's/^#baseurl/baseurl/g' ${target}/etc/yum.repos.d/*
-        sed -i 's/^mirrorlist/#mirrorlist/g' ${target}/etc/yum.repos.d/*
-        grep -q "^proxy=" ${target}/etc/yum.conf || echo -e "[main]\nproxy=" >> ${target}/etc/yum.conf
-        sed -i "s#^proxy=.*#proxy=${http_proxy}#" ${target}/etc/yum.conf
-    fi
-
     cp -f /etc/resolv.conf "$target/etc/"
 
     if [ ! -f "${target}/usr/bin/yum" ]; then
@@ -135,6 +125,42 @@ gpgcheck=0
 enabled=1
 EOF
 
+    cat > ${target}/etc/yum.repos.d/sf-mirror.repo <<EOF
+[sfbase]
+name=CentOS-$releasever - Base
+baseurl=http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror/base/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+enabled = 1
+
+#released updates
+[sfupdates]
+name=CentOS-$releasever - Updates
+baseurl=http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror/updates/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+enabled = 1
+
+#additional packages that may be useful
+[sfextras]
+name=CentOS-$releasever - Extras
+baseurl=http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror/extras/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+enabled = 1
+
+[sfepel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+baseurl=http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror/epel/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+enabled = 1
+EOF
+
+    do_chroot ${dir} yum install -y yum-utils
+    do_chroot ${dir} yum-config-manager --disable base,extras,updates,epel
+    do_chroot ${dir} yum-config-manager --enable sfbase,sfextras,sfupdates,sfepel
+    do_chroot ${dir} yum repolist all  # For debugging only
 }
 
 enable_selinux() {
