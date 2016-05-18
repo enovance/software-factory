@@ -1,0 +1,12 @@
+---
+- name: Create metadata directory for metadata
+  file: path={{ metadata_path }} state=directory
+
+- name: Copy metadata
+  shell: cp -LR {{ clone_path }}/image/metadata/{{ from_version }}/* {{ metadata_path }}/
+
+- name: Create install directory
+  file: path={{ install_path }}/softwarefactory state=directory
+
+- name: Symlink for debootstrap
+  file: src={{ install_base }} dest=/var/lib/debootstrap/install state=link

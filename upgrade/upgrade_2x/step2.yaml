@@ -1,4 +1,10 @@
 ---
+- hosts: install-server
+  tasks:
+  - name: umount image
+    shell: umount -n {{ upstream_path }}/softwarefactory-{{ version }}.img.raw
+    ignore_errors: yes
+
 - hosts: all
   tasks:
   - include: tasks/bootloader.yml

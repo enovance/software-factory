@@ -18,11 +18,6 @@ fi
 # set PATH
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
-# fix rsyncd install dir
-[ -d /var/lib/debootstrap ] || mkdir /var/lib/debootstrap
-[ -e /var/lib/debootstrap/install ] && rm -Rf /var/lib/debootstrap/install
-ln -s /var/lib/sf/roles/install/ /var/lib/debootstrap/install
-
 set -x
 # Start the upgrade by jumping in the cloned version and running
 # the ansible playbook.
@@ -31,6 +26,7 @@ cp group_vars/all.tmpl group_vars/all
 sed -i "s/FROM/${current_version}/" group_vars/all
 sed -i "s/TO/${SF_VER}/" group_vars/all
 sed -i "s|CLONE_PATH|${cloned_path}|" group_vars/all
+sed -i "s|SWIFT_SF_URL|${SWIFT_SF_URL}|" group_vars/all
 
 echo "[+] Running step1.yaml"
 ansible-playbook step1.yaml

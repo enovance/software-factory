@@ -1,13 +1,16 @@
 ---
 - hosts: install-server
   tasks:
+  - include: tasks/prepare_install_server.yml
   - include: tasks/fetchupstream.yml
+    when: fetchupstream == true
 
 - hosts: all
   tasks:
   - include: tasks/stopsfservices.yml
 
 - hosts: all
+  tasks:
   # Synchronize the FS with eDeploy
   - name: Synchronize FS with eDeploy
     command: edeploy upgrade {{ version }}
