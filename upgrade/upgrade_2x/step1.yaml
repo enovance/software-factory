@@ -1,9 +1,13 @@
 ---
-- hosts: managesf
+- hosts: install-server
   gather_facts: no
   tasks:
   - include: tasks/fetchupstream.yml
+
+- hosts: all
   - include: tasks/stopsfservices.yml
+
+- hosts: all
   # Synchronize the FS with eDeploy
   - name: Synchronize FS with eDeploy
     command: edeploy upgrade {{ version }}
