@@ -1,3 +1,49 @@
+2.2.1  2016-05-23
+=================
+
+This is release 2.2.1
+
+Upgrade Notes
+-------------
+
+New Features
+------------
+
+  - Keep track of external authenticated user (via OAuth/OpenID) and enable
+    autosync of the primary user email to SF
+  - The config repository now owns a "gerrit/replication.config" that
+    the main place to configure the replication on Gerrit. Merged changed
+    on that file will be taken in account by Gerrit without any restart.
+  - Documentation has been updated to reflect changes about the
+    replication.
+
+Bug Fixes
+---------
+
+  - Fix primary user email not fetched from Github
+  - Wrong documentation version number in the doc
+  - Fix some Redmine 404 errors
+  - Set selinux labels when missing
+
+Changes
+-------
+
+  - Redirect by default to Gerrit instead of the dashboard
+  - Remove the replication management via the sfmanager CLI
+
+Security Fixes
+--------------
+
+  - Upgrade jenkins to version 1.651.2 to mitigate Jenkins Security
+    Advisory 2016-05-11.
+
+Components updated
+------------------
+
+  - Zuul upgraded to fdeb224824584dad355cbda207811a2105d1d2e2 (May 11 2016)
+  - Nodepool upgrade to e0f65825b0a38f8370017a08dd6f6012704d8db6 (May 11 2016)
+
+
 2.2.0  2016-04-08
 =================
 
