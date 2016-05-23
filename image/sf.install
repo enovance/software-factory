@@ -73,6 +73,16 @@ function install_sf {
     sudo cp -Rv ${PYSFLIB_CLONED_PATH}/* ${dir}/tmp/pysflib/
     do_chroot ${dir} bash -c "cd /tmp/pysflib; python setup.py install"
 
+    # Fix pysflib
+    cat > ${dir}/tmp/sfgerrit.py.patch << EOF
+19a20
+> import requests
+42a44
+>         self.session = requests.session()
+EOF
+    do_chroot ${dir} patch /usr/lib/python2.7/site-packages/pysflib-0.7.0-py2.7.egg/pysflib/sfgerrit.py /tmp/sfgerrit.py.patch
+    do_chroot ${dir} rm -f /usr/lib/python2.7/site-packages/pysflib-0.7.0-py2.7.egg/pysflib/sfgerrit.pyc
+
     # Install managesf
     [ ! -d "${dir}/var/www/managesf" ] && sudo mkdir ${dir}/var/www/managesf
     sudo cp -Rv ${MANAGESF_CLONED_PATH}/* ${dir}/var/www/managesf/
