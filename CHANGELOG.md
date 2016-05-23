@@ -9,12 +9,6 @@ New Features
 - Documentation has been updated to reflect changes about the replication.
 
 
-Known Issues
-------------
-
-- The config-check was unable to validate nodepool configuration when multiple cloud provider are used.
-
-
 Upgrade Notes
 -------------
 
@@ -40,6 +34,7 @@ Bug Fixes
 - Fix primary user email not fetched from Github
 - Wrong documentation version number in the doc
 - Fix some Redmine 404 errors
+- Fix config-check was unable to validate nodepool configuration when multiple cloud provider are used.
 
 
 Other Notes
