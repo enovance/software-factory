@@ -69,37 +69,20 @@ class gerritbot {
     source  => 'puppet:///modules/gerritbot/logging.conf',
   }
 
-  file { '/etc/gerritbot/channels.yaml':
-    require => File['/etc/gerritbot'],
-    ensure  => file,
-    owner   => 'gerritbot',
-    group   => 'gerritbot',
-    source  => 'puppet:///modules/gerritbot/channels.yaml',
-    replace => false,
-  }
-
   file { 'gerritbot_service':
     path    => '/lib/systemd/system/gerritbot.service',
     source  => 'puppet:///modules/gerritbot/gerritbot.service',
   }
 
   if $gerritbot['disabled'] {
-    $running = false
-    $enabled = false
-  }
-  else {
-    $running = true
-    $enabled = true
-  }
-
-  service { 'gerritbot':
-    ensure     => $running,
-    enable     => $enabled,
-    hasrestart => true,
-    require    => File['/lib/systemd/system/gerritbot.service'],
-    subscribe  => [File['/etc/gerritbot/gerritbot.conf'],
-                   File['/etc/gerritbot/channels.yaml'],
-                   File['/etc/gerritbot/logging.conf'],
-                   File['/var/run/gerritbot']],
+    service { 'gerritbot':
+      ensure     => false,
+      enable     => false,
+      hasrestart => true,
+      require    => File['/lib/systemd/system/gerritbot.service'],
+      subscribe  => [File['/etc/gerritbot/gerritbot.conf'],
+                     File['/etc/gerritbot/logging.conf'],
+                     File['/var/run/gerritbot']],
+    }
   }
 }

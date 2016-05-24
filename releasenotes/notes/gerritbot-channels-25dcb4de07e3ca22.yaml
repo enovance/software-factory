@@ -1,0 +1,4 @@
+---
+features:
+  - Gerritbot channels configuration is now managed
+    through the config-repo.
