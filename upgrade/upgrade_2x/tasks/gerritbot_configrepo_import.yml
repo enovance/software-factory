@@ -1,0 +1,18 @@
+---
+- name: Check if gerritbot already in config-repo
+  stat: path=/root/config/gerritbot
+  register: gerritbot
+
+- name: Copy gerritbot configuration
+  when: gerritbot.stat.exists == false
+  command: chdir=/root/config {{ item }}
+  with_items:
+    - git fetch --all
+    - git reset --hard origin/master --
+    - git clean -f -x -d
+    - mkdir gerritbot
+      # Copy or create an empty file
+    - bash -c "cp /etc/gerritbot/channels.yaml gerritbot/channels.yaml || touch gerritbot/channels.yaml"
+    - git add gerritbot
+    - git commit -m "Import of gerritbot configuration"
+    - git push
