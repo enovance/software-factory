@@ -1,3 +1,4 @@
 #!/bin/bash
-ssh root@managesf.<%= @fqdn %> cat /root/lodgeitdb.sql.gz | gunzip | mysql -u root -p<%= @mysql_root_pwd %>
+ssh root@managesf.<%= @fqdn %> cat /root/lodgeitdb.sql.gz | gunzip | mysql
+#TODO: check if the line below is really needed
 systemctl restart mariadb
