@@ -182,6 +182,8 @@ function wait_for_ssh {
     while true; do
         KEY=$(ssh-keyscan -p 22 $host 2> /dev/null | grep ssh-rsa)
         if [ "$KEY" != ""  ]; then
+            sed -i -e '/29418/d' ${HOME}/.ssh/known_hosts
+            ssh-keyscan -p 29418 ${host} | sed "s/${host}/\[${host}\]:29418/" >> ${HOME}/.ssh/known_hosts
             grep -q ${host} ${HOME}/.ssh/known_hosts || (echo $KEY >> $HOME/.ssh/known_hosts)
             echo "  -> $host:22 is up!"
             return 0
@@ -207,6 +209,14 @@ generate_keys
 if [ ! -f "${BUILD}/generate.done" ]; then
     generate_yaml
     touch "${BUILD}/generate.done"
+fi
+
+if [ -f "/etc/puppet/hiera/sf/sfcreds.yaml.orig" ]; then
+    # Most likely this is a sfconfig.sh run after restoring a backup.
+    # We need to set the update the mysql root password
+    oldpw=`grep -Po "(?<=creds_mysql_root_pwd: ).*" /etc/puppet/hiera/sf/sfcreds.yaml.orig`
+    newpw=`grep -Po "(?<=creds_mysql_root_pwd: ).*" /etc/puppet/hiera/sf/sfcreds.yaml`
+    mysqladmin -u root -p"$oldpw" password "$newpw"
 fi
 
 update_config
