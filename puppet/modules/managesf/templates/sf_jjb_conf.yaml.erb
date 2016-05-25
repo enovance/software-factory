@@ -218,6 +218,8 @@
             done
           ) > build/nodepool/nodepool.yaml
           cd config
+          echo "[+] Checking YAML syntax"
+          yamllint -d "{extends: relaxed, rules: {line-length: {max: 180}}}" .
           echo "[+] Checking jobs"
           # JJB needs access to jenkins to test (validate) jobs
           sudo jenkins-jobs test jobs/ -o ../build/
