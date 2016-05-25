@@ -468,6 +468,13 @@ function run_upgrade {
     checkpoint "run_upgrade"
 }
 
+function run_sfconfig {
+    echo "$(date) ======= run_sfconfig"
+    ssh sftests.com sfconfig.sh
+    checkpoint "run_sfconfig"
+}
+
+
 function run_checker {
     echo "$(date) ======= run_checker"
     ./tests/functional/provisioner/checker.py $1 2>> ${ARTIFACTS_DIR}/checker.debug || fail "Backup checker failed" ${ARTIFACTS_DIR}/checker.debug
