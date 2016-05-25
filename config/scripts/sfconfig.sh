@@ -209,6 +209,19 @@ if [ ! -f "${BUILD}/generate.done" ]; then
     touch "${BUILD}/generate.done"
 fi
 
+if [ -f "/etc/puppet/hiera/sf/sfcreds.yaml.new" ]; then
+    # Most likely this is a sfconfig.sh run after restoring a backup.
+    # sfcreds.yaml is the restored version not matching credentials except some
+    # ssh keys; sfcreds.yaml.new is the new version with the correct passwords.
+    # We now need to use the new version with the ssh keys from the restored one
+    cp /etc/puppet/hiera/sf/sfcreds.yaml /etc/puppet/hiera/sf/sfcreds.yaml.restored
+    cp /etc/puppet/hiera/sf/sfcreds.yaml.new /etc/puppet/hiera/sf/sfcreds.yaml
+    sed -i -e "/^creds.*sshkey:/d" /etc/puppet/hiera/sf/sfcreds.yaml
+    sed -i -e "/^creds.*pub_key:/d" /etc/puppet/hiera/sf/sfcreds.yaml
+    grep "^creds.*pub_key:" /etc/puppet/hiera/sf/sfcreds.yaml.restored >> /etc/puppet/hiera/sf/sfcreds.yaml
+    grep "^creds.*sshkey:" /etc/puppet/hiera/sf/sfcreds.yaml.restored >> /etc/puppet/hiera/sf/sfcreds.yaml
+fi
+
 update_config
 
 # Configure ssh access to inventory and copy puppet configuration
