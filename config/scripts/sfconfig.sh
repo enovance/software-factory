@@ -209,6 +209,12 @@ if [ ! -f "${BUILD}/generate.done" ]; then
     touch "${BUILD}/generate.done"
 fi
 
+if [ -f "/etc/puppet/hiera/sf/sfcreds.yaml.org" ]; then
+    echo "Found sfcreds.yaml.org and using it"
+    mv /etc/puppet/hiera/sf/sfcreds.yaml /etc/puppet/hiera/sf/sfcreds.yaml.old
+    mv /etc/puppet/hiera/sf/sfcreds.yaml.org /etc/puppet/hiera/sf/sfcreds.yaml
+fi
+
 update_config
 
 # Configure ssh access to inventory and copy puppet configuration
