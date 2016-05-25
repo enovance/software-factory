@@ -1,2 +1,2 @@
 #!/bin/bash
-bup join -r root@managesf.<%= @fqdn %>: backup | tar -xPf -
+bup join -r root@managesf.<%= @fqdn %>: backup | tar -xP --transform="s/sfcreds.yaml/sfcreds.yaml.restored/g" -f -
