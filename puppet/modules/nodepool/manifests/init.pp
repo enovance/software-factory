@@ -96,12 +96,6 @@ class nodepool {
     require => [File['/etc/nodepool/scripts']],
   }
 
-  file { '/etc/nodepool/nodepool.logging.conf':
-    owner   => 'nodepool',
-    source  => 'puppet:///modules/nodepool/nodepool.logging.conf',
-    require => [File['/etc/nodepool']],
-  }
-
   # This file will be used by the conf merger
   file { '/etc/nodepool/_nodepool.yaml':
     owner   => 'nodepool',
@@ -138,7 +132,6 @@ class nodepool {
                     File['/var/run/nodepool'],
                     File['/var/log/nodepool/'],
                     File['/etc/nodepool/_nodepool.yaml'],
-                    File['/etc/nodepool/nodepool.logging.conf'],
                     File['/etc/nodepool/scripts'],
                     File['/etc/nodepool/logging.conf'],
                     ],
