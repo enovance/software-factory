@@ -79,18 +79,15 @@ function clean_nodepool_tenant {
     checkpoint "clean nodepool tenant"
 }
 
-function run_it_jenkins_ci {
-    ./tests/integration/run.py > ${ARTIFACTS_DIR}/integration_tests.txt \
+function run_health-zuul {
+    ssh ${SF_HOST} ansible-playbook /etc/ansible/health-check/zuul.yaml > ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "Basic integration test SUCCESS"                        \
         || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
-    checkpoint "run_it_jenkins_ci"
+    checkpoint "run_health-zuul"
 }
 
 function run_it_openstack {
     it_cmd="./tests/integration/run.py --password ${ADMIN_PASSWORD} --playbook"
-    ${it_cmd} zuul >> ${ARTIFACTS_DIR}/integration_tests.txt        \
-        && echo "Basic integration test SUCCESS"                    \
-        || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     ${it_cmd} nodepool --os_base_image "sf-${SF_VER}" --os_network ${HEAT_SLAVE_NETWORK} >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "(non-voting) Nodepool integration test SUCCESS"    \
         || echo "(non-voting) Nodepool integration test failed"
@@ -183,6 +180,7 @@ function build_image {
         sudo rsync -a --delete --no-owner -L config/defaults/ ${IMAGE_PATH}/etc/puppet/hiera/sf/
         sudo rsync -a --delete --no-owner -L config/defaults/ ${IMAGE_PATH}/usr/local/share/sf-default-config/
         sudo rsync -a --delete --no-owner config/ansible/ ${IMAGE_PATH}/etc/ansible/
+        sudo rsync -a --delete --no-owner health-check/ ${IMAGE_PATH}/etc/ansible/health-check/
         sudo rsync -a --delete --no-owner config/config-repo/ ${IMAGE_PATH}/usr/local/share/sf-config-repo/
         sudo rsync -a --delete --no-owner serverspec/ ${IMAGE_PATH}/etc/serverspec/
         sudo rsync -a config/scripts/ ${IMAGE_PATH}/usr/local/bin/
@@ -337,10 +335,10 @@ function run_bootstraps {
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
-    ssh -A -tt ${SF_HOST} sfconfig.sh 2>&1 | tee ${ARTIFACTS_DIR}/sfconfig.log
-    res=${PIPESTATUS[0]}
+    ssh -A -tt ${SF_HOST} sfconfig.sh &> ${ARTIFACTS_DIR}/sfconfig.log \
+        && echo "sfconfig.sh: SUCCESS"  \
+        || { kill -9 $SSH_AGENT_PID; fail "sfconfig.sh failed" ${ARTIFACTS_DIR}/sfconfig.log }
     kill -9 $SSH_AGENT_PID
-    [ "$res" != "0" ] && fail "Bootstrap fails" ${ARTIFACTS_DIR}/bootstraps.log
     checkpoint "run_bootstraps"
     fetch_bootstraps_data
 }
