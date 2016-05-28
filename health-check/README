@@ -1,0 +1,34 @@
+This is a collection of playbook to test and control service behavior.
+They are designed to run from the install-server to use the dynamic inventory.
+
+Each playbook test a specific service:
+
+zuul.yaml
+---------
+* Create a new project
+* Add jobs and zuul layout to config repo
+* Verify config-update
+* Submit a bad change and verify Jenkins CI -1
+* Fix bad change and verify Jenkins CI +1
+* Check if change got merged
+
+playbooks/config_reset.yaml
+---------
+* Reset /root/config checkout and update to origin/master
+
+playbooks/config_submit_change.yaml
+---------
+* Submit and wait config repo change
+* Check for SUCCESS in config-update post job log
+
+playbooks/jenkins_check_job.yaml
+---------
+* Check if a jenkins jobs exists
+
+playbooks/managesf_project_create.yaml
+---------
+* Create project and checkout or update local clone
+
+
+# Render above doc using:
+for pb in *.yaml playbooks/*.yaml; do echo -e "$pb\n---------\n$(grep "^#" $pb | sed 's/^# //')\n"; done

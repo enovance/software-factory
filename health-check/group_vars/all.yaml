@@ -1,0 +1,15 @@
+---
+# Keep created ressources, otherwise test artifacts are deleted
+keep: true
+# Use dynamic suffix for project name to create temporary project
+suffix: "-{{ ansible_date_time.epoch }}"
+# Default project name
+project: "health/zuul-basic{{ suffix }}"
+# Jenkins node label
+node: master
+# Zuul pipelines
+check: ["health-{{ node }}-unit-tests"]
+gate: ["health-{{ node }}-functional-tests", "health-{{ node }}-unit-tests"]
+
+# Where projects are checkout on install-server
+project_path: "/var/lib/software-factory/health-check/{{ project }}"
