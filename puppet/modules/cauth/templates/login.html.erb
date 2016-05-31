@@ -5,6 +5,10 @@
         <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/static/font-awesome/css/font-awesome.min.css">
         <script type="text/javascript" src="/static/js/topmenu.js"></script>
+        <style type="text/css">
+         div.panel-body {background-color: #f8f8f8;}
+        </style>
+
     </head>
 
     <body>
@@ -20,6 +24,7 @@
                           <span>${message}</span>
                         </div>
                     % endif
+                        <div><p><b>Log in with an external service</b></p></div>
                         <% if not @github["disabled"] %>
                         <form method="post" action="/auth/login/" target="_top">
                         <input type="hidden" name="back" value="${back}">
@@ -31,8 +36,8 @@
                             </button>
                        </form>
                        <br />
-                       <hr />
                        <% end %>
+                       <br />
                        <% if not @launchpad["disabled"] %>
                        <form method="post" action="/auth/login/" target="_top">
                         <input type="hidden" name="back" value="${back}">
@@ -44,8 +49,10 @@
                             </button>
                        </form>
                        <br />
-                       <hr />
                        <% end %>
+                       <br />
+                       <hr />
+                        <div><p><b>Or log in with an internal account</b></p></div>
                         <form method="post" action="/auth/login/" class="form-signin" target="_top">
                             % if message:
                             <div class="form-group has-error">
@@ -67,7 +74,7 @@
                             <input type="hidden" name="method" value="Password">
 
                             <button type="submit" class="btn btn-primary col-md-12">
-                                Internal Login
+                                Log in
                                 <i class="fa fa-sign-in fa-fw"></i>
                             </button>
                         </form>
