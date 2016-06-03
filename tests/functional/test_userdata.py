@@ -1,4 +1,5 @@
 #!/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
@@ -262,3 +263,45 @@ class TestUserdata(Base):
         if has_issue_tracker():
             new_tracker_id = self.rm.get_user_id_by_username('freddie')
             self.assertTrue(tracker_id != new_tracker_id)
+
+    def test_unicode_user(self):
+        """ Try to create a local user with unicode charset, login, delete
+        """
+        # /!\ redmine does not support non-ASCII chars in usernames.
+        auth_cookie = config.USERS[config.ADMIN_USER]['auth_cookie']
+        try:
+            self.msu.create_user('naruto', 'rasengan', 'datte@bayo.org',
+                                 fullname=u'うずまきナルト')
+        except NotImplementedError:
+            skip("user management not supported in this version of managesf")
+        except UnicodeEncodeError:
+            raise Warning('Cannot run shell command with unicode chars for '
+                          'whatever reason, retrying with a direct REST '
+                          'API call ...')
+            create_url = config.GATEWAY_URL + "/manage/user/naruto"
+            headers = {'Content-Type': 'application/json'}
+            create_user = requests.post(create_url,
+                                        headers=headers,
+                                        data={'email': 'datte@bayo.org',
+                                              'fullname': u'うずまきナルト',
+                                              'password': 'rasengan'},
+                                        cookies={'auth_pubtkt': auth_cookie})
+            self.assertEqual(201,
+                             create_user.status_int)
+        self.logout()
+        url = config.GATEWAY_URL + "/dashboard/"
+        quoted_url = urllib2.quote(url, safe='')
+        response = self.login('naruto',
+                              'rasengan', quoted_url)
+        self.assertEqual(url, response.url)
+        naru_gerrit = self.gu.get_account('naruto')
+        self.assertEqual(u'うずまきナルト',
+                         naru_gerrit.get('name'))
+        # TODO this should be tested in the tracker as well
+        del_url = config.GATEWAY_URL +\
+            '/manage/services_users/?email=datte@bayo.org'
+        d = requests.delete(del_url,
+                            cookies={'auth_pubtkt': auth_cookie})
+        self.assertTrue(int(d.status_code) < 400, d.status_code)
+        self.assertEqual(False,
+                         self.gu.get_account('naruto'))
