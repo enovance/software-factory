@@ -213,7 +213,7 @@ class Tool:
 
     def exe(self, cmd, cwd=None):
         logger.debug('Starting Process "%s"' % cmd)
-        cmd = shlex.split(cmd)
+        cmd = map(lambda s: s.decode('utf8'), shlex.split(cmd.encode('utf8')))
         ocwd = os.getcwd()
         output = ''
         if cwd:
