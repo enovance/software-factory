@@ -213,14 +213,15 @@ class Tool:
 
     def exe(self, cmd, cwd=None):
         logger.debug('Starting Process "%s"' % cmd)
-        cmd = shlex.split(cmd)
+        cmd = map(lambda s: s.decode('unicode-escape'), shlex.split(cmd.encode('utf8')))
         ocwd = os.getcwd()
         output = ''
         if cwd:
             os.chdir(cwd)
         try:
             output = subprocess.check_output(
-                cmd, stderr=subprocess.STDOUT, env=self.env)
+                cmd, stderr=subprocess.STDOUT,
+                env=self.env)
             if output:
                 logger.debug('Process Output [%s]' % output.strip())
         except subprocess.CalledProcessError as err:
