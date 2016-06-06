@@ -1,0 +1,9 @@
+---
+upgrade:
+  - Fix mumble upgrade to keep TLS certificates and
+    room created.
+critical:
+  - Fix backup restore to properly reset mysql service
+    user credencials.
+  - Fix nodepool paramiko incorrect version and logs
+    of image-update command.
