@@ -2,10 +2,10 @@
 #
 
 # Current development version of SF
-VER=2.2.2
+VER=2.2.3
 
 # Version string
-SF_PREVIOUS_VER=C7.0-2.2.1
+SF_PREVIOUS_VER=C7.0-2.2.2
 
 # A tagged release of SF is defined by the string "TaggedRelease" in the commit msg
 REL_VER=$(git log --simplify-merges -n 1 | grep -i 'TaggedRelease:' | awk '{ print $2 }')

@@ -1,3 +1,33 @@
+2.2.2-39
+========
+
+New Features
+------------
+
+- An automatic groovy scripts will remove offline jenkins slave daily.
+- Gerritbot channels configuration is now managed through the config-repo.
+
+
+Upgrade Notes
+-------------
+
+- Fix mumble upgrade to keep TLS certificates and room created.
+- Gerritbot channels.yaml configuration file will be automatically submitted to the configuration repo
+
+
+Critical Issues
+---------------
+
+- Fix backup restore to properly reset mysql service user credencials.
+- Fix nodepool paramiko incorrect version and logs of image-update command.
+
+
+Bug Fixes
+---------
+
+- Properly set postfix myhostname to the fqdn. To avoid Greylisting, operator needs to configure the reverse dns of public ip to the fqdn.
+
+
 2.2.1  2016-05-23
 =================
 
