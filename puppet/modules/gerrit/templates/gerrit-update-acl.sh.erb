@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -x
+set -e
+
+# Git config complains about HOME env var missing ...
+export HOME=/root
+
+ADMINUSER=admin
+ADMINUSEREMAIL=admin@<%= @fqdn %>
+
+
+function upgrade_project_acl {
+    PROJECT=$1
+    CLONETEMPDIR="/tmp/${PROJECT}"
+    [ -d "$CLONETEMPDIR" ] && rm -Rf $CLONETEMPDIR
+    git init $CLONETEMPDIR
+    cd $CLONETEMPDIR
+    git config --global user.name "SF initial configurator"
+    git config --global user.email $ADMINUSEREMAIL
+    git remote add origin ssh://$ADMINUSER@localhost:29418/${PROJECT}
+    GIT_SSH=/root/gerrit_data_source/ssh_wrapper.sh git fetch origin refs/meta/config:refs/remotes/origin/meta/config
+    git checkout meta/config
+
+    meta_config=`git config -f /tmp/${PROJECT}/project.config -l`
+
+    CHANGED=0
+
+    if echo "$meta_config" | grep -i -q "access.refs/\*.read=deny group Registered Users" ; then
+        if echo "$meta_config" | grep -i -v -q "access.refs/meta/config.read=deny group Registered Users" ; then
+            git config -f project.config --add access.refs/meta/config.read "deny group Registered Users"
+            CHANGED=1
+        fi
+    fi
+
+    if echo "$meta_config" | grep -i -q "access.refs/\*.read=deny group Anonymous Users" ; then
+        if echo "$meta_config" | grep -i -v -q "access.refs/meta/config.read=deny group Anonymous Users" ; then
+            git config -f project.config --add access.refs/meta/config.read "deny group Anonymous Users"
+            CHANGED=1
+        fi
+    fi
+
+    if [ $CHANGED ]; then
+        git status
+        git diff
+        git add project.config
+        git commit -a -m "Auto upgrade ACLs"
+        GIT_SSH=/root/gerrit_data_source/ssh_wrapper.sh git push origin meta/config:meta/config
+    fi
+    cd -
+}
+
+projects=`/root/gerrit_data_source/ssh_wrapper.sh -p 29418 -l admin gerrit "gerrit ls-projects" --all`
+for project in ${projects}; do
+	upgrade_project_acl ${project}
+done
