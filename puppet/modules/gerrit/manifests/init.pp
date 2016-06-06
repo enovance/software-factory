@@ -308,6 +308,12 @@ class gerrit {
     content => template('gerrit/gerrit-set-default-acl.sh.erb'),
     replace => true,
   }
+  file { '/root/gerrit-update-acl.sh':
+    ensure  => file,
+    mode    => '0700',
+    content => template('gerrit/gerrit-update-acl.sh.erb'),
+    replace => true,
+  }
   file { '/root/gerrit-set-jenkins-user.sh':
     ensure  => file,
     mode    => '0700',
