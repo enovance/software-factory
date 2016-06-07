@@ -5,6 +5,10 @@
         <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/static/font-awesome/css/font-awesome.min.css">
         <script type="text/javascript" src="/static/js/topmenu.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+        <style type="text/css">
+         div.panel-body {background-color: #f8f8f8;}
+        </style>
     </head>
 
     <body>
@@ -30,10 +34,9 @@
                                 <i class="fa fa-sign-in fa-fw"></i>
                             </button>
                        </form>
+                       <% elsif not @launchpad["disabled"] %>
                        <br />
                        <hr />
-                       <% end %>
-                       <% if not @launchpad["disabled"] %>
                        <form method="post" action="/auth/login/" target="_top">
                         <input type="hidden" name="back" value="${back}">
                         <input type="hidden" name="method" value="OpenID">
@@ -43,10 +46,15 @@
                                 <i class="fa fa-sign-in fa-fw"></i>
                             </button>
                        </form>
-                       <br />
-                       <hr />
                        <% end %>
-                        <form method="post" action="/auth/login/" class="form-signin" target="_top">
+                       <% if @github["disabled"] and @launchpad["disabled"] %>
+                       <div id="login-form">
+                       <% else %>
+                       <div id="login-form" class="hidden">
+                       <% end %>
+                        <br />
+                        <hr />
+                        <form method="post" action="/auth/login/" class="form-signin" target="_top"/>
                             % if message:
                             <div class="form-group has-error">
                             % else:
@@ -67,13 +75,27 @@
                             <input type="hidden" name="method" value="Password">
 
                             <button type="submit" class="btn btn-primary col-md-12">
-                                Internal Login
+                                Local Login
                                 <i class="fa fa-sign-in fa-fw"></i>
                             </button>
                         </form>
+                       </div>
+                       <div id="login-form-toogling" style="padding-top: 50px;">
+                         <a id="toggle" title="Click hide/unhide the local login form" href="#">Toggle login form</a>
+                       </div>
                     </div>
                 </div>
             </div>
+        <script>
+          $( "#toggle" ).click(function(){
+            if ( $( "#login-form" ).hasClass( 'hidden' ) ) {
+              $( "#login-form" ).removeClass('hidden');
+            }
+            else {
+              $( "#login-form" ).addClass('hidden');
+            }
+          });
+        </script>
         <%= @theme["loginpage_custom_footer"] %>
     </body>
 </html>
