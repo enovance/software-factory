@@ -85,6 +85,8 @@ class BaseGuiTest(unittest.TestCase):
         self.driver.switch_to.frame(iframe)
         self.driver.find_element_by_id("login-btn").click()
         self.driver.switch_to.default_content()
+        self.driver.find_element_by_id("toggle").click()
+        self.driver.implicitly_wait(1)
         self.driver.find_element_by_name("username").send_keys(username)
         self.driver.find_element_by_name("password").send_keys(passwd)
         self.driver.find_element_by_name("password").submit()

@@ -22,6 +22,8 @@ from selenium.common.exceptions import NoSuchElementException
 
 class TestSoftwareFactoryDashboard(BaseGuiTest):
     def _internal_login(self, driver, user, password):
+        driver.find_element_by_id("toggle").click()
+        driver.implicitly_wait(1)
         u = driver.find_element_by_id("username")
         u.send_keys(user)
         p = driver.find_element_by_id("password")
@@ -33,7 +35,7 @@ class TestSoftwareFactoryDashboard(BaseGuiTest):
         driver = self.driver
         driver.get("%s/r/login" % config.GATEWAY_URL)
         self.assertTrue("Log in with Github" in driver.page_source)
-        self.assertTrue("Internal Login" in driver.page_source)
+        self.assertTrue(">Log in<" in driver.page_source)
 
     @snapshot_if_failure
     def test_admin_login(self):
@@ -51,7 +53,7 @@ class TestSoftwareFactoryDashboard(BaseGuiTest):
         driver.get("%s/auth/logout" % config.GATEWAY_URL)
         self.assertIn("SF", driver.title)
         self.assertTrue("Log in with Github" in driver.page_source)
-        self.assertTrue("Internal Login" in driver.page_source)
+        self.assertTrue(">Log in<" in driver.page_source)
         self.assertTrue(
             "successfully logged out" in driver.page_source)
 
