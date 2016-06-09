@@ -1,0 +1,55 @@
+From ef04d7b0477788cc565650f27bec648b97553dfb Mon Sep 17 00:00:00 2001
+From: Fabien Boucher <fboucher@redhat.com>
+Date: Fri, 10 Jun 2016 10:55:03 +0200
+Subject: [PATCH] Make zuul_swift_upload.py more accurate for mime type
+ detection
+
+When a text file is quite generic like a .css or .js file
+libmagic will detect the file's content as text/plain. This
+patch adds a check of the mime database in order to guess the
+mime type given a file extension. This is only done
+if text/plain is detected by libmagic.
+
+Change-Id: Ic73332533fc4d6c1a89ccbdb59d44f3697c56dc0
+---
+ jenkins/scripts/zuul_swift_upload.py | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/jenkins/scripts/zuul_swift_upload.py b/jenkins/scripts/zuul_swift_upload.py
+index dd45903..71dd8b0 100755
+--- a/jenkins/scripts/zuul_swift_upload.py
++++ b/jenkins/scripts/zuul_swift_upload.py
+@@ -23,6 +23,7 @@ import argparse
+ import logging
+ import glob2
+ import magic
++import mimetypes
+ import os
+ import Queue
+ import requests
+@@ -154,12 +155,20 @@ def get_file_mime(file_path):
+         return None
+ 
+     if hasattr(magic, 'from_file'):
+-        return magic.from_file(file_path, mime=True)
++        mime = magic.from_file(file_path, mime=True)
+     else:
+         # no magic.from_file, we might be using the libmagic bindings
+         m = magic.open(magic.MAGIC_MIME)
+         m.load()
+-        return m.file(file_path).split(';')[0]
++        mime = m.file(file_path).split(';')[0]
++    # libmagic can fail to detect the right mime type when content
++    # is too generic. The case for css or js files. So in case
++    # text/plain is detected then we rely on the mimetype db
++    # to guess by file extension.
++    if mime == 'text/plain':
++       mime_guess = mimetypes.guess_type(file_path)[0]
++       mime = mime_guess if mime_guess else mime
++    return mime
+ 
+ 
+ def get_file_metadata(file_path):
+-- 
+2.4.11
+
