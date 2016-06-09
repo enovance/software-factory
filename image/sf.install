@@ -58,11 +58,14 @@ function install_sf {
     sudo rsync --delete -a --no-owner ./../config/ansible/ ${dir}/etc/ansible/
     sudo mkdir -p ${dir}/etc/software-factory ${dir}/etc/ansible/group_vars ${dir}/var/lib/ansible
 
+    zuul_swift_upload_patch=./patches/0001-Make-zuul_swift_upload.py-more-accurate-for-mime-typ.patch
     sudo cp -Rv ./../config/config-repo/ ${dir}/usr/local/share/sf-config-repo
     sudo cp -Rv ./../tools/slaves/ ${dir}/usr/local/share/sf-jenkins-slave-tools
+    sudo patch ${dir}/usr/local/share/sf-jenkins-slave-tools/zuul_swift_upload.py < ${zuul_swift_upload_path}
     # Also copy tool in image PATH so that sf image could
     # be used as slave base image
     sudo cp -Rv ./../tools/slaves/* ${dir}/usr/local/bin/
+    sudo patch ${dir}/usr/local/bin/zuul_swift_upload.py < ${zuul_swift_upload_path}
 
     # Install cauth
     [ ! -d "${dir}/var/www/cauth" ] && sudo mkdir ${dir}/var/www/cauth
