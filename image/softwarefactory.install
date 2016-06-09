@@ -204,10 +204,6 @@ install_sf_packages() {
     # JJB directory
     mkdir -p ${dir}/etc/jenkins_jobs
 
-    # install zuul_swift_upload.py
-    http_fetch $ZUUL_SWIFT_UPLOAD_URL ${dir}/usr/local/bin/zuul_swift_upload.py
-    chmod +x ${dir}/usr/local/bin/zuul_swift_upload.py
-
     # don't rename net ifaces
     net_rules="${target}/etc/udev/rules.d/80-net-name-slot.rules"
     if [ "$(readlink ${net_rules} 2> /dev/null)" != "/dev/null" ]; then
