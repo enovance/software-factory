@@ -27,6 +27,7 @@ import os
 import Queue
 import requests
 import requests.exceptions
+import requestsexceptions
 import stat
 import sys
 import tempfile
@@ -86,9 +87,9 @@ def generate_log_index(folder_links, header_message='',
         output += '<tr>'
         output += (
             '<td><img alt="[ ]" title="%(m)s" src="%(i)s"></img></td>' % ({
-                'm': file_details['metadata']['mime'],
-                'i': get_mime_icon(file_details['metadata']['mime'],
-                                   file_details['filename']),
+            'm': file_details['metadata']['mime'],
+            'i': get_mime_icon(file_details['metadata']['mime'],
+                               file_details['filename']),
             }))
         output += '<td><a href="%s">%s</a></td>' % (file_details['url'],
                                                     file_details['filename'])
@@ -381,8 +382,8 @@ class PostThread(threading.Thread):
             try:
                 job = self.queue.get_nowait()
                 logging.debug("%s: proccessing job %s",
-                              threading.current_thread(),
-                              job)
+                        threading.current_thread(),
+                        job)
                 self._post_file(*job)
             except requests.exceptions.RequestException:
                 # Do our best to attempt to upload all the files
@@ -450,6 +451,10 @@ def grab_args():
 
 
 if __name__ == '__main__':
+
+    # Avoid unactionable warnings
+    requestsexceptions.squelch_warnings(requestsexceptions.InsecureRequestWarning)
+
     args = grab_args()
     # file_list: A list of files to push to swift (in file_detail format)
     file_list = []
