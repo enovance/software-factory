@@ -9,6 +9,30 @@
   when: config.stat.isdir is defined and config.stat.isdir
   command: chdir=/root/config {{ item }}
   with_items:
+    - git config -f .git/config --replace-all remote.origin.url http://{{ fqdn }}/r/config
     - git fetch --all
     - git reset --hard origin/master --
     - git clean -f -x -d
+
+- name: Check if config repo uses correct fqdn
+  command: chdir=/root/config grep {{ fqdn }} .gitreview
+  register: fqdn_changed
+  ignore_errors: True
+  changed_when: "fqdn_changed.rc == 2"
+
+- name: Remove outdated /usr/share/httpd/.ssh/known_hosts
+  file: path=/usr/share/httpd/.ssh/known_hosts state=absent
+  when: fqdn_changed.rc == 1
+
+- name: Update config repo with correct fqdn
+  when: fqdn_changed.rc == 1
+  command: chdir=/root/config {{ item }}
+  with_items:
+    - sed -i -e 's/host=.*/host={{ fqdn }}/g' .gitreview
+    - sed -i -e 's#zuul-cloner http://.*/r#zuul-cloner http://{{ fqdn }}/r#g' jobs/sf_jjb_conf.yaml
+    - sed -i -e 's#ssh root@managesf..* /usr/local/bin/sf-config-update.sh#ssh root@managesf.{{ fqdn }} /usr/local/bin/sf-config-update.sh#g' jobs/sf_jjb_conf.yaml
+    - git add .gitreview jobs/sf_jjb_conf.yaml
+    - git commit -m "Update with new fqdn"
+    - git push git+ssh://{{ fqdn }}:29418/config master
+    - mysql gerrit < /root/gerrit-restore-user-keys.sql
+    - systemctl restart gerrit

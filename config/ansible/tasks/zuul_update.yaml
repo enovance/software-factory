@@ -14,6 +14,9 @@
 - name: Start or reload zuul service
   shell: systemctl status zuul && systemctl reload zuul || systemctl start zuul
 
+- name: Start or reload zuul.merger service
+  shell: systemctl status zuul-merger && systemctl reload zuul-merger || systemctl start zuul-merger
+
 # Reload doesn't start service see: https://github.com/ansible/ansible/issues/4448
 - service: name=zuul state=started enabled=yes
 - service: name=zuul-merger state=started enabled=yes
