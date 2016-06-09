@@ -9,6 +9,8 @@
   when: config.stat.isdir is defined and config.stat.isdir
   command: chdir=/root/config {{ item }}
   with_items:
+    - git config -f .git/config --replace-all remote.origin.url http://{{ fqdn }}/r/config
+    - sed -i -e 's#url = ssh://admin@.*:29418/config#url = ssh://admin@{{ fqdn }}:29418/config#g' .git/config
     - git fetch --all
     - git reset --hard origin/master --
     - git clean -f -x -d
