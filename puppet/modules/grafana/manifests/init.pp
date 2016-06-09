@@ -35,6 +35,7 @@ class grafana {
     enable     => true,
     hasrestart => true,
     require     => File['/etc/grafana/grafana.ini'],
+    subscribe   => File['/etc/grafana/grafana.ini'],
   }
 
   file { '/root/grafana-init.sql':

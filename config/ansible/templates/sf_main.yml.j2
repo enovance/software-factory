@@ -30,3 +30,8 @@
       when: selinuxenabled
 
 {% endfor %}
+
+- hosts: managesf
+  gather_facts: no
+  tasks:
+    - include: tasks/update_fqdn.yaml
