@@ -100,7 +100,16 @@ case "${TEST_TYPE}" in
     "gui")
         lxc_init
         run_bootstraps
+        setup_selenium
         run_gui_tests
+        stop_selenium
+        ;;
+    "user_stories")
+        lxc_init
+        run_bootstraps
+        setup_selenium
+        record_user_stories
+        stop_selenium
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"
