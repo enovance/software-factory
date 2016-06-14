@@ -3,8 +3,8 @@ biff = no
 
 append_dot_mydomain = no
 
-myhostname = managesf.<%= @domain %>
-mydomain = <%= @domain %>
+myhostname = <%= @domain %>
+mydomain = $myhostname
 mydestination = $myhostname, localhost
 
 alias_maps = hash:/etc/aliases
