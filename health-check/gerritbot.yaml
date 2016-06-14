@@ -1,0 +1,49 @@
+---
+- hosts: gerritbot
+  tasks:
+# * Start fake_ircd service
+    - name: "Setup fake_ircd.py"
+      copy: src=files/fake_ircd.py dest=/root/fake_ircd.py
+
+    - name: "Start fake irc server"
+      command: chdir=/root python /root/fake_ircd.py
+
+# * Setup gerritbot and start service
+    - name: "Setup configuration"
+      template: src=templates/gerritbot.conf.j2 dest=/etc/gerritbot/gerritbot.conf
+
+    - name: "Setup channels"
+      copy: src=files/gerritbot-channels.yaml dest=/etc/gerritbot/channels.yaml
+
+    - name: "Restart service"
+      service: name=gerritbot state=restarted
+
+# * Check gerritbot connect to gerrit and irc
+    - name: "Wait for gerritbot to connect to gerrit"
+      wait_for: path=/var/log/gerritbot/gerritbot.log search_regex="INFO gerritbot{{':'}} Start watching Gerrit event stream."
+
+    - name: "Wait for gerritbot to connect to irc"
+      wait_for: path=/var/log/gerritbot/gerritbot.log search_regex="INFO gerritbot{{':'}} Identified with IRC server."
+
+    - name: "Wait for gerritbot to connect to channel"
+      wait_for: path=/var/log/gerritbot/gerritbot.log search_regex="INFO gerritbot{{':'}} Joined channel .health-check"
+
+- name: "Reset config repos"
+  include: playbooks/config_reset.yaml
+
+# * Submit fake config review
+- hosts: install-server
+  tasks:
+    - name: "Create fake config change"
+      command: chdir=/root/config {{ item }}
+      with_items:
+        - touch test_gerritbot_notif
+        - git add test_gerritbot_notif
+        - git commit -m "Test gerritbot notif"
+        - git review
+
+# * Check gerritbot send irc message on new change created
+- hosts: gerritbot
+  tasks:
+    - name: "Check fake_ircd server log for notification"
+      wait_for: path=/root/fake_ircd.log search_regex="PRIVMSG .health-check .* proposed config. Test gerritbot notif .*http"

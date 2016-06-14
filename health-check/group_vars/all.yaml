@@ -22,3 +22,6 @@ image_name: sfcentos
 
 # Swift
 os_container: sflogs
+
+# Gerritbot
+bot_name: health-check-bot
