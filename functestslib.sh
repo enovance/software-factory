@@ -155,7 +155,14 @@ function heat_wait {
         sleep 5
         let RETRY--
     done
-    [ $RETRY -eq 0 ] && fail "Instance ping failed..."
+    [ $RETRY -eq 0 ] && {
+        set -x
+        heat stack-show sf_stack
+        nova list
+        neutron port-list
+        nova console-log managesf.sftests.com
+        fail "Instance ping failed..."
+    }
     echo "ok."
     checkpoint "heat-wait"
 }
