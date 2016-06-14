@@ -187,7 +187,8 @@ First time: **Please read `Root password consideration`**.
 
  $ ssh -A root@sf_instance
  [root@managesf ~]# vim /etc/puppet/hiera/sf/sfconfig.yaml
- [root@managesf ~]# sfconfig.sh
+ [root@managesf ~]# git diff
+ [root@managesf ~]# sfconfig.sh && git commit -a -m "Auto-update $(TZ=UTC date)"
 
 Network Access
 --------------
