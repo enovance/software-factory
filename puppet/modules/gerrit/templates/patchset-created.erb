@@ -41,48 +41,48 @@ key="$1"
 
 case $key in
     --change)
-    CHANGE="$2"
+    CHANGE="${2//\"/\\\"}"
     shift # past argument
     ;;
     --is-draft)
-    ISDRAFT="$2"
+    ISDRAFT="${2//\"/\\"}"
     shift # past argument
     ;;
     --change-url)
-    CHANGEURL="$2"
+    CHANGEURL="${2//\"/\\"}"
     shift # past argument
     ;;
     --project)
-    PROJECT="$2"
+    PROJECT="${2//\"/\\"}"
     shift # past argument
     ;;
     --branch)
-    BRANCH="$2"
+    BRANCH="${2//\"/\\"}"
     ;;
     --topic)
-    TOPIC="$2"
+    TOPIC="${2//\"/\\"}"
     shift # past argument
     ;;
     --uploader)
-    UPLOADER="$2"
+    UPLOADER="${2//\"/\\"}"
     shift # past argument
     ;;
     --commit)
-    COMMIT="$2"
+    COMMIT="${2//\"/\\"}"
     ;;
     --patchset)
-    PATCHSET="$2"
+    PATCHSET="${2//\"/\\"}"
     shift # past argument
     ;;
     --kind)
-    KIND="$2"
+    KIND="${2//\"/\\"}"
     shift # past argument
     ;;
     --change-owner)
-    CHANGEOWNER="$2"
+    CHANGEOWNER="${2//\"/\\"}"
     ;;
     --newrev)
-    NEWREV="$2"
+    NEWREV="${2//\"/\\"}"
     ;;
     *)
             # unknown option

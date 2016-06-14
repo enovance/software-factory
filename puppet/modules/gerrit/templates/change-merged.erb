@@ -43,36 +43,36 @@ key="$1"
 
 case $key in
     --change)
-    CHANGE="$2"
+    CHANGE="${2//\"/\\"}"
     shift # past argument
     ;;
     --change-url)
-    CHANGEURL="$2"
+    CHANGEURL="${2//\"/\\"}"
     shift # past argument
     ;;
     --project)
-    PROJECT="$2"
+    PROJECT="${2//\"/\\"}"
     shift # past argument
     ;;
     --branch)
-    BRANCH="$2"
+    BRANCH="${2//\"/\\"}"
     ;;
     --topic)
-    TOPIC="$2"
+    TOPIC="${2//\"/\\"}"
     shift # past argument
     ;;
     --submitter)
-    SUBMITTER="$2"
+    SUBMITTER="${2//\"/\\"}"
     shift # past argument
     ;;
     --commit)
-    COMMIT="$2"
+    COMMIT="${2//\"/\\"}"
     ;;
     --change-owner)
-    CHANGEOWNER="$2"
+    CHANGEOWNER="${2//\"/\\"}"
     ;;
     --newrev)
-    NEWREV="$2"
+    NEWREV="${2//\"/\\"}"
     ;;
     *)
             # unknown option
