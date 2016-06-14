@@ -3,6 +3,14 @@ They are designed to run from the install-server to use the dynamic inventory.
 
 Each playbook test a specific service:
 
+gerritbot.yaml
+---------
+* Start fake_ircd service
+* Setup gerritbot and start service
+* Check gerritbot connect to gerrit and irc
+* Submit fake config review
+* Check gerritbot send irc message on new change created
+
 nodepool.yaml
 ---------
 * Setup provider with sfconfig.sh
