@@ -196,7 +196,7 @@ class TestProjectReplication(Base):
 
         # Be sure sftests.com host key is inside the known_hosts
         cmds = [['ssh', 'gerrit.%s' % config.GATEWAY_HOST,
-                 'ssh-keyscan', 'sftests.com', '>',
+                 'ssh-keyscan', config.GATEWAY_HOST, '>',
                  '/home/gerrit/.ssh/known_hosts']]
         for cmd in cmds:
             self.ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
