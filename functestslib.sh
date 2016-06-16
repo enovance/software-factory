@@ -478,6 +478,10 @@ function change_fqdn {
     # creation.
     ssh sftests.com "rm sf-bootstrap-data/certs/gateway.* openssl.cnf"
 
+    # The following changes are only required to run functional tests
+    ssh sftests.com "sed -i -e 's/fqdn == \"sftests.com\"/fqdn == \"sftests2.com\"/g' /etc/puppet/environments/sf/modules/cauth/templates/cauth-config.py.erb"
+    ssh sftests.com "sed -i -e 's/fqdn == \"sftests.com\"/fqdn == \"sftests2.com\"/g' /etc/puppet/environments/sf/modules/managesf/templates/managesf-config.py.erb "
+
     checkpoint "change_fqdn"
 }
 

@@ -180,7 +180,7 @@ USER_6_PRIV_KEY = USER_4_PRIV_KEY
 
 USERS = {
     USER_1: {"password": ADMIN_PASSWORD,
-             "email": "admin@sftests.com",
+             "email": "admin@%s" % GATEWAY_HOST,
              "pubkey": file(ADMIN_PUB_KEY_PATH).read(),
              "privkey": file(ADMIN_PRIV_KEY_PATH).read(),
              "auth_cookie": "",
