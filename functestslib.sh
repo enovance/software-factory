@@ -398,10 +398,10 @@ function reset_etc_hosts_dns {
         ip=$2
         grep -q " ${host}" /etc/hosts || {
             # adds to /etc/hosts if not already defined
-            echo "${ip} ${host}" | sudo tee -a /etc/hosts
+            echo "${ip} ${host} sftests2.com" | sudo tee -a /etc/hosts
         } && {
             # else sed in-place
-            sudo sed -i "s/^.* ${host}/${ip} ${host}/" /etc/hosts
+            sudo sed -i "s/^.* ${host}/${ip} ${host} sftests2.com/" /etc/hosts
         }
     ) &> ${ARTIFACTS_DIR}/etc_hosts.log
 }
@@ -414,11 +414,13 @@ function run_provisioner {
 
 function run_backup_start {
     echo "$(date) ======= run_backup_start"
+    MANAGESF_URL=https://sftests2.com
     sfmanager --url "${MANAGESF_URL}" --auth "admin:${ADMIN_PASSWORD}" system backup_start || fail "Backup failed"
     sfmanager --url "${MANAGESF_URL}" --auth "admin:${ADMIN_PASSWORD}" system backup_get   || fail "Backup get failed"
     scp sftests.com:/var/log/managesf/managesf.log ${ARTIFACTS_DIR}/backup_managesf.log
     tar tzvf sf_backup.tar.gz > ${ARTIFACTS_DIR}/backup_content.log
     grep -q '\.bup\/objects\/pack\/.*.pack$' ${ARTIFACTS_DIR}/backup_content.log || fail "Backup empty" ${ARTIFACTS_DIR}/backup_content.log
+    MANAGESF_URL=https://sftests.com
     checkpoint "run_backup_start"
 }
 
@@ -480,6 +482,22 @@ function change_fqdn {
     ssh sftests.com "rm sf-bootstrap-data/certs/gateway.* openssl.cnf"
 
     checkpoint "change_fqdn"
+}
+
+function change_tests_fqdn {
+    echo "$(date) ======= change_tests_fqdn"
+    # The following changes are only required to run functional tests from the
+    # deploy node
+    ssh sftests.com "sed -i -e 's/fqdn == \"sftests.com\"/fqdn == \"sftests2.com\"/g' /etc/puppet/environments/sf/modules/cauth/templates/cauth-config.py.erb"
+    ssh sftests.com "sed -i -e 's/fqdn == \"sftests.com\"/fqdn == \"sftests2.com\"/g' /etc/puppet/environments/sf/modules/managesf/templates/managesf-config.py.erb "
+
+    cat << EOF >> ${HOME}/.ssh/config
+Host sftests2.com
+    Hostname 192.168.135.101
+    User root
+EOF
+
+    checkpoint "change_tests_fqdn"
 }
 
 function run_sfconfig {

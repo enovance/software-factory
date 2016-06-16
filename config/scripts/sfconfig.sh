@@ -177,6 +177,7 @@ EOF
         hieraedit.py --yaml /etc/puppet/hiera/sf/sfcreds.yaml -f ${OUTPUT}/gateway.crt gateway_chain
         # Trust this certificate. This is mostly required for sfmanager
         cat ${OUTPUT}/gateway.crt >> /etc/pki/tls/certs/ca-bundle.crt
+        cat ${OUTPUT}/gateway.crt >> ${OUTPUT}/ca-bundle.trust.crt
     }
     # Update missing chain configuration (TODO: move this to global config updater (coming soon))
     grep -q '^gateway_chain:' /etc/puppet/hiera/sf/sfcreds.yaml || \
