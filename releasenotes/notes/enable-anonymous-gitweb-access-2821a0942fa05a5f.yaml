@@ -1,0 +1,14 @@
+---
+fixes:
+  - Until now aonymous access to view a repository content in gitweb was
+    not possible. The reason was a missing ACL to allow read access to
+    refs/meta/config for the groups "Anonymous Users" and "Registered Users".
+
+    This has been changed, and the mentioned ACL is now added to the
+    All-Projects repository, inherited by default in other projects.
+    Finally anonymous gitweb access to public repos is now possible. 
+
+    Private repos should update their project.config and disable
+    anonymous access to this ref. Note that even without this change it
+    is not possible to access the branches except refs/meta/config on
+    private repos.
