@@ -1,0 +1,2 @@
+---
+- template: src=/etc/ansible/templates/mail-ssh-login.j2 dest=/etc/rsyslog.d/mail-ssh-login.conf
