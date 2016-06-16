@@ -69,7 +69,6 @@ case "${TEST_TYPE}" in
         run_bootstraps
         run_serverspec_tests
         run_health_base
-        run_functional_tests
         run_provisioner
         run_backup_start
         lxc_stop
@@ -82,6 +81,7 @@ case "${TEST_TYPE}" in
         run_sfconfig
         run_serverspec_tests
         fetch_bootstraps_data
+        run_functional_tests
         ;;
     "upgrade")
         ./fetch_image.sh ${SF_PREVIOUS_VER} || fail "Could not fetch ${SF_PREVIOUS_VER}"
