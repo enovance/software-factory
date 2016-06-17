@@ -60,6 +60,7 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
     @snapshot_if_failure
     def test_login_page(self):
         driver = self.driver
+        driver.implicitly_wait(15)
         driver.get("%s/r/login" % config.GATEWAY_URL)
         self.assertTrue("Log in with Github" in driver.page_source)
         self.assertTrue("Internal Login" in driver.page_source)
@@ -67,6 +68,7 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
     @snapshot_if_failure
     def test_admin_login(self):
         driver = self.driver
+        driver.implicitly_wait(15)
         driver.get("%s/r/login" % config.GATEWAY_URL)
         self.assertIn("SF", driver.title)
         self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
@@ -77,6 +79,7 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
     @snapshot_if_failure
     def test_logout(self):
         driver = self.driver
+        driver.implicitly_wait(15)
         driver.get("%s/auth/logout" % config.GATEWAY_URL)
         self.assertIn("SF", driver.title)
         self.assertTrue("Log in with Github" in driver.page_source)
@@ -87,6 +90,7 @@ class TestSoftwareFactoryDashboard(unittest.TestCase):
     @snapshot_if_failure
     def test_topmenu_links(self):
         driver = self.driver
+        driver.implicitly_wait(15)
         driver.get(config.GATEWAY_URL)
         driver.set_window_size(1280, 800)
         # switch to top menu iframe
