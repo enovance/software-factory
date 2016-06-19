@@ -14,8 +14,9 @@
     - git reset --hard origin/master --
     - git clean -f -x -d
     - mkdir gerritbot
-      # Copy or create an empty file
-    - bash -c "cp /etc/gerritbot/channels.yaml gerritbot/channels.yaml || touch gerritbot/channels.yaml"
+    # Copy or create an empty file. Note that the shell is not in the same
+    # directory, therefore using absolute paths
+    - bash -c "cp /etc/gerritbot/channels.yaml /root/config/gerritbot/channels.yaml || touch /root/config/gerritbot/channels.yaml"
     - git add gerritbot
     - git commit -m "Import of gerritbot configuration"
     - git push git+ssh://{{ fqdn }}/config
