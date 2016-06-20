@@ -43,10 +43,15 @@ function initAuth() {
     if ( isCookiesEnabled() ) {
         var tokens = document.cookie.split(';');
         for ( var i = 0; i < tokens.length; i++ ) {
-	    tokens[i] = tokens[i].trim();
+            tokens[i] = tokens[i].trim();
             if ( tokens[i].indexOf('auth_pubtkt') == 0 ) {
                 var username = getValueOfKey(tokens[i].substring(12), 'uid');
                 if ( username ) {
+                    var storyboard_user_id = getValueOfKey(tokens[i], 'eid')
+                    //alert(tokens[i]);
+                    localStorage.setItem("ls.access_token", username); // storyboard_api is already protected by cauth
+                    localStorage.setItem("ls.id_token", storyboard_user_id);
+                    localStorage.setItem("ls.token_type", "Bearer");
                     displayLoggedIn(username);
                     return;
                 }
