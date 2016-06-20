@@ -43,10 +43,18 @@ function initAuth() {
     if ( isCookiesEnabled() ) {
         var tokens = document.cookie.split(';');
         for ( var i = 0; i < tokens.length; i++ ) {
-	    tokens[i] = tokens[i].trim();
+            tokens[i] = tokens[i].trim();
             if ( tokens[i].indexOf('auth_pubtkt') == 0 ) {
                 var username = getValueOfKey(tokens[i].substring(12), 'uid');
                 if ( username ) {
+                    /* Storyboard localstorage setting */
+                    /* TODO: replace hardcoded value bellow by dynamic values */
+                    var token = "42424242" //getValueOfKey(tokens[i], 'sig').substring(100);
+                    var storyboard_user_id = "1"
+                    //alert(tokens[i]);
+                    localStorage.setItem("ls.access_token", token);
+                    localStorage.setItem("ls.id_token", storyboard_user_id);
+                    localStorage.setItem("ls.token_type", "Bearer");
                     displayLoggedIn(username);
                     return;
                 }

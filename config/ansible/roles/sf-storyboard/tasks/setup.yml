@@ -1,0 +1,32 @@
+---
+- group: name=storyboard
+- user: name=storyboard group=storyboard shell=/sbin/nologin home=/var/lib/storyboard
+- file: path=/var/lib/storyboard state=directory mode=0700 owner=storyboard group=storyboard
+- file: path=/etc/storyboard state=directory mode=0700 owner=storyboard group=storyboard
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+- name: "Install storyboard.conf"
+  template: src=storyboard.conf.j2 dest=/etc/storyboard/storyboard.conf owner=storyboard group=storyboard mode=0400
+- name: "Setup database"
+  command: storyboard-db-manage --config-file /etc/storyboard/storyboard.conf upgrade head
+
+# Better WSGI installation
+#- name: "Install storyboard.httpd.conf"
+#  template: src=storyboard.httpd.conf.j2 dest=/etc/httpd/conf.d/storyboard.conf
+
+# Or trivial systemd service
+- name: "Install storyboard service"
+  template: src=storyboard.service.j2 dest=/lib/systemd/system/storyboard.service
+  register: storyboard_service
+- name: "systemctl daemon-reload"
+  command: systemctl daemon-reload
+  when: storyboard_service|changed
+- name: "Start service"
+  service: name=storyboard state=started enabled=yes
+
+# TODO: replace below by managesf code
+- name: "Create admin user"
+  command: mysql storyboard -e 'insert into users (email, is_staff, is_active, is_superuser, full_name) values ("admin@sftests.com", 1, 1, 1, "SF Admin")'
+- name: "Create fake token"
+  command: mysql storyboard -e 'insert into accesstokens (access_token, created_at, updated_at, expires_in, expires_at, user_id) values ("42424242", now(), now(), 4320000, date_add(now(), INTERVAL 4320000 SECOND), 1);'
+- name: "Create config project"
+  command: mysql storyboard -e 'insert into projects (name, description, autocreate_branches) VALUES ("config", "the config repo", 1); insert into branches (name, project_id) VALUES ("master", 2);'
