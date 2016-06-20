@@ -27,6 +27,11 @@ export PIP_USE_MIRRORS=True
 # Serverspec gem versions
 SERVERSPEC_VERSION=2.25.0
 
+# Storyboard
+STORYBOARD_COMMIT="3781b33cf688685a62ad6a4ae740618aa699fdce"
+STORYBOARD_WEBCLIENT_COMMIT="ffda0be"
+STORYBOARD_CLIENT_COMMIT="ad713855fbfdd0e89cdc867af7d347c2b2f8ae38"
+
 # mod_auth_pubtkt
 MOD_AUTH_PUBTKT_VERSION=0.8
 MOD_AUTH_PUBTKT_URL="https://neon1.net/mod_auth_pubtkt/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
