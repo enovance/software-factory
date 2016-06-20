@@ -1,0 +1,14 @@
+---
+- name: "Fetch storyboard code"
+  git: repo=git://git.openstack.org/openstack-infra/storyboard dest=/srv/storyboard_git recursive=no version={{ storyboard_commit }} update=no
+- name: "Install venv"
+  command: "{{ item }}"
+  with_items:
+    - virtualenv /srv/storyboard
+    - /srv/storyboard/bin/pip install --upgrade 'pbr' 'pip<8'
+    - /srv/storyboard/bin/pip install 'pip<8' file:///srv/storyboard_git/
+- name: "Install program"
+  command: ln -sf /srv/storyboard/bin/{{ item }} /usr/bin/{{ item }}
+  with_items:
+    - storyboard-db-manage
+    - storyboard-api

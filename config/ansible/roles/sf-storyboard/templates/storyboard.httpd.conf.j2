@@ -1,0 +1,14 @@
+WSGIScriptAlias /storyboard_api /srv/storyboard/lib/python2.7/site-packages/storyboard/api/app.wsgi
+WSGIDaemonProcess storyboard user=storyboard group=storyboard threads=5 python-path=/srv/storyboard/lib/python2.7/site-packages/
+<Location /storyboard_api>
+    WSGIPassAuthorization On
+    WSGIProcessGroup storyboard
+    WSGIApplicationGroup %{GLOBAL}
+    Order deny,allow
+    Allow from all
+    AuthType mod_auth_pubtkt
+    TKTAuthLoginURL /auth/login
+    TKTAuthFakeBasicAuth on
+    TKTAuthDebug 1
+    require valid-user
+</Location>

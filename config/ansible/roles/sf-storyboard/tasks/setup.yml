@@ -1,0 +1,24 @@
+---
+- group: name=storyboard
+- user: name=storyboard group=storyboard shell=/sbin/nologin home=/var/lib/storyboard
+- file: path=/var/lib/storyboard state=directory mode=0700 owner=storyboard group=storyboard
+- file: path=/etc/storyboard state=directory mode=0700 owner=storyboard group=storyboard
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+- name: "Install storyboard.conf"
+  template: src=storyboard.conf.j2 dest=/etc/storyboard/storyboard.conf owner=storyboard group=storyboard mode=0400
+- name: "Setup database"
+  command: storyboard-db-manage --config-file /etc/storyboard/storyboard.conf upgrade head
+
+# Better WSGI installation
+#- name: "Install storyboard.httpd.conf"
+#  template: src=storyboard.httpd.conf.j2 dest=/etc/httpd/conf.d/storyboard.conf
+
+# Or trivial systemd service
+- name: "Install storyboard service"
+  template: src=storyboard.service.j2 dest=/lib/systemd/system/storyboard.service
+  register: storyboard_service
+- name: "systemctl daemon-reload"
+  command: systemctl daemon-reload
+  when: storyboard_service|changed
+- name: "Start service"
+  service: name=storyboard state=started enabled=yes
