@@ -526,6 +526,19 @@ function run_serverspec_tests {
     checkpoint "run_serverspec_tests"
 }
 
+function wait_boot_finished {
+    echo "$(date) ======= wait_boot_finished"
+    STOP_RETRY=12
+    while [ $STOP_RETRY -gt 0 ]; do
+        # auditd and ksm are expected to fail on LXC, ignore them
+        state=`ssh ${SF_HOST} "systemctl reset-failed auditd ksm ; systemctl is-system-running"`
+        [ "${state}" == "running" ] && break
+        sleep 5
+        let STOP_RETRY--
+    done
+    checkpoint "wait_boot_finished"
+}
+
 START=$(date '+%s')
 
 function checkpoint {
