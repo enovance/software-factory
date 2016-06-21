@@ -14,6 +14,7 @@
 # under the License.
 
 class lodgeit {
+  include ::systemctl
 
   $fqdn = hiera('fqdn')
   $session_key = hiera('creds_lodgeit_session_key')
@@ -28,6 +29,7 @@ class lodgeit {
     mode    => '0755',
     source  => 'puppet:///modules/lodgeit/lodgeit.service',
     require => File['/srv/lodgeit/lodgeit/manage.py'],
+    notify  => Exec['systemctl_reload'],
   }
 
   file { '/srv/lodgeit/lodgeit/manage.py':
