@@ -193,7 +193,7 @@ class TestProjectTestsWorkflow(Base):
         last_build_num_ch, last_success_build_num_ch = 0, 1
         attempt = 0
         while last_build_num_ch != last_success_build_num_ch:
-            if attempt >= 90:
+            if attempt >= 120:
                 break
             time.sleep(1)
             last_build_num_ch = \
@@ -230,7 +230,7 @@ class TestProjectTestsWorkflow(Base):
         last_build_num_ch, last_success_build_num_ch = 0, 1
         attempt = 0
         while last_build_num_ch != last_success_build_num_ch:
-            if attempt >= 90:
+            if attempt >= 120:
                 break
             time.sleep(1)
             last_build_num_ch = \
@@ -252,7 +252,7 @@ class TestProjectTestsWorkflow(Base):
         change_status = change['status']
         attempt = 0
         while change_status != 'MERGED':
-            if attempt >= 90:
+            if attempt >= 120:
                 break
             time.sleep(1)
             change = self.gu.get_change('config', 'master', change_id)
@@ -320,7 +320,7 @@ class TestProjectTestsWorkflow(Base):
         change_id = change_ids[0]
 
         # let some time to Zuul to update the test result to Gerrit.
-        for i in range(90):
+        for i in range(120):
             if "jenkins" in self.gu.get_reviewers(change_id):
                 break
             time.sleep(1)
