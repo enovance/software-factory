@@ -317,8 +317,10 @@ class gerrit {
   }
 
   file { 'wait4gerrit':
-    path   => '/root/wait4gerrit.sh',
-    mode   => '0740',
+    path   => '/usr/libexec/wait4gerrit',
+    mode   => '0755',
+    owner  => 'root',
+    group  => 'root',
     source => 'puppet:///modules/gerrit/wait4gerrit.sh',
   }
 
@@ -357,16 +359,6 @@ class gerrit {
     logoutput   => on_failure,
   }
 
-  # This ressource wait for gerrit TCP ports are up
-  # Be really tolenrant with the timeout Gerrit can take long
-  # to start in, it seems, low mem env ...
-  exec { 'wait4gerrit':
-    path    => '/usr/bin:/usr/sbin:/bin',
-    command => '/root/wait4gerrit.sh',
-    timeout => 900,
-    require => [File['wait4gerrit'],  Service['gerrit']],
-  }
-
   # Init default in Gerrit. Require a running gerrit but
   # must be done the first time after gerrit-init-init
   exec {'gerrit-init-firstuser':
@@ -374,7 +366,6 @@ class gerrit {
     logoutput   => on_failure,
     subscribe   => Exec['gerrit-initial-init'],
     require     => [Service['gerrit'],
-                    Exec['wait4gerrit'],
                     File['/root/gerrit-firstuser-init.sql'],
                     File['/root/gerrit_admin_rsa']],
     refreshonly => true,
@@ -383,7 +374,7 @@ class gerrit {
     command     => '/root/gerrit-set-default-acl.sh',
     logoutput   => on_failure,
     subscribe   => Exec['gerrit-init-firstuser'],
-    require     => [Service['gerrit'], Exec['wait4gerrit'],
+    require     => [Service['gerrit'],
                     File['/root/gerrit_data_source/project.config'],
                     File['/root/gerrit_data_source/ssh_wrapper.sh'],
                     File['/home/gerrit/gerrit.war']],
@@ -392,8 +383,8 @@ class gerrit {
   exec {'gerrit-init-jenkins':
     command     => '/root/gerrit-set-jenkins-user.sh',
     logoutput   => on_failure,
-    subscribe   => Exec['gerrit-init-firstuser'],
-    require     => [Service['gerrit'], Exec['wait4gerrit']],
+    subscribe   => [Exec['gerrit-init-firstuser'], File['/root/gerrit-set-jenkins-user.sh']],
+    require     => Service['gerrit'],
     refreshonly => true,
   }
 

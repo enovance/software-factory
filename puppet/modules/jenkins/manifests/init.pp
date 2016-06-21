@@ -202,17 +202,11 @@ class jenkins {
   }
 
   file { 'wait4jenkins':
-    path   => '/root/wait4jenkins.sh',
-    mode   => '0740',
+    path   => '/usr/libexec/wait4jenkins',
+    mode   => '0755',
+    owner   => 'root',
+    group   => 'root',
     source => 'puppet:///modules/jenkins/wait4jenkins.sh',
-  }
-
-  # This ressource wait for Jenkins to bee fully UP
-  exec { 'wait4jenkins':
-    path    => '/usr/bin:/usr/sbin:/bin',
-    command => '/root/wait4jenkins.sh',
-    timeout => 900,
-    require => [File['wait4jenkins'],  Service['jenkins']],
   }
 
   file { '/etc/httpd/htpasswd':
