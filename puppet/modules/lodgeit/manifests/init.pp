@@ -22,12 +22,18 @@ class lodgeit {
   $mysql_db_username = 'lodgeit'
   $mysql_db = 'lodgeit'
 
+  exec {'systemctl_reload':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
+
   file {'init':
     ensure  => file,
     path    => '/lib/systemd/system/lodgeit.service',
     mode    => '0755',
     source  => 'puppet:///modules/lodgeit/lodgeit.service',
     require => File['/srv/lodgeit/lodgeit/manage.py'],
+    notify  => Exec['systemctl_reload'],
   }
 
   file { '/srv/lodgeit/lodgeit/manage.py':

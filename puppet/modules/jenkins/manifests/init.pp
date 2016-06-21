@@ -49,12 +49,18 @@ class jenkins {
     ensure  => 'absent',
   }
 
+  exec {'systemctl_reload':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
+
   file {'/lib/systemd/system/jenkins.service':
     ensure  => file,
     mode    => '0640',
     owner   => 'jenkins',
     group   => 'jenkins',
     content => template('jenkins/jenkins.service.erb'),
+    notify  => Exec['systemctl_reload'],
   }
 
   file { '/var/cache/jenkins':
@@ -202,17 +208,11 @@ class jenkins {
   }
 
   file { 'wait4jenkins':
-    path   => '/root/wait4jenkins.sh',
-    mode   => '0740',
+    path   => '/usr/libexec/wait4jenkins',
+    mode   => '0755',
+    owner   => 'root',
+    group   => 'root',
     source => 'puppet:///modules/jenkins/wait4jenkins.sh',
-  }
-
-  # This ressource wait for Jenkins to bee fully UP
-  exec { 'wait4jenkins':
-    path    => '/usr/bin:/usr/sbin:/bin',
-    command => '/root/wait4jenkins.sh',
-    timeout => 900,
-    require => [File['wait4jenkins'],  Service['jenkins']],
   }
 
   file { '/etc/httpd/htpasswd':

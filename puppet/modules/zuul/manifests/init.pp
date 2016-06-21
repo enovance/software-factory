@@ -41,6 +41,11 @@ class zuul {
     notify  => Service['webserver'],
   }
 
+  exec {'systemctl_reload':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
+
   file {'zuul_init':
     ensure => file,
     path   => '/lib/systemd/system/zuul.service',
@@ -48,6 +53,7 @@ class zuul {
     owner  => 'root',
     group  => 'root',
     source => 'puppet:///modules/zuul/zuul.service',
+    notify  => Exec['systemctl_reload'],
   }
 
   file {'zuul_merger_init':
@@ -57,6 +63,7 @@ class zuul {
     group  => 'root',
     owner  => 'root',
     source => 'puppet:///modules/zuul/zuul-merger.service',
+    notify  => Exec['systemctl_reload'],
   }
 
   group { 'zuul':

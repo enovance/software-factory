@@ -35,6 +35,7 @@ function prepare_artifacts {
 }
 
 function lxc_stop {
+    ssh ${SF_HOST} sync
     (cd deploy/lxc; sudo ./deploy.py --workspace ${SF_WORKSPACE} stop)
     checkpoint "lxc-stop"
 }
@@ -524,6 +525,19 @@ function run_serverspec_tests {
     ssh ${SF_HOST} "cd /etc/serverspec; rake spec" 2>&1 | tee ${ARTIFACTS_DIR}/serverspec.output
     [ "${PIPESTATUS[0]}" != "0" ] && fail "Serverspec tests failed"
     checkpoint "run_serverspec_tests"
+}
+
+function wait_boot_finished {
+    echo "$(date) ======= wait_boot_finished"
+    STOP_RETRY=12
+    while [ $STOP_RETRY -gt 0 ]; do
+        # auditd and ksm are expected to fail on LXC, ignore them
+        state=`ssh ${SF_HOST} "systemctl reset-failed auditd ksm ; systemctl is-system-running"`
+        [ "${state}" == "running" ] && break
+        sleep 5
+        let STOP_RETRY--
+    done
+    checkpoint "wait_boot_finished"
 }
 
 START=$(date '+%s')
