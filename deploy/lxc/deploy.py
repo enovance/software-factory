@@ -117,7 +117,7 @@ def prepare_role(base_path, name, ip, gateway, netmask="255.255.255.0"):
                 os.unlink(s)
 
 
-def stop(arch):
+def stop(arch, cmd="terminate"):
     print "[deploy] Stop"
     port_redirection(arch, "down")
     # Remove legacy name
@@ -134,7 +134,7 @@ def stop(arch):
     for machine in pread(['machinectl', 'list'], silent=True).split('\n'):
         if arch["domain"] not in machine:
             continue
-        execute(['machinectl', 'terminate', machine.split()[0]], silent=True)
+        execute(['machinectl', cmd, machine.split()[0]], silent=True)
 
 
 def init(arch, base):
@@ -197,7 +197,7 @@ parser.add_argument("--version")
 parser.add_argument("--workspace", default="/var/lib/sf")
 parser.add_argument("--arch", default="../../config/refarch/allinone.yaml")
 parser.add_argument("action", choices=[
-    "start", "stop", "restart", "init", "destroy"])
+    "start", "stop", "restart", "init", "destroy", "poweroff"])
 args = parser.parse_args()
 
 try:
@@ -209,7 +209,9 @@ except IOError:
 if args.action == "start":
     start(arch)
 elif args.action == "stop":
-    stop(arch)
+    stop(arch, cmd="terminate")
+elif args.action == "poweroff":
+    stop(arch, cmd="poweroff")
 elif args.action == "restart":
     stop(arch)
     start(arch)
