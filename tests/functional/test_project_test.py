@@ -205,13 +205,17 @@ class TestProjectTestsWorkflow(Base):
             attempt += 1
 
         self.assertEqual(last_build_num_ch, last_success_build_num_ch)
-        # let some time to Zuul to update the test result to Gerrit.
-        time.sleep(2)
 
         # Get the change id
         change_ids = self.gu.get_my_changes_for_project("config")
         self.assertGreater(len(change_ids), 0)
         change_id = change_ids[0]
+
+        # Wait until some Jenkins review is available
+        for _ in range(300):
+            if "jenkins" in self.gu.get_reviewers(change_id):
+                break
+            time.sleep(1)
 
         # Check whether zuul sets verified to +1 after running the tests
         # let some time to Zuul to update the test result to Gerrit.
