@@ -52,6 +52,11 @@ class nodepool {
     content => inline_template('<%= @nodepool_rsa %>'),
   }
 
+  exec {'systemctl_reload':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
+
   file { 'nodepool_service':
     path    => '/lib/systemd/system/nodepool.service',
     owner   => 'nodepool',
