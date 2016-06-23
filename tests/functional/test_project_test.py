@@ -193,7 +193,7 @@ class TestProjectTestsWorkflow(Base):
         last_build_num_ch, last_success_build_num_ch = 0, 1
         attempt = 0
         while last_build_num_ch != last_success_build_num_ch:
-            if attempt >= 90:
+            if attempt >= 150:
                 break
             time.sleep(1)
             last_build_num_ch = \
@@ -202,6 +202,7 @@ class TestProjectTestsWorkflow(Base):
             last_success_build_num_ch = \
                 self.ju.get_last_build_number("config-check",
                                               "lastSuccessfulBuild")
+            print attempt, last_build_num_ch, last_success_build_num_ch
             attempt += 1
 
         self.assertEqual(last_build_num_ch, last_success_build_num_ch)
