@@ -74,14 +74,7 @@ class TestProjectTestsWorkflow(Base):
         self.gu.add_group_member(config.USER_2, "config-core")
 
     def tearDown(self):
-        self.restore_config_repo(self.original_layout,
-                                 self.original_project,
-                                 self.original_zuul_projects)
-        for name in self.projects:
-            self.msu.deleteProject(name,
-                                   config.ADMIN_USER)
-        for dirs in self.dirs_to_delete:
-            shutil.rmtree(dirs)
+        pass
 
     def assert_reviewer_approvals(self, change_id, value):
         approvals = {}
@@ -205,6 +198,7 @@ class TestProjectTestsWorkflow(Base):
             attempt += 1
 
         self.assertEqual(last_build_num_ch, last_success_build_num_ch)
+
         # let some time to Zuul to update the test result to Gerrit.
         time.sleep(2)
 
