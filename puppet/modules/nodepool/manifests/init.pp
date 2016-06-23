@@ -51,10 +51,16 @@ class nodepool {
     content => inline_template('<%= @nodepool_rsa %>'),
   }
 
+  exec {'systemctl_reload':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
+
   file { 'nodepool_service':
     path    => '/lib/systemd/system/nodepool.service',
     owner   => 'nodepool',
     source  => 'puppet:///modules/nodepool/nodepool.service',
+    notify  => Exec['systemctl_reload'],
   }
 
   file { '/var/run/nodepool':
@@ -140,6 +146,7 @@ class nodepool {
                     File['/etc/nodepool/nodepool.logging.conf'],
                     File['/etc/nodepool/scripts'],
                     File['/etc/nodepool/logging.conf'],
+                    Exec['systemctl_reload'],
                     ],
   }
 
