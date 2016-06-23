@@ -193,7 +193,7 @@ class TestProjectTestsWorkflow(Base):
         last_build_num_ch, last_success_build_num_ch = 0, 1
         attempt = 0
         while last_build_num_ch != last_success_build_num_ch:
-            if attempt >= 90:
+            if attempt >= 150:
                 break
             time.sleep(1)
             last_build_num_ch = \
@@ -206,7 +206,7 @@ class TestProjectTestsWorkflow(Base):
 
         self.assertEqual(last_build_num_ch, last_success_build_num_ch)
         # let some time to Zuul to update the test result to Gerrit.
-        time.sleep(2)
+        time.sleep(30)
 
         # Get the change id
         change_ids = self.gu.get_my_changes_for_project("config")
