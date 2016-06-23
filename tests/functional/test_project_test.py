@@ -31,6 +31,8 @@ from utils import create_random_str
 
 from pysflib.sfgerrit import GerritUtils
 
+MAX_TIMEOUT = 150
+
 
 class TestProjectTestsWorkflow(Base):
     """ Functional tests to verify the configuration of a project test
@@ -85,7 +87,7 @@ class TestProjectTestsWorkflow(Base):
 
     def assert_reviewer_approvals(self, change_id, value):
         approvals = {}
-        for _ in range(90):
+        for _ in range(MAX_TIMEOUT):
             approvals = self.gu.get_reviewer_approvals(change_id,
                                                        'jenkins')
             if approvals and approvals.get('Verified') == value:
@@ -193,7 +195,7 @@ class TestProjectTestsWorkflow(Base):
         last_build_num_ch, last_success_build_num_ch = 0, 1
         attempt = 0
         while last_build_num_ch != last_success_build_num_ch:
-            if attempt >= 90:
+            if attempt >= 150:
                 break
             time.sleep(1)
             last_build_num_ch = \
@@ -206,7 +208,7 @@ class TestProjectTestsWorkflow(Base):
 
         self.assertEqual(last_build_num_ch, last_success_build_num_ch)
         # let some time to Zuul to update the test result to Gerrit.
-        time.sleep(2)
+        time.sleep(MAX_TIMEOUT)
 
         # Get the change id
         change_ids = self.gu.get_my_changes_for_project("config")
@@ -230,7 +232,7 @@ class TestProjectTestsWorkflow(Base):
         last_build_num_ch, last_success_build_num_ch = 0, 1
         attempt = 0
         while last_build_num_ch != last_success_build_num_ch:
-            if attempt >= 90:
+            if attempt >= MAX_TIMEOUT:
                 break
             time.sleep(1)
             last_build_num_ch = \
@@ -252,7 +254,7 @@ class TestProjectTestsWorkflow(Base):
         change_status = change['status']
         attempt = 0
         while change_status != 'MERGED':
-            if attempt >= 90:
+            if attempt >= MAX_TIMEOUT:
                 break
             time.sleep(1)
             change = self.gu.get_change('config', 'master', change_id)
@@ -320,7 +322,7 @@ class TestProjectTestsWorkflow(Base):
         change_id = change_ids[0]
 
         # let some time to Zuul to update the test result to Gerrit.
-        for i in range(90):
+        for i in range(MAX_TIMEOUT):
             if "jenkins" in self.gu.get_reviewers(change_id):
                 break
             time.sleep(1)
