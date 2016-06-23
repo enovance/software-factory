@@ -205,6 +205,7 @@ class TestProjectTestsWorkflow(Base):
             attempt += 1
 
         self.assertEqual(last_build_num_ch, last_success_build_num_ch)
+
         # let some time to Zuul to update the test result to Gerrit.
         time.sleep(2)
 
