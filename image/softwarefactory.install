@@ -225,12 +225,6 @@ install_sf_packages() {
 function install_jenkins {
     [ -d ${dir}/var/lib/jenkins/plugins ] || mkdir -p ${dir}/var/lib/jenkins/plugins
 
-    # Jenkins Swarm client
-    swarm_client=$(basename $JENKINS_SWARM_CLIENT_URL)
-    http_fetch $JENKINS_SWARM_CLIENT_URL ${dir}/var/lib/jenkins/${swarm_client}
-    rm -f ${dir}/var/lib/jenkins/swarm-client-latest.jar
-    ln -sf ${swarm_client} ${dir}/var/lib/jenkins/swarm-client-latest.jar
-
     # Jenkins ssh-agent plugin
     http_fetch $JENKINS_SSH_AGENT_PLUGIN_URL ${dir}/var/lib/jenkins/plugins/$(basename $JENKINS_SSH_AGENT_PLUGIN_URL)
     # Jenkins Gearman plugin
