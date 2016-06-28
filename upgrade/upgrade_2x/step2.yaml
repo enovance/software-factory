@@ -21,6 +21,8 @@
   - include: tasks/new_creds.yml sf_secret_name=managesf_sql_pwd
   # 2.0.0: Remove hosts.yaml hiera
   - file: path=/etc/puppet/hiera/sf/hosts.yaml state=absent
+  # Read sfconfig.yaml to source the config
+  - include_vars: /etc/puppet/hiera/sf/sfconfig.yaml
 
 - hosts: all
   tasks:
@@ -31,6 +33,17 @@
   tasks:
   - name: Be sure Jenkins master executors amount is 1
     replace: dest=/var/lib/jenkins/config.xml regexp='<numExecutors>.*</numExecutors>' replace='<numExecutors>1</numExecutors>'
+
+- hosts: mysql
+  tasks:
+  - name: Start MariaDB for maintainance actions
+    service: name=mariadb state=started
+  # Clean the node table to force Nodepool to restart with a clean state
+  - name: Wipe the node table of the Nodepool database
+    shell: echo 'delete from node;' | mysql nodepool
+    when: nodepool.disabled == false
+  - name: Stop MariaDB after maintainance actions
+    service: name=mariadb state=stopped
 
 - hosts: install-server
   tasks:
