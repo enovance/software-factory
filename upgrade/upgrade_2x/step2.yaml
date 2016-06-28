@@ -32,6 +32,16 @@
   - name: Be sure Jenkins master executors amount is 1
     replace: dest=/var/lib/jenkins/config.xml regexp='<numExecutors>.*</numExecutors>' replace='<numExecutors>1</numExecutors>'
 
+- hosts: mysql
+  tasks:
+  - name: Start MariaDB for maintainance actions
+    service: name=mariadb state=started
+  # Clean the node table to force Nodepool to restart with a clean state
+  - name: Wipe the node table of the Nodepool database
+    shell: echo 'delete from node;' | mysql nodepool
+  - name: Stop MariaDB after maintainance actions
+    service: name=mariadb state=stopped
+
 - hosts: install-server
   tasks:
   - name: Restart the configuration script
