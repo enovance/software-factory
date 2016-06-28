@@ -36,6 +36,7 @@
 /root/.ansible
 /root/.gitconfig
 /root/.gnupg
+/root/.my.cnf
 
 # System var stuff
 /var/cache/

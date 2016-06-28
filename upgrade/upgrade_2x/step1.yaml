@@ -6,6 +6,15 @@
   - include: tasks/gerrit_configrepo_import.yml
   - include: tasks/zuul_layout_namechange.yml
   - include: tasks/sf_jjb_namechange.yml
+  - include_vars: /etc/puppet/hiera/sf/sfconfig.yaml
+
+- hosts: mysql
+  tasks:
+  - name: Start Nodepool for clearing the database
+    service: name=nodepool state=stopped
+  - name: Wipe the node table of the Nodepool database
+    shell: echo 'delete from node;' | mysql nodepool
+    when: nodepool.disabled == false
 
 - hosts: all
   tasks:
