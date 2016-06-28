@@ -120,6 +120,25 @@ set custom ACL:
 
   https://wiki.mumble.info/wiki/Murmurguide#Becoming_Administrator_and_Registering_a_User
 
+
+How-to restart zuul without loosing running jobs ?
+..................................................
+
+Zuul service is stateless and stopping the process will loose track
+of running jobs. However the zuul-changes.py utility can be used
+to save and restore the current state:
+
+.. code-block:: bash
+
+    # Print and save running all jobs to /var/lib/zuul/zuul-queues-dump.sh
+    zuul-changes.py dump
+
+    systemctl restart zuul
+
+    # Reload the previous state:
+    zuul-changes.py load
+
+
 How can I use the Gerrit REST API?
 ..................................
 
