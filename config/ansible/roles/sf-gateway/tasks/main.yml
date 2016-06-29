@@ -7,3 +7,9 @@
 
 - service: name=socat_gerrit enabled=no state=stopped
   when: groups['gerrit'] == groups['gateway'] and socat_service.stat.exists
+
+- name: "Create /var/www/static directory"
+  file: path=/var/www/static state=directory
+
+- name: "Install javascript licence table"
+  copy: src=javascript.html dest=/var/www/static mode=0644
