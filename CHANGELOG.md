@@ -2,6 +2,31 @@
 Release Notes
 =============
 
+2.3.1 2016-07-01
+================
+
+A new service called storyboard is now available to manage issues and sprint board.
+
+
+New Features
+------------
+
+- The storyboard webclient is available from the top-menu. Direct access to the API is possible with a cauth cookie, url is fqdn/storyboard_api, userid is cid and access_token is the username.
+
+
+Upgrade Notes
+-------------
+
+- To activate the storyboard service, the ansible roles (storyboard and storyboardclient) needs to be added to the arch.yaml hiera configuration file.
+
+
+Bug Fixes
+---------
+
+- Set by default the amount of Jenkins master executors to 1. This prevent two config-update job to run in parallel.
+- Nodepool logging for image-update command now properly print setup scripts stdout on terminal. Moreover service's logs were missing automatic rotation.
+
+
 2.2.2 2016-06-21
 ================
 
