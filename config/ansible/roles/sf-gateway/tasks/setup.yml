@@ -22,6 +22,13 @@
     line="LoadModule ssl_module modules/mod_ssl.so"
     owner=apache group=apache mode=0640
 
+- name: "Create /var/www/static directory"
+  file: path=/var/www/static state=directory
+
+- name: "Install javascript licence table"
+  copy: src=javascript.html dest=/var/www/static mode=0644
+
+
 - name: "apache: start service"
   service: name=httpd enabled=yes state=started
 
