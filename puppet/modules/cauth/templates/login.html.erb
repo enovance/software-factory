@@ -46,6 +46,7 @@
                        <br />
                        <hr />
                        <% end %>
+                       <% if not @loginform["hidden"] %>
                         <form method="post" action="/auth/login/" class="form-signin" target="_top">
                             % if message:
                             <div class="form-group has-error">
@@ -71,6 +72,7 @@
                                 <i class="fa fa-sign-in fa-fw"></i>
                             </button>
                         </form>
+                       <% end %>
                     </div>
                 </div>
             </div>

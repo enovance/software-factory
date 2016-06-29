@@ -61,6 +61,8 @@ authentication:
     launchpad:
         disabled: False
 
+    loginform:
+        hidden: False
 
 theme:
     loginpage_custom_footer: ""
