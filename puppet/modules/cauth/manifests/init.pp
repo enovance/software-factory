@@ -25,6 +25,7 @@ class cauth ($cauth = hiera('cauth'), $gerrit = hiera('gerrit')) {
   $ldap = $auth['ldap']
   $github = $auth['github']
   $launchpad = $auth['launchpad']
+  $internal = $auth['internal']
   $issues_tracker_api_key = hiera('creds_issues_tracker_api_key')
   $gerrit_mysql_host = "mysql.${fqdn}"
   $gerrit_mysql_db = 'gerrit'
@@ -101,5 +102,13 @@ class cauth ($cauth = hiera('cauth'), $gerrit = hiera('gerrit')) {
     group   => 'apache',
     content => template('cauth/login.html.erb'),
     require => File['/var/www/cauth/cauth/templates'],
+  }
+
+  file {'/var/www/static/intlogin.html':
+    ensure  => file,
+    mode    => '0640',
+    owner   => 'apache',
+    group   => 'apache',
+    source => 'puppet:///modules/cauth/intlogin.html',
   }
 }

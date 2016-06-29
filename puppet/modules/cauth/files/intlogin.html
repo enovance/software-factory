@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/font-awesome/css/font-awesome.min.css">
+        <script type="text/javascript" src="/static/js/topmenu.js"></script>
+    </head>
+
+    <body>
+
+        <div class="container">
+            <br />
+            <div class="col-md-4 col-md-offset-4">
+                <div class="panel panel-default" id="login">
+                    <div class="panel-body text-center">
+                        <form method="post" action="/auth/login/" class="form-signin" target="_top">
+                            <div class="form-group">
+                                <input class="form-control" name="username" id="username" type="text" value="" placeholder="Username" required autofocus>
+                            </div>
+
+                            <div class="form-group">
+                                <input class="form-control" name="password" id="password" type="password" placeholder="Password" required>
+                            </div>
+
+                            <input type="hidden" name="back" value="/r/">
+                            <input type="hidden" name="method" value="Password">
+
+                            <button type="submit" class="btn btn-primary col-md-12">
+                                Internal Login
+                                <i class="fa fa-sign-in fa-fw"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </body>
+</html>
