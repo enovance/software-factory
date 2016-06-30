@@ -29,6 +29,7 @@ class etherpad {
     mode   => '0740',
     source => 'puppet:///modules/etherpad/etherpad.service',
     notify => Exec['systemctl_reload'],
+    require => File['wait4mariadb'],
   }
 
   user { 'etherpad':
