@@ -531,7 +531,7 @@ function run_gui_tests {
 
 function if_gui_tests_failure {
     if [[ "$1" == "1" ]]; then
-         fail "GUI tests failed" ${ARTIFACTS_DIR}/gui-tests.debug
+        fail "GUI tests failed" ${ARTIFACTS_DIR}/gui-tests.debug
     fi
 }
 
