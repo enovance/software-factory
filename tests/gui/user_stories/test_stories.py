@@ -14,8 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from .base import BaseGuiTest, caption, snapshot_if_failure
-from .. import config
+from tests.gui.base import BaseGuiTest, caption, snapshot_if_failure
+from tests.functional import config
 
 
 class TestAdministratorTasks(BaseGuiTest):
@@ -25,26 +25,28 @@ class TestAdministratorTasks(BaseGuiTest):
         self.driver.get(config.GATEWAY_URL)
         self.login_as(config.ADMIN_USER, config.ADMIN_PASSWORD)
 
-        msg = "Log in as adminstrator Go to the dashboard from the top menu"
+        msg = ("Log in as administrator, "
+               "then go to the dashboard from the top menu.")
         with caption(self.driver, msg) as driver:
             driver.get("%s/dashboard/" % config.GATEWAY_URL)
 
         #TODO (gp) Give the buttons an element id
-        msg = "Click on 'Create project' bottom"
+        msg = "Click on the 'Create project' button."
         with caption(self.driver, msg) as driver:
             driver.find_element_by_css_selector("button.btn-primary").click()
 
-        msg = "Describe your project"
+        msg = ("Define your project here. "
+               "Eventually specify an upstream repo to clone from.")
         with caption(self.driver, msg) as driver:
             self.highlight("#projectname").send_keys("Demo_Project")
             self.highlight("#description").send_keys("Test Description")
             ele = self.highlight_button("Create project")
             ele.click()
 
-        msg = "Now you have a project ready to work"
+        msg = "Now your project is ready."
         with caption(self.driver, msg) as driver:
             self.highlight_link("Demo_Project").click()
-        msg = "Thank you for watching"
+        msg = "Thank you for watching !"
         with caption(self.driver, msg) as driver:
             self.highlight("body")
 
