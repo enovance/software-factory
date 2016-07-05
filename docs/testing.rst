@@ -43,6 +43,9 @@ The default Zuul layout.yaml provided four test pipelines:
   cron job) Jenkins jobs.
   This pipeline is managed by the independent manager of Zuul.
 
+Additionnally, there is also a tag pipeline where jobs are triggered after
+a tag is pushed on a project.
+
 This default pipeline's configuration can be customized according to your
 needs.
 
@@ -81,6 +84,13 @@ Then these scripts are executed by their associated job:
 * '{name}-unit-tests'
 * '{name}-functional-tests'
 * '{name}-publish-docs'
+
+If a project is a python library, the template job '{name}-upload-to-pypi' can
+be used to push a package to a PyPI server. A valid .pypirc file set as a
+Jenkins credential must exist first; the id of the credential must then be
+passed as the variable 'pypirc' when configuring the job for the project.
+More information about the .pypirc file format can be found
+`here <https://docs.python.org/2/distutils/packageindex.html#pypirc>`_.
 
 Obviously, adding these pre-defined scripts to your projects in order to have tests
 executed is not mandatory. You can define your own.
