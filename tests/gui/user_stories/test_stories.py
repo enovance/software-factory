@@ -16,6 +16,7 @@
 
 
 from tests.gui.base import BaseGuiTest, caption, snapshot_if_failure
+from tests.gui.base import loading_please_wait
 from tests.functional import config
 
 
@@ -33,8 +34,9 @@ class TestAdministratorTasks(BaseGuiTest):
 
         #TODO (gp) Give the buttons an element id
         msg = "Click on the 'Create project' button."
-        with caption(self.driver, msg) as driver:
-            driver.find_element_by_css_selector("button.btn-primary").click()
+        with loading_please_wait(self.driver) as driver:
+            with caption(driver, msg) as _d:
+                _d.find_element_by_css_selector("button.btn-primary").click()
 
         msg = ("Define your project here. "
                "Eventually specify an upstream repo to clone from.")
@@ -45,8 +47,10 @@ class TestAdministratorTasks(BaseGuiTest):
             ele.click()
 
         msg = "Now your project is ready."
-        with caption(self.driver, msg) as driver:
-            self.highlight_link("Demo_Project").click()
+        with loading_please_wait(self.driver) as driver:
+            with caption(driver, msg) as d:
+                self.highlight_link("Demo_Project").click()
+        
         msg = "Thank you for watching !"
         with caption(self.driver, msg) as driver:
             self.highlight("body")
