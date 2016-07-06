@@ -60,11 +60,22 @@ def caption(driver, message, duration=3):
     time.sleep(duration)
 
 
+@contextmanager
+def loading_please_wait(driver):
+    yield driver
+    loading = driver.find_element_by_class_name("alert alert-info")
+    if loading:
+        safeguard = 0
+        while loading.is_displayed() and safeguard < 100:
+            time.sleep(0.1)
+            safeguard += 1
+
+
 class BaseGuiTest(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.maximize_window()
-        self.driver.implicitly_wait(15)
+        self.driver.implicitly_wait(20)
 
     def tearDown(self):
         # Close the tab instead of the application.
