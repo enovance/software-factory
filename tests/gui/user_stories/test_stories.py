@@ -14,10 +14,87 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
+import subprocess
+from unittest import skipIf
+
+try:
+    import spielbash
+except ImportError:
+    spielbash = None
 
 from tests.gui.base import BaseGuiTest, caption, snapshot_if_failure
 from tests.gui.base import loading_please_wait
 from tests.functional import config
+
+
+class MockMovie:
+    def __init__(self, *args, **kwargs):
+        self.vars = {}
+
+    def flush_vars(self):
+        self.vars = {}
+
+
+class ShellRecorder(BaseGuiTest):
+
+    def make_reel(self, session_name):
+        reel = spielbash.Command('tmux new-session -d -s %s' % session_name)
+        return reel 
+
+    def start_movie(self, session_name, title, output_file):
+        asciinema_cmd = 'asciinema rec -c "tmux attach -t %s"' % session_name
+        asciinema_cmd += ' -y -t %s' % title
+        asciinema_cmd += ' %s' % output_file
+        movie = subprocess.Popen(asciinema_cmd,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 shell=True)
+        return movie
+
+    def start_display(self, session_name):
+        env = os.environ()
+        # TODO detect this value rather than hardcode it
+        env.update({'DISPLAY': ':99'})
+        xterm = 'xterm -e "tmux attach -t %s"'
+        display = subprocess.Popen(xterm % session_name,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   shell=True,
+                                   env=env)
+        return display
+
+    def record(self, session_name, title, output_file):
+        reel = self.make_reel(session_name)
+        display = self.start_display(session_name)
+        movie = self.start_movie(session_name, title, output_file)
+        return reel, display, movie
+
+    def stop_recording(self, session_name, reel, display, movie):
+        spielbash.TmuxSendKeys(session_name, 'exit')
+        spielbash.TmuxSendKeys(session_name, 'C-m')
+        reel.communicate('exit')
+        movie.communicate()
+        display.communicate()
+
+    def play_scene(self, session_name, scene, mock_movie):
+        spielbash.pause(0.4)
+        s = None
+        if 'action' in scene:
+            s = spielbash.Scene(scene['name'], scene.get('action', ''),
+                                session_name,
+                                scene.get('keep', {}), mock_movie,
+                                wait_for_execution=scene.get('wait', False))
+        elif 'line' in scene:
+            s = spielbash.Dialogue(scene['line'], session_name)
+        elif 'press_key' in scene:
+            s = spielbash.PressKey(scene['press_key'], session_name)
+        elif 'pause' in scene:
+            spielbash.pause(scene.get('pause', 1))
+        else:
+            raise Exception('Unknown scene type %r' % scene)
+        if s:
+            s.run()
 
 
 class TestAdministratorTasks(BaseGuiTest):
@@ -54,6 +131,29 @@ class TestAdministratorTasks(BaseGuiTest):
         msg = "Thank you for watching !"
         with caption(self.driver, msg):
             self.highlight("body")
+
+    @skipIf(spielbash is None,
+            'missing spielbash dependency')
+    def test_create_project_from_CLI(self):
+        sfm = "sfmanager --url %s --auth-server-url %s --auth %%s:%%s "
+        sfm = sfm % (config.GATEWAY_URL, config.GATEWAY_URL,
+                     config.ADMIN_USER, config.ADMIN_PASSWORD)
+        sfm += "project create --name %s" % 'CLI_project'
+        scenes = [
+            {'name': 'Create a project from the CLI',
+             'action': sfm,
+             'keep': {},
+             'wait': True},
+        ]
+        session_name = 'create_project_from_CLI'
+        r, d, m = self.record(session_name,
+                              'Create a project from the CLI',
+                              '/tmp/gui/create_project_from_CLI.json')
+        mock_movie = MockMovie()
+        for scene in scenes:
+            self.play_scene(session_name, scene, mock_movie)
+
+        self.stop_recording(session_name, r, d, m)
 
 
 if __name__ == '__main__':
