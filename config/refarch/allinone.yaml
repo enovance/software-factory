@@ -18,6 +18,8 @@ inventory:
       - jenkins
       - redmine
       - murmur
+      - job-logs-gearman-client
+      - job-logs-gearman-worker
     mem: 8
     cpu: 4
     disk: 20
