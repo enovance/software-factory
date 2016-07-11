@@ -147,3 +147,6 @@ mumble:
     disabled: False
     password: False
     super_user_password: CHANGEME
+
+joblogs_indexation:
+    disabled: False
