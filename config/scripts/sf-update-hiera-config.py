@@ -43,6 +43,13 @@ def update_sfconfig(data):
             'swift_mirror_tempurl_key': 'CHANGEME',
         }
         dirty = True
+
+    # Make sure joblogs_indexation is in the conf
+    if 'joblogs_indexation' not in data:
+        data['joblogs_indexation'] = {
+            'disabled': False,
+        }
+        dirty = True
     return dirty
 
 
