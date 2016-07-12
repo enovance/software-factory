@@ -18,6 +18,11 @@ inventory:
       - jenkins
       - redmine
       - murmur
+      - elasticsearch
+      - mirror
+      - job-logs-gearman-client
+      - job-logs-gearman-worker
+      - logstash
     mem: 8
     cpu: 4
     disk: 20
