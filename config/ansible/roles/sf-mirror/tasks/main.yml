@@ -1,3 +1,7 @@
 ---
-- include: setup.yml
-  when: action is not defined or action == "setup"
+- include: install.yml
+  when: action is not defined or action == "install"
+- include: update.yml
+  when: action is defined and action == "update"
+- include: postconf.yml
+  when: action is defined and action == "postconf"

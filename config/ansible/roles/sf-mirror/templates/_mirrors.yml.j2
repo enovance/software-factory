@@ -1,0 +1,20 @@
+# This file is managed by sfconfig.sh, don't edit.
+
+pipelines:
+  - name: periodic_mirrors
+    description: This pipeline manage swift mirrors update
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      timer:
+        - time: '{{ mirrors.periodic_update }}'
+    failure:
+      smtp:
+        from: jenkins@{{ fqdn }}
+        to: dev-robot@{{ fqdn }}
+        subject: '{{ fqdn }}: Periodic mirror update failed'
+
+projects:
+  - name: sf_mirror-update
+    periodic_mirrors:
+      - sf_mirror-update

@@ -43,6 +43,9 @@ def update_sfconfig(data):
             'swift_mirror_tempurl_key': 'CHANGEME',
         }
         dirty = True
+    if 'periodic_update' not in data['mirrors']:
+        data['mirrors']['periodic_update'] = False
+        dirty = True
     return dirty
 
 

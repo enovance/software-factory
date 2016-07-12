@@ -138,6 +138,35 @@ set custom ACL:
 
   https://wiki.mumble.info/wiki/Murmurguide#Becoming_Administrator_and_Registering_a_User
 
+How-to setup swift mirror of external requirements ?
+....................................................
+
+The mirror component can be enabled to automate swift mirror management:
+
+* Add the mirror role to arch.yaml
+* Configure mirror role in sfconfig.yaml
+* Run sfconfig.sh
+* Add mirror in config repo
+
+When the periodic_update is set, the mirror update will be scheduled
+according to zuul timer format, e.g. daily is '0 0 * * \*'
+
+sfconfig.yaml example:
+
+  mirrors:
+    periodic_update: '0 0 * * \*'
+    swift_mirror_url: http://swift:8080/v1/AUTH_uuid/repomirror/
+    swift_mirror_tempurl_key: TEMP_URL_KEY
+
+config-repo example:
+
+  - name: os
+    type: repodata
+    url: 'http://centos.mirror.example.com/7/os/x86_64/'
+    prefix: 'os/'
+
+This will mirror the CentOS-7 base repository to http://swift:8080/v1/AUTH_uuid/repomirror/os/
+
 How can I use the Gerrit REST API?
 ..................................
 
