@@ -260,7 +260,7 @@
     builders:
       - shell: |
           echo "Updating configuration using $ZUUL_COMMIT"
-          ssh root@managesf.<%= @fqdn %> /usr/local/bin/sf-config-update.sh
+          ssh root@managesf.<%= @fqdn %> sf_configrepo_update
     triggers:
       - zuul
     node: master
