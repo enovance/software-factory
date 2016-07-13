@@ -43,6 +43,18 @@ def update_sfconfig(data):
             'swift_mirror_tempurl_key': 'CHANGEME',
         }
         dirty = True
+
+    if 'gerrit' not in data:
+        data['gerrit'] = {
+            'heap_limit': '256m',
+        }
+        dirty = True
+
+    if 'jenkins' not in data:
+        data['jenkins'] = {
+            'heap_limit': '256m',
+        }
+        dirty = True
     return dirty
 
 
