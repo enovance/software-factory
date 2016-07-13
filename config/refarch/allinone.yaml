@@ -18,6 +18,8 @@ inventory:
       - jenkins
       - redmine
       - murmur
+      - elasticsearch
+      - mirror
     mem: 8
     cpu: 4
     disk: 20
