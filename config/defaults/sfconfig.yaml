@@ -147,3 +147,9 @@ mumble:
     disabled: False
     password: False
     super_user_password: CHANGEME
+
+gerrit:
+    heap_limit: 256m
+
+jenkins:
+    heap_limit: 256m

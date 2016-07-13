@@ -26,6 +26,7 @@ class jenkins {
   $settings = hiera('jenkins')
   $jenkins_password = hiera('creds_jenkins_user_password')
   $jenkins_rsa = hiera('jenkins_rsa')
+  $heap_limit = hiera('jenkins_heap_limit')
 
   file {'/etc/httpd/conf.d/ports.conf':
     ensure => file,
