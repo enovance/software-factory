@@ -2,3 +2,9 @@
 - group: name=nodepool
 - user: name=nodepool group=nodepool shell=/sbin/nologin home=/var/lib/nodepool
 - file: path=/var/lib/nodepool state=directory mode=0700 owner=nodepool group=nodepool
+
+- name: "Apply patch"
+  patch: src={{ item }} basedir=/srv/nodepool/lib/python2.7/site-packages strip=1
+  with_items:
+    - 272097-image-api-use-tasks.patch
+    - 321480-Add-log-config-option-to-nodepool-cmd.patch

@@ -473,32 +473,6 @@ EOF
     rm -Rf ${dir}/srv/lodgeit/lodgeit/.git
 }
 
-function install_nodepool {
-    # Checkout VERSION in /tmp
-    do_chroot ${dir} virtualenv /srv/nodepool
-    [ -d ${dir}/tmp/nodepool ] || retry do_chroot ${dir} git clone ${NODEPOOL_URL} /tmp/nodepool
-    do_chroot ${dir} bash -c "cd /tmp/nodepool && git checkout -b sf_stable ${NODEPOOL_VERSION}"
-
-    # Apply not-merged fixes
-    for patch in ./patches/nodepool_*; do
-        do_chroot ${dir} bash -c "cd /tmp/nodepool; patch -p1" < ${patch}
-    done
-
-    # Install
-    do_chroot ${dir} sed -i "s/^apscheduler>=3.0/apscheduler>=3.0,<3.1/" /tmp/nodepool/requirements.txt
-
-    do_chroot ${dir} /srv/nodepool/bin/pip install --upgrade 'pbr>=1.3' 'pip<8'
-    do_chroot ${dir} /srv/nodepool/bin/pip install 'pip<8' 'funcsigs' file:///tmp/nodepool
-
-    # Install symlink to venv to set correct python path
-    for bin in nodepool nodepoold; do
-        ln -sf /srv/nodepool/bin/${bin} ${dir}/usr/bin/${bin}
-    done
-
-    # Cleanup left-overs
-    rm -Rf ${dir}/tmp/nodepool*
-}
-
 function install_gerritbot {
     # Checkout VERSION in /tmp
     rm -Rf ${dir}/tmp/gerritbot
@@ -580,8 +554,6 @@ if [ "$STEP" == 1 ]; then
     checkpoint "gerrit installed"
     install_elk
     checkpoint "elk installed"
-    install_nodepool
-    checkpoint "nodepool installed"
     install_gerritbot
     checkpoint "gerritbot installed"
     install_murmurd
@@ -599,6 +571,7 @@ if [ "$STEP" == 1 ]; then
     copy_sf_ansible_roles
     ansible_install sf-base
     ansible_install sf-zuul "zuul_commit: \"${ZUUL_VERSION}\", zuul_url: \"${ZUUL_URL}\", jquery_visibility_url: \"${JQUERY_VISIBILITY_URL}\", jquery_graphite_url: \"${JQUERY_GRAPHITE_URL}\""
+    ansible_install sf-nodepool "nodepool_commit: \"${NODEPOOL_VERSION}\", nodepool_url: \"${NODEPOOL_URL}\""
     ansible_install sf-storyboard "storyboard_commit: \"${STORYBOARD_COMMIT}\", storyboard_client_commit: \"${STORYBOARD_CLIENT_COMMIT}\""
     ansible_install sf-storyboard-webclient "storyboard_webclient_commit: \"${STORYBOARD_WEBCLIENT_COMMIT}\""
     ansible_install sf-mirror
