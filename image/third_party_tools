@@ -145,11 +145,10 @@ ANGULARJS_URL="https://ajax.googleapis.com/ajax/libs/angularjs/${ANGULARJS_VERSI
 
 URL_LIST="$URL_LIST $ANGULARJS_URL"
 
-# Latest version of nodepool/zuul as of May11 2016
 ZUUL_URL="https://github.com/openstack-infra/zuul"
-ZUUL_VERSION=fdeb224824584dad355cbda207811a2105d1d2e2
+ZUUL_VERSION=79b8bad9bfa1d5ae022a7b89f75982d2e388c9d2     # 2016-07-13
 NODEPOOL_URL="https://github.com/openstack-infra/nodepool"
-NODEPOOL_VERSION=1fd2a14ab79d256419083e2b2d9c463af36e039a
+NODEPOOL_VERSION=1fd2a14ab79d256419083e2b2d9c463af36e039a # 2016-05-18
 
 # gerritbot
 GERRITBOT_URL="https://github.com/openstack-infra/gerritbot"
