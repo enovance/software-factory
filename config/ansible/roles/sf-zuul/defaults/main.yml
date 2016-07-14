@@ -1,1 +1,5 @@
 puppet_modules: zuul
+jquery_visibility_url: http://status.openstack.org/jquery-visibility.min.js
+jquery_graphite_url: http://status.openstack.org/jquery-graphite.js
+zuul_url: https://git.openstack.org/openstack-infra/zuul
+zuul_commit: 569b7a30de9d6e181989ede5c53ec4be6554da6b     # 2016-08-15
