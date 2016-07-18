@@ -4,7 +4,7 @@
 STAGING_PKGS=""
 STAGING_PIP=""
 
-GNOCCHI_PLUGINS_URL="https://github.com/sileht/grafana-plugins-gnocchi"
+GNOCCHI_PLUGINS_URL="git://github.com/sileht/grafana-plugins-gnocchi"
 
 function install_gnocchi {
     do_chroot ${dir} git clone $GNOCCHI_PLUGINS_URL /tmp/gnocchi-plugins
