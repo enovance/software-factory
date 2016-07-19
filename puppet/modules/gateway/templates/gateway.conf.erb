@@ -12,6 +12,7 @@
     # Some internal requests require larger refactoring, thus allow these kind
     # of requests for now
     Include conf.d/gateway.common
+    Include conf.d/gateway-*.conf
 </VirtualHost>
 
 <VirtualHost *:443>
@@ -21,4 +22,5 @@
     SSLCertificateChainFile /etc/httpd/conf.d/gateway-chain.crt
 
     Include conf.d/gateway.common
+    Include conf.d/gateway-*.conf
 </VirtualHost>
