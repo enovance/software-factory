@@ -2,6 +2,64 @@
 Release Notes
 =============
 
+2.2.3 2016-07-20
+================
+
+A new service called storyboard is now available to manage issues and sprint board.
+
+New Features
+------------
+
+- Add storyboard service (disabled by default)
+
+- Expand dynarch effort
+
+- disable statsd by default
+
+- make mariadb systemd dependency multihost-aware
+
+- allow FQDN change on an existing deployment
+
+- add deletebranches tool
+
+- add a template job to upload a package to PyPI
+
+- add ElasticSearch ansible role to SF
+
+- Gerritbot notification now suports the "change-created" event type to notify new change only, instead of every patchset.
+
+- The storyboard webclient is available from the top-menu. Direct access to the API is possible with a cauth cookie, url is fqdn/storyboard_api, userid is cid and access_token is the username.
+
+- Add swift mirror service through config-repo. It uses mirror2swift to mirror http or rpm repodata contents.
+
+
+Upgrade Notes
+-------------
+
+- prevent gnupg keyrings of the root user to be wiped during upgrade
+
+- To activate the storyboard service, the ansible roles (storyboard and storyboardclient) needs to be added to the arch.yaml hiera configuration file.
+
+- To ensure nodepool test run on a fresh node, the zuul parameter-function is now set in the read only config/zuul/layout.yaml file. If the ^.*$ parameter function is set in another file, it needs to be manually removed in the upgrade proposed change "Upgrade of base config repository files".
+
+
+Bug Fixes
+---------
+
+- fix admin user update without username in gerrit
+
+- prevent monit from restarting gerrit
+
+- remove monit actions for redmine
+
+- improve rebooting
+
+- fix hook failure when commit message contains double quotes
+
+- Set by default the amount of Jenkins master executors to 1. This prevent two config-update job to run in parallel.
+
+- Nodepool logging for image-update command now properly print setup scripts stdout on terminal. Moreover service's logs were missing automatic rotation.
+
 2.2.2 2016-06-21
 ================
 
