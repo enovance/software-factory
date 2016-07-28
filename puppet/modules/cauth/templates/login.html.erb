@@ -33,13 +33,26 @@
                        <br />
                        <hr />
                        <% end %>
-                       <% if not @launchpad["disabled"] %>
+                        <% if not @github["disabled"] %>
+                        <form method="post" action="/auth/login/" target="_top">
+                        <input type="hidden" name="back" value="${back}">
+                        <input type="hidden" name="method" value="Google">
+                            <button type="submit" class="btn btn-primary col-md-12">
+                                <i class="fa fa-lg fa-google"></i>
+                                &nbsp;&nbsp;Log in with Google
+                                <i class="fa fa-sign-in fa-fw"></i>
+                            </button>
+                       </form>
+                       <br />
+                       <hr />
+                       <% end %>
+                       <% if not @openid["disabled"] %>
                        <form method="post" action="/auth/login/" target="_top">
                         <input type="hidden" name="back" value="${back}">
                         <input type="hidden" name="method" value="OpenID">
                             <button type="submit" class="btn btn-warning col-md-12">
                                 <i class="fa fa-lg fa-openid"></i>
-                                &nbsp;&nbsp;Log in with Launchpad
+                                &nbsp;&nbsp; <%= @openid["login_button_text"] %>
                                 <i class="fa fa-sign-in fa-fw"></i>
                             </button>
                        </form>

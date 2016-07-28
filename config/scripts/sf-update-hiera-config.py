@@ -37,7 +37,51 @@ def update_sfconfig(data):
         }
         dirty = True
 
-    return dirty
+    # 2.2.4: refactor OAuth2 and OpenID auth config
+    if 'oauth2' not in data['authentication']:
+        data['authentication']['oauth2'] = {
+            'github': {
+                'disabled': False,
+                'client_id': '',
+                'client_secret': '',
+                'github_allowed_organizations': ''
+            },
+            'google': {
+                'disabled': False,
+                'client_id': '',
+                'client_secret': ''
+            }
+        }
+        dirty = True
+    if 'openid' not in data['authentication']:
+        data['authentication']['openid'] = {
+            'disabled': False,
+            'server': 'https://login.launchpad.net/+openid',
+            'login_button_text': 'Log in with the Launchpad service'
+        }
+        dirty = True
+    if data['authentication']['github']:
+        (data['authentication']['oauth2']
+         ['github']['disabled']) = (data['authentication']['github']
+                                    ['disabled'])
+        (data['authentication']['oauth2']
+         ['github']['client_id']) = (data['authentication']['github']
+                                     ['github_app_id'])
+        (data['authentication']['oauth2']
+         ['github']['client_secret']) = (data['authentication']['github']
+                                         ['github_app_secret'])
+        (data['authentication']['oauth2']['github']
+         ['github_allowed_organizations']) = (data['authentication']
+                                              ['github']
+                                              ['github_allowed_organizations'])
+        del data['authentication']['github']
+        dirty = True
+    if data['authentication']['launchpad']:
+        (data['authentication']['openid']
+         ['disabled']) = data['authentication']['launchpad']['disabled']
+        del data['authentication']['launchpad']
+        dirty = True
+    return dirty    
 
 
 def clean_arch(data):
