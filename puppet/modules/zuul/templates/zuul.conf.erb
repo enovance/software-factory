@@ -54,6 +54,15 @@ baseurl=<%= @url['gerrit_pub_url'] %>
 user=jenkins
 sshkey=/var/lib/zuul/.ssh/id_rsa
 
+<% if not @external_gerrit['disabled'] %>
+[connection external_gerrit]
+driver=gerrit
+server=<%= @external_gerrit['hostname'] %>
+baseurl=<%= @external_gerrit['puburl'] %>
+user=<%= @external_gerrit['username'] %>
+sshkey=/var/lib/zuul/.ssh/id_rsa
+<% end %>
+
 [connection smtp]
 driver=smtp
 server=localhost

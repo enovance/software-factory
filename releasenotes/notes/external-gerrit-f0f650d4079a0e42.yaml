@@ -1,0 +1,4 @@
+---
+features:
+  - A new 'external_gerrit' option is added to sfconfig
+    to enable third party CI use-case.

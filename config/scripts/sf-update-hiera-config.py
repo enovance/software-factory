@@ -92,6 +92,15 @@ def update_sfconfig(data):
                                   ['redirect_uri'])
         del data['authentication']['launchpad']
         dirty = True
+
+    if 'external_gerrit' not in data:
+        data['external_gerrit'] = {
+            'disabled': True,
+            'hostname': 'external-gerrit-hostname',
+            'puburl': 'https://external-gerrit-host-name/r/',
+            'username': 'external-gerrit-user-name',
+        }
+        dirty = True
     return dirty
 
 
