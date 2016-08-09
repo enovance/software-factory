@@ -89,8 +89,6 @@ class gateway {
     require => [File['gateway_crt'],
                 File['gateway_key'],
                 File['gateway_common'],
-                File['ssl.conf'],
-                File['00-ssl.conf']],
   }
 
   file {'/var/www/static/js/topmenu.js':
