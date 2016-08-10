@@ -73,4 +73,9 @@ if [ "$upgrade" = "true" ]; then
     cd -
 
 fi
+# create a hard link to the policy file in the managesf www directory if necessary
+if [ ! -e '/var/www/managesf/policy.json' ]; then
+    ln /root/config/policies/policy.json /var/www/managesf/policy.json
+fi
+
 rm -rf ${CONF_TMP}
