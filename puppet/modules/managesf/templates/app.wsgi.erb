@@ -1,0 +1,13 @@
+import os
+import site
+from pecan.deploy import deploy
+
+
+cur_path = os.path.dirname(__file__)
+
+site.addsitedir(cur_path + '/lib/python2.7/site-packages')
+
+activate_env=os.path.expanduser(cur_path + '/bin/activate_this.py')
+execfile(activate_env, dict(__file__=activate_env))
+
+application = deploy(cur_path + '/config.py')
