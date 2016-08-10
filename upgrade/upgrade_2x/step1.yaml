@@ -3,6 +3,7 @@
   tasks:
   - include: tasks/fetchupstream.yml
   - include: tasks/gerritbot_configrepo_import.yml
+  - include: tasks/policy_configrepo.yml
 
 - hosts: all
   tasks:
