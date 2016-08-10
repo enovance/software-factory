@@ -1,0 +1,8 @@
+---
+- name: "Apply new policy.json"
+  copy: src=/root/config/policies/policy.json dest=/var/www/managesf/policy.json
+  register: policy
+
+- name: "Reload managesf when policy|changed"
+  service: name=httpd state=restarted
+  when: policy|changed
