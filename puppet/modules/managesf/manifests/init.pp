@@ -105,6 +105,16 @@ class managesf ($gerrit = hiera('gerrit')) {
     replace => true,
   }
 
+  file { '/var/www/managesf/app.wsgi':
+    ensure  => file,
+    owner   => 'apache',
+    group   => 'apache',
+    mode    => '0640',
+    content => template('managesf/app.wsgi.erb'),
+    require => File['/var/www/managesf/'],
+    replace => true,
+  }
+
   file { '/var/www/managesf/gerrit_admin_rsa':
     ensure  => file,
     owner   => 'apache',
