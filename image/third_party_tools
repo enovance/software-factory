@@ -4,6 +4,8 @@ set +x
 
 # yum
 RDO_REPO="https://repos.fedorapeople.org/repos/openstack/openstack-mitaka/rdo-release-mitaka-5.noarch.rpm"
+URL_LIST="$URL_LIST $RDO_REPO"
+
 RDO_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_rdo.txt)"
 
 EPEL_REPO="epel-release"
@@ -12,11 +14,9 @@ EPEL_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_epel.txt)"
 BUILD_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_build_requirements.txt)"
 CENTOS_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_centos.txt)"
 
-PASSENGER_REPO="https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo"
 PASSENGER_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_passenger.txt)"
 
 RPM_PKGS="${PASSENGER_PKGS} ${EPEL_PKGS} ${RDO_PKGS} ${CENTOS_PKGS} ${BUILD_PKGS} jenkins grafana"
-URL_LIST="$URL_LIST $PASSENGER_REPO $RDO_REPO"
 
 SF_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_sf.txt)"
 
