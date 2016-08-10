@@ -349,10 +349,24 @@ function run_bootstraps {
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
+    echo "Preparing custom policy file ..."
+    cat > /tmp/pol_change.py <<SCRIPT
+import json
+f = '/usr/local/share/sf-config-repo/policies/policy.json'
+j = json.load(file(f))
+j['managesf.project:create'] = 'rule:authenticated_api'
+j['managesf.project:delete'] = 'rule:authenticated_api'
+json.dump(j, file(f, 'w'), indent=1)
+SCRIPT
+    scp /tmp/pol_change.py ${SF_HOST}:/tmp/pol_change.py
+    # this can fail in upgrade test from 2.2.3 since the policy file is not there yet, we do not care
+    ssh -A -tt ${SF_HOST} "python /tmp/pol_change.py"
+    ssh -A -tt ${SF_HOST} "rm /tmp/pol_change.py"
     ssh -A -tt ${SF_HOST} sfconfig.sh &> ${ARTIFACTS_DIR}/sfconfig.log \
         && echo "sfconfig.sh: SUCCESS"  \
         || { kill -9 $SSH_AGENT_PID; fail "sfconfig.sh failed" ${ARTIFACTS_DIR}/sfconfig.log; }
     kill -9 $SSH_AGENT_PID
+    rm /tmp/pol_change.py
     checkpoint "run_bootstraps"
     fetch_bootstraps_data
 }
