@@ -127,6 +127,7 @@ function generate_yaml {
     sed -i "s#LODGEIT_SESSION_KEY#${LODGEIT_SESSION_KEY}#" ${OUTPUT}/sfcreds.yaml
 
     hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/service_rsa service_rsa
+    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/service_rsa.pub service_rsa_pub
     hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/jenkins_rsa jenkins_rsa
     hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/jenkins_rsa.pub jenkins_rsa_pub
     hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/gerrit_admin_rsa gerrit_admin_rsa
@@ -193,6 +194,7 @@ function recreate_bootstrap_data {
     python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('service_rsa')" > ${BUILD}/ssh_keys/service_rsa
     echo -n "ssh-rsa " > ${BUILD}/ssh_keys/service_rsa.pub
     python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('creds_service_pub_key')" >> ${BUILD}/ssh_keys/service_rsa.pub
+    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('service_rsa_pub')" >> ${BUILD}/ssh_keys/service_rsa.pub
     python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('jenkins_rsa')" > ${BUILD}/ssh_keys/jenkins_rsa
     echo -n "ssh-rsa " > ${BUILD}/ssh_keys/jenkins_rsa.pub
     python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('jenkins_rsa_pub')" >> ${BUILD}/ssh_keys/jenkins_rsa.pub
