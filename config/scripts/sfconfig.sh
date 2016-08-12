@@ -126,14 +126,7 @@ function generate_yaml {
     LODGEIT_SESSION_KEY=$(generate_random_pswd 32)
     sed -i "s#LODGEIT_SESSION_KEY#${LODGEIT_SESSION_KEY}#" ${OUTPUT}/sfcreds.yaml
 
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/service_rsa service_rsa
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/jenkins_rsa jenkins_rsa
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/jenkins_rsa.pub jenkins_rsa_pub
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/gerrit_admin_rsa gerrit_admin_rsa
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/gerrit_service_rsa gerrit_service_rsa
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/ssh_keys/gerrit_service_rsa.pub gerrit_service_rsa_pub
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/certs/privkey.pem privkey_pem
-    hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f ${BUILD}/certs/pubkey.pem  pubkey_pem
+    manage_ssh_keys_and_certs
 
     chown -R root:puppet /etc/puppet/hiera/sf
     chmod -R 0750 /etc/puppet/hiera/sf
@@ -189,21 +182,34 @@ EOF
         hieraedit.py --yaml /etc/puppet/hiera/sf/sfcreds.yaml -f ${OUTPUT}/gateway.crt gateway_chain
 }
 
-function recreate_bootstrap_data {
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('service_rsa')" > ${BUILD}/ssh_keys/service_rsa
-    echo -n "ssh-rsa " > ${BUILD}/ssh_keys/service_rsa.pub
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('creds_service_pub_key')" >> ${BUILD}/ssh_keys/service_rsa.pub
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('jenkins_rsa')" > ${BUILD}/ssh_keys/jenkins_rsa
-    echo -n "ssh-rsa " > ${BUILD}/ssh_keys/jenkins_rsa.pub
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('jenkins_rsa_pub')" >> ${BUILD}/ssh_keys/jenkins_rsa.pub
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('gerrit_admin_rsa')" > ${BUILD}/ssh_keys/gerrit_admin_rsa
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('gerrit_service_rsa')" > ${BUILD}/ssh_keys/gerrit_service_rsa
-    echo -n "ssh-rsa " > ${BUILD}/ssh_keys/gerrit_service_rsa.pub
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('gerrit_service_rsa_pub')" >> ${BUILD}/ssh_keys/gerrit_service_rsa.pub
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('privkey_pem')" > ${BUILD}/certs/privkey_pem
-    python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('pubkey_pem')" > ${BUILD}/certs/pubkey_pem
+function manage_ssh_keys_and_certs {
+    OUTPUT=/etc/puppet/hiera/sf/
+    for key in $(find ${BUILD}/ssh_keys -type f); do
+        name=$(basename $key | sed "s/.pub/_pub/")
+        if ! grep -qE  "\b$name\b" ${OUTPUT}/sfcreds.yaml; then
+            hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f $key $name
+        fi
+    done
+
+    for cert in $(find ${BUILD}/certs -type f -name '*.pem'); do
+        name=$(basename $cert | sed "s/.pem/_pem/")
+        if ! grep -qE  "\b$name\b" ${OUTPUT}/sfcreds.yaml; then
+            hieraedit.py --yaml ${OUTPUT}/sfcreds.yaml -f $cert $name
+        fi
+    done
 }
 
+function recreate_bootstrap_data {
+    for name in $(awk -F ":" '/_rsa/ {print $1}' /etc/puppet/hiera/sf/sfcreds.yaml); do
+        filename=$(echo $name | sed "s/_pub/.pub/")
+        python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('$name')" > ${BUILD}/ssh_keys/$filename
+    done
+
+    for name in $(awk -F ":" '/_pem/ {print $1}' /etc/puppet/hiera/sf/sfcreds.yaml); do
+        filename=$(echo $name | sed "s/_pem/.pem/")
+        python -c "import yaml;print yaml.load(open('/etc/puppet/hiera/sf/sfcreds.yaml')).get('$name')" > ${BUILD}/certs/$filename
+    done
+}
 
 function wait_for_ssh {
     local host=$1
@@ -236,6 +242,9 @@ if [ ! -f "${BUILD}/generate.done" ]; then
     generate_yaml
     touch "${BUILD}/generate.done"
 fi
+
+# Ensure all the ssh keys and certs are on sfcreds
+manage_ssh_keys_and_certs
 
 if [ -f "/etc/puppet/hiera/sf/sfcreds.yaml.orig" ]; then
     # Most likely this is a sfconfig.sh run after restoring a backup.
