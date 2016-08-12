@@ -19,6 +19,7 @@
   pre_tasks:
     - include: /etc/ansible/tasks/selinux_check.yml
   roles:
+    - {name: "sf-ssh", action: "setup"}
     - {name: "sf-base", action: "setup"}
 
 - hosts: mysql

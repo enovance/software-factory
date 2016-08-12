@@ -14,9 +14,6 @@
 - name: "system: disable root password login"
   user: name=root password="*"
 
-- name: "system: set /etc/ssh/ssh_known_hosts for all inventory"
-  template: src=global_known_hosts.j2 dest=/etc/ssh/ssh_known_hosts owner=root group=root mode=0644
-
 - name: "system: allow apache to connect database"
   seboolean: name={{ item }} state=yes persistent=yes
   with_items: [httpd_can_network_connect, httpd_can_network_connect_db]
