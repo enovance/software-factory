@@ -327,7 +327,7 @@ EOF
     # Install Redmine backlog plugin
     [ -d ${dir}/var/www/redmine/plugins ] || mkdir -p ${dir}/var/www/redmine/plugins
     if [ ! -d ${dir}/var/www/redmine/plugins/redmine_backlogs ]; then
-        retry do_chroot ${dir} git clone --depth 1 -b ${REDMINE_BACKLOG_VERSION} $REDMINE_BACKLOG_URL /var/www/redmine/plugins/redmine_backlogs
+        do_chroot ${dir} git clone -b ${REDMINE_BACKLOG_VERSION} $REDMINE_BACKLOG_URL /var/www/redmine/plugins/redmine_backlogs
         do_chroot ${dir} bash -c "cd /var/www/redmine/plugins/redmine_backlogs; patch Gemfile" < ./patches/redmine_backlog_gemfile.patch
         SUDO_UID=0 SUDO_GID=0 do_chroot ${dir} bash -c "cd /var/www/redmine/plugins/redmine_backlogs && bundle install --without development test"
     fi
@@ -395,7 +395,7 @@ EOF
 function install_bup {
     if [ ! -d ${dir}/opt/bup ]; then
         do_chroot ${dir} mkdir -p /opt/bup
-        do_chroot ${dir} git clone --depth 1 ${BUP_URL} /opt/bup/
+        do_chroot ${dir} git clone ${BUP_URL} /opt/bup/
         do_chroot ${dir} bash -c 'cd /opt/bup && git checkout ${BUP_VERSION}'
         do_chroot ${dir} bash -c 'cd /opt/bup && ./configure && make && make install'
     fi
@@ -557,7 +557,7 @@ function install_gerritbot {
     # Checkout VERSION in /tmp
     rm -Rf ${dir}/tmp/gerritbot
 
-    retry do_chroot ${dir} git clone --depth 1 ${GERRITBOT_URL} /tmp/gerritbot
+    retry do_chroot ${dir} git clone ${GERRITBOT_URL} /tmp/gerritbot
     do_chroot ${dir} bash -c "cd /tmp/gerritbot && git checkout -b working ${GERRITBOT_VERSION}"
 
     # Install
@@ -571,7 +571,7 @@ function install_gitweb_theme {
     # Checkout VERSION in /tmp
     rm -Rf ${dir}/tmp/kogakure
 
-    retry do_chroot ${dir} git clone --depth 1 ${KOGAKURE_URL} /tmp/kogakure
+    retry do_chroot ${dir} git clone ${KOGAKURE_URL} /tmp/kogakure
     do_chroot ${dir} bash -c "cp /tmp/kogakure/gitweb.css /var/www/git/static/"
 
     # tweak config for gravatars and syntax highlighting

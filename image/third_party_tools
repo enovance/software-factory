@@ -2,6 +2,9 @@
 
 set +x
 
+USE_SWIFT_CACHE=${USE_SWIFT_CACHE:-yes}
+SWIFT_CACHE="http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror"
+
 # yum
 RDO_REPO="https://repos.fedorapeople.org/repos/openstack/openstack-mitaka/rdo-release-mitaka-5.noarch.rpm"
 URL_LIST="$URL_LIST $RDO_REPO"
@@ -26,13 +29,16 @@ SF_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_sf.txt)"
 PIP_PKGS="$(grep '^[a-zA-Z\-]' ${ORIG}/packages/pip_pkgs.txt)"
 export PIP_USE_MIRRORS=True
 
+
 # Serverspec gem versions
 SERVERSPEC_VERSION=2.25.0
+
 
 # Storyboard
 STORYBOARD_COMMIT="3781b33cf688685a62ad6a4ae740618aa699fdce"
 STORYBOARD_WEBCLIENT_COMMIT="ffda0be"
 STORYBOARD_CLIENT_COMMIT="ad713855fbfdd0e89cdc867af7d347c2b2f8ae38"
+
 
 # Job logs Gearman processors
 LOG_GEARMAN_CLIENT_VERSION="d7d9d50ee2706608386c802246591a6c80a58a7f"
@@ -41,37 +47,61 @@ LOG_GEARMAN_WORKER_VERSION="84c7e723128fab9da321ae1b0977e7d13923b36b"
 LOG_GEARMAN_WORKER_URL="https://raw.githubusercontent.com/openstack-infra/puppet-log_processor/${LOG_GEARMAN_WORKER_VERSION}/files/log-gearman-worker.py"
 
 URL_LIST="$URL_LIST $LOG_GEARMAN_CLIENT_URL $LOG_GEARMAN_WORKER_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    LOG_GEARMAN_CLIENT_URL="${SWIFT_CACHE}/log_gearman/log-gearman-client.py"
+    LOG_GEARMAN_WORKER_URL="${SWIFT_CACHE}/log_gearman/log-gearman-worker.py"
+fi
+
 
 # mod_auth_pubtkt
 MOD_AUTH_PUBTKT_VERSION=0.8
 MOD_AUTH_PUBTKT_URL="https://neon1.net/mod_auth_pubtkt/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
 
 URL_LIST="$URL_LIST $MOD_AUTH_PUBTKT_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    MOD_AUTH_PUBTKT_URL="${SWIFT_CACHE}/apache_mod/mod_auth_pubtkt-${MOD_AUTH_PUBTKT_VERSION}.tar.gz"
+fi
+
 
 # redmine
 REDMINE_VERSION=2.6.9
 REDMINE_RHEL_URL="http://www.redmine.org/releases/redmine-${REDMINE_VERSION}.tar.gz"
-REDMINE_BACKLOG_URL="git://github.com/backlogs/redmine_backlogs.git"
+REDMINE_BACKLOG_URL="https://github.com/backlogs/redmine_backlogs.git"
 REDMINE_BACKLOG_VERSION="v1.0.6"
-REDMINE_HTTP_PLUGIN_URL="git://github.com/kevinfoote/redmine_http_auth.git"
+REDMINE_HTTP_PLUGIN_URL="https://github.com/kevinfoote/redmine_http_auth.git"
 REDMINE_HTTP_PLUGIN_VERSION="259fb633ac27737d8b0f6a02230e7fa8f619b852"
 
 URL_LIST="$URL_LIST $REDMINE_RHEL_URL"
 GIT_REPO_LIST="$GIT_REPO_LIST $REDMINE_BACKLOG_URL $REDMINE_HTTP_PLUGIN_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    REDMINE_RHEL_URL="${SWIFT_CACHE}/redmine/redmine-${REDMINE_VERSION}.tar.gz"
+    REDMINE_BACKLOG_URL="${SWIFT_CACHE}/redmine_backlogs.git"
+    REDMINE_HTTP_PLUGIN_URL="${SWIFT_CACHE}/redmine_http_auth.git"
+fi
+
 
 # murmur
 MURMUR_VERSION=1.2.13
 MURMUR_URL="https://github.com/mumble-voip/mumble/releases/download/${MURMUR_VERSION}/murmur-static_x86-${MURMUR_VERSION}.tar.bz2"
+
+URL_LIST="$URL_LIST $MURMUR_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    MURMUR_URL="${SWIFT_CACHE}/murmur/murmur-static_x86-${MURMUR_VERSION}.tar.bz2"
+fi
+
 
 # bup
 BUP_URL="https://github.com/bup/bup.git"
 BUP_VERSION=0.26
 
 GIT_REPO_LIST="$GIT_REPO_LIST $BUP_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    BUP_URL="${SWIFT_CACHE}/bup.git"
+fi
 
 # gerrit
 GERRIT_VERSION=2.11.5
-GERRIT_URL="http://gerrit-releases.storage.googleapis.com/gerrit-${GERRIT_VERSION}.war"
+GERRIT_URL="https://gerrit-releases.storage.googleapis.com/gerrit-${GERRIT_VERSION}.war"
 MYSQLJAVA_VERSION=5.1.21
 MYSQLJAVA_URL="http://repo2.maven.org/maven2/mysql/mysql-connector-java/${MYSQLJAVA_VERSION}/mysql-connector-java-${MYSQLJAVA_VERSION}.jar"
 BCPROV_VERSION="151"
@@ -82,12 +112,23 @@ BCPKIXJDK_VERSION=$BCPROVJDK_VERSION
 BCPKIXJAVA_URL="http://downloads.bouncycastle.org/java/bcpkix-${BCPKIXJDK_VERSION}-${BCPKIX_VERSION}.jar"
 
 URL_LIST="$URL_LIST $GERRIT_URL $MYSQLJAVA_URL $BCPROVJAVA_URL $BCPKIXJAVA_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    GERRIT_URL="${SWIFT_CACHE}/gerrit/gerrit-${GERRIT_VERSION}.war"
+    MYSQLJAVA_URL="${SWIFT_CACHE}/gerrit/mysql-connector-java-${MYSQLJAVA_VERSION}.jar"
+    BCPROVJAVA_URL="${SWIFT_CACHE}/gerrit/bcprov-${BCPROVJDK_VERSION}-${BCPROV_VERSION}.jar"
+    BCPKIXJAVA_URL="${SWIFT_CACHE}/gerrit/bcpkix-${BCPKIXJDK_VERSION}-${BCPKIX_VERSION}.jar"
+fi
+
 
 # bootstrap
 BOOTSTRAP_VERSION=3.2.0
 BOOTSTRAP_URL="https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAP_VERSION}/bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
 
 URL_LIST="$URL_LIST $BOOTSTRAP_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    BOOTSTRAP_URL="${SWIFT_CACHE}/javascripts/bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
+fi
+
 
 # jenkins plugins
 JENKINS_MIRROR_URL="http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/jenkins_plugins"
@@ -124,36 +165,60 @@ JENKINS_ZMQ_PLUGIN_URL="${JENKINS_MIRROR_URL}/plugins/zmq-event-publisher/latest
 JENKINS_DASHBOARD_PLUGIN_URL="${JENKINS_MIRROR_URL}/plugins/dashboard-view/latest/dashboard-view.hpi"
 JENKINS_COBERTURA_URL="${JENKINS_MIRROR_URL}/plugins/cobertura/latest/cobertura.hpi"
 
+URL_LIST="$URL_LIST $JENKINS_SWARM_CLIENT_URL $JENKINS_SWARM_PLUGIN_URL $JENKINS_THEME_PLUGIN_URL $JENKINS_CREDENTIALS_BINDING_URL $JENKINS_CREDENTIALS_URL $JENKINS_WORKFLOW_STEP_API_URL $JENKINS_PLAIN_CREDENTIALS_URL $JENKINS_ZMQ_PLUGIN_URL $JENKINS_SSH_AGENT_PLUGIN_URL $JENKINS_GEARMAN_PLUGIN_URL $JENKINS_REVERSE_AUTH_PROXY_PLUGIN_URL $JENKINS_POST_BUILDSCRIPT_PLUGIN_URL $JENKINS_DASHBOARD_PLUGIN_URL $JENKINS_COBERTURA_URL $JENKINS_ANSI_COLOR_PLUGIN_URL"
+
+
+# zuul_swift_upload
 ZUUL_SWIFT_UPLOAD_URL="https://raw.githubusercontent.com/openstack-infra/project-config/master/jenkins/scripts/zuul_swift_upload.py"
 URL_LIST="${URL_LIST} ${ZUUL_SWIFT_UPLOAD_URL}"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    ZUUL_SWIFT_UPLOAD_URL="${SWIFT_CACHE}/zuul/zuul_swift_upload.py"
+fi
 
-URL_LIST="$URL_LIST $JENKINS_SWARM_CLIENT_URL $JENKINS_SWARM_PLUGIN_URL $JENKINS_THEME_PLUGIN_URL $JENKINS_CREDENTIALS_BINDING_URL $JENKINS_CREDENTIALS_URL $JENKINS_WORKFLOW_STEP_API_URL $JENKINS_PLAIN_CREDENTIALS_URL $JENKINS_ZMQ_PLUGIN_URL $JENKINS_SSH_AGENT_PLUGIN_URL $JENKINS_GEARMAN_PLUGIN_URL $JENKINS_REVERSE_AUTH_PROXY_PLUGIN_URL $JENKINS_POST_BUILDSCRIPT_PLUGIN_URL $JENKINS_DASHBOARD_PLUGIN_URL $JENKINS_COBERTURA_URL $JENKINS_ANSI_COLOR_PLUGIN_URL"
 
 # etherpad
 ETHERPAD_LITE_VERSION=1.5.7
 ETHERPAD_LITE_URL="https://codeload.github.com/ether/etherpad-lite/tar.gz/${ETHERPAD_LITE_VERSION}"
 
 URL_LIST="$URL_LIST $ETHERPAD_LITE_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    ETHERPAD_LITE_URL="${SWIFT_CACHE}/etherpad/${ETHERPAD_LITE_VERSION}"
+fi
+
 
 # font awesome
 FONTAWESOME_VERSION=4.2.0
 FONTAWESOME_URL="https://codeload.github.com/FortAwesome/Font-Awesome/zip/v${FONTAWESOME_VERSION}"
 
 URL_LIST="$URL_LIST $FONTAWESOME_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    FONTAWESOME_URL="${SWIFT_CACHE}/fontawesome/v${FONTAWESOME_VERSION}"
+fi
+
 
 # JQuery
 JQUERY_VERSION=2.1.1
-JQUERY_URL="http://code.jquery.com/jquery-${JQUERY_VERSION}.min.js"
+JQUERY_URL="https://code.jquery.com/jquery-${JQUERY_VERSION}.min.js"
 JQUERY_VISIBILITY_URL="http://status.openstack.org/jquery-visibility.min.js"
 JQUERY_GRAPHITE_URL="http://status.openstack.org/jquery-graphite.js"
 
 URL_LIST="$URL_LIST $JQUERY_URL $JQUERY_VISIBILITY_URL $JQUERY_GRAPHITE_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    JQUERY_URL="${SWIFT_CACHE}/javascripts/jquery-${JQUERY_VERSION}.min.js"
+    JQUERY_VISIBILITY_URL="${SWIFT_CACHE}/javascripts/jquery-visibility.min.js"
+    JQUERY_GRAPHITE_URL="${SWIFT_CACHE}/javascripts/jquery-graphite.js"
+fi
+
 
 # AngularJS
 ANGULARJS_VERSION=1.2.27
 ANGULARJS_URL="https://ajax.googleapis.com/ajax/libs/angularjs/${ANGULARJS_VERSION}/angular.min.js"
 
 URL_LIST="$URL_LIST $ANGULARJS_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    ANGULARJS_URL="${SWIFT_CACHE}/javascripts/angular.min.js"
+fi
+
 
 # Latest version of nodepool/zuul as of May11 2016
 ZUUL_URL="https://github.com/openstack-infra/zuul"
@@ -165,22 +230,29 @@ NODEPOOL_VERSION=1fd2a14ab79d256419083e2b2d9c463af36e039a
 GERRITBOT_URL="https://github.com/openstack-infra/gerritbot"
 GERRITBOT_VERSION=d48b1bc41717291e43425ff437d6214b6934f60f
 
-URL_LIST="$URL_LIST $ZUUL_URL $NODEPOOL_URL"
-
 # paste (lodgeit)
 PASTE_URL="https://git.openstack.org/openstack-infra/lodgeit"
 PASTE_VERSION=beb3ff7e266 # latest commit as of 05 Jun 2015
 
-GIT_REPO_LIST="$GIT_REPO_LIST $PASTE_URL"
+GIT_REPO_LIST="$URL_LIST $ZUUL_URL $NODEPOOL_URL $GERRITBOT_URL $PASTE_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    ZUUL_URL="${SWIFT_CACHE}/zuul.git"
+    NODEPOOL_URL="${SWIFT_CACHE}/nodepool.git"
+    PASTE_URL="${SWIFT_CACHE}/lodgeit.git"
+fi
 
 GRAFANA_URL="http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/rpms/grafana-2.5.0-1.x86_64.rpm"
 
 URL_LIST="$URL_LIST $GRAFANA_URL"
 
+
 # gitweb kogakure theme
 KOGAKURE_URL="https://github.com/kogakure/gitweb-theme.git"
 
 GIT_REPO_LIST="$GIT_REPO_LIST $KOGAKURE_URL"
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    KOGAKURE_URL="${SWIFT_CACHE}/gitweb-theme.git"
+fi
 
 #---- URL health check -------
 function test_url {
