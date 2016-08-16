@@ -1,3 +1,8 @@
+# This file should not be modified by hand. This file
+# can be automatically modifed during a platform upgrade.
+# If new pipelines are requested, please create them in
+# a new file in the zuul directory.
+
 includes:
   - python-file: zuul_functions.py
 
