@@ -19,8 +19,8 @@ set -e
 
 [ "$1" = "upgrade" ] && upgrade=true || upgrade=false
 
-gateway_host="<%= @fqdn %>"
-gateway_url="<%= @url['gateway_url'] %>"
+gateway_host="$2"
+gateway_url="http://$2"
 
 auth="admin:<%= @auth['admin_password'] %>"
 
