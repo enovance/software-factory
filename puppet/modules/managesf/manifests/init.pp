@@ -155,3 +155,4 @@ class managesf ($gerrit = hiera('gerrit')) {
     group   => 'root',
     content => template('managesf/sf_jjb_conf.yaml.erb'),
   }
+}
