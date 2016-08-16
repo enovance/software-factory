@@ -1,5 +1,3 @@
-.. toctree::
-
 Configure GIT repository replication to a remote
 ================================================
 

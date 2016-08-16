@@ -1,5 +1,3 @@
-.. toctree::
-
 Deploy Software Factory
 =======================
 
@@ -41,7 +39,7 @@ digest are signed with gpg, install the key and verify content with:
 Architecture
 ------------
 
-SF architecture is modular and defined by a single file called refarch::
+SF architecture is modular and defined by a single file called refarch:
 
 .. code-block:: yaml
 
@@ -50,10 +48,11 @@ SF architecture is modular and defined by a single file called refarch::
       roles:
         - install-server
         - mysql
+
     - name: node02
+      mem: 8
       roles:
         - gerrit
-      mem: 8
 
 Heat and Lxc based deployment autoconfigure dns. Manual deployments needs to edits the
 /etc/puppet/hiera/sf/hosts.yaml to set hostname and ip address of other node.

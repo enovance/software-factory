@@ -1,5 +1,3 @@
-.. toctree::
-
 Configure slave nodes for Jenkins
 =================================
 

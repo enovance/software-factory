@@ -1,7 +1,4 @@
-Contents:
-
-.. toctree::
-
+================================
 Introduction to Software Factory
 ================================
 
@@ -192,6 +189,6 @@ The future of Software Factory
 Long term roadmap:
 
 * Plugins interface for other issue trackers like Jira or Phabricator
-* More collaborative tools like Taiga, mumble and irc server.
-* Autoscaling and Heat templates.
+* More collaborative tools like mailman mailing-list, Taiga and irc server.
+* Autoscaling of OpenStack Heat deployment.
 * Developer, Project leaders, Scrum master useful dashboard.

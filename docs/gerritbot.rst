@@ -1,5 +1,3 @@
-.. toctree::
-
 Configure gerritbot for IRC notification
 ========================================
 
@@ -8,14 +6,18 @@ System configuration
 
 To start the service:
 
-* Add the gerritbot role to desired host in the inventory: /etc/puppet/hiera/sf/arch.yaml::
+* Add the gerritbot role to desired host in the inventory: /etc/puppet/hiera/sf/arch.yaml:
+
+.. code-block:: yaml
 
   inventory:
     - hostname: managesf.sftests.com
       roles:
         - gerritbot
 
-* Set the gerritbot configuration in /etc/puppet/hiera/sf/sfconfig.yaml::
+* Set the gerritbot configuration in /etc/puppet/hiera/sf/sfconfig.yaml:
+
+.. code-block:: yaml
 
   gerritbot:
     botname: sfbot
@@ -30,7 +32,9 @@ Project configuration
 Once the service is running, you can configure the irc channels to get notification:
 
 * git clone the config-repository
-* add a new file or edit one in config/gerritbot directory::
+* add a new file or edit one in config/gerritbot directory:
+
+.. code-block:: yaml
 
   irc-channel-name:
     events:

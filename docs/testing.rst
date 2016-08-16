@@ -1,5 +1,3 @@
-.. toctree::
-
 Configure automatic tests for a project
 =======================================
 

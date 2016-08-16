@@ -1,5 +1,3 @@
-.. toctree::
-
 Using Software factory for project development
 ==============================================
 

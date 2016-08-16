@@ -1,9 +1,7 @@
-.. toctree::
+Migration of existing projects to Software Factory
+==================================================
 
-Migrating to Software Factory
-=============================
-
-It is relatively easy to migrate a previous work environment to a new
+It is relatively easy to migrate a previous work environment to an
 instance of Software Factory. Here are a few strategies available.
 
 Migrating a repository

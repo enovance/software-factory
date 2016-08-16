@@ -1,7 +1,6 @@
-.. toctree::
-
-Contributing to Software Factory
-================================
+==================================================
+Software-Factory project Contributor documentation
+==================================================
 
 How can I help?
 ---------------
@@ -9,6 +8,8 @@ How can I help?
 Thanks for asking.
 
 The easiest way to get involved is to join us on IRC: #softwarefactory channel on Freenode.
+
+The mailing list is: softwarefactory-dev@redhat.com , subscribe here: https://www.redhat.com/mailman/listinfo/softwarefactory-dev
 
 User stories and bug tracker is available here: http://softwarefactory-project.io/redmine/projects/software-factory/issues
 

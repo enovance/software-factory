@@ -1,7 +1,3 @@
-Contents:
-
-.. toctree::
-
 Software Factory Deep Dive
 ==========================
 
@@ -9,7 +5,7 @@ The goal of this document is to describe SF internals.
 
 
 The image
-.........
+---------
 
 SF release is actually a new disk image with *everythings* included.
 The build_image.sh script does the following:
@@ -35,7 +31,7 @@ Why use an image ?
 
 
 The deployment
-..............
+--------------
 
 The image is deployment agnostic since all services are pre-installed but not configured.
 Different architectures are supported through a notion of REFARCH.
@@ -54,7 +50,7 @@ How are services configured ?
 
 
 The system configuration
-........................
+------------------------
 
 The sfconfig.sh script drive the configuration of all services, running from the managesf node it will:
 
@@ -77,7 +73,7 @@ SF is meant to be a self-service system, thus project configuration is done thro
 
 
 The config-repo
-...............
+---------------
 
 Once SF is up and running, the actual configuration of the CI happens in the config-repo:
 
@@ -94,7 +90,7 @@ This job is actually an ansible playbook that will:
 
 
 SF upgrade
-..........
+----------
 
 The upgrade procedure is not included in the image, and the operator needs to manually download
 the module. It is part of software-factory project repository and the wanted tag release, based

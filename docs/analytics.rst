@@ -1,5 +1,3 @@
-.. toctree::
-
 Getting project statistics in Software Factory
 ==============================================
 

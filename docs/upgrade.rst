@@ -1,5 +1,3 @@
-.. toctree::
-
 Upgrade Software Factory
 ========================
 

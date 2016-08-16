@@ -1,5 +1,3 @@
-.. toctree::
-
 Sofware Factory Authentication
 ==============================
 
