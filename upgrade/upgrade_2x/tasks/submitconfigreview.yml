@@ -5,4 +5,4 @@
 # process. This let the ability to the user to fix or report problem with
 # the upgrade.
 - name: Trigger init config repo with the upgrade option
-  shell: /root/init-config-repo.sh upgrade
+  shell: /usr/local/bin/init-config-repo.sh upgrade {{ fqdn }} {{ authentication.admin_password }}
