@@ -19,10 +19,10 @@ set -e
 
 [ "$1" = "upgrade" ] && upgrade=true || upgrade=false
 
-gateway_host="<%= @fqdn %>"
-gateway_url="<%= @url['gateway_url'] %>"
+gateway_host="$2"
+gateway_url="http://$2"
 
-auth="admin:<%= @auth['admin_password'] %>"
+auth="admin:$3"
 
 gerrit_ssh_key="/root/sf-bootstrap-data/ssh_keys/gerrit_admin_rsa"
 
