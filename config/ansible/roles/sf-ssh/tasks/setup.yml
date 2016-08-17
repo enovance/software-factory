@@ -1,27 +1,38 @@
 ---
 - include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+- include_vars: main.yml
 
-- name: "system: chmod ssh directory"
+- name: ensure user are present
+  user: name={{ item.name }} state=present
+  with_items: "{{ users }}"
+
+- name: "system: chmod ssh directory for root and gerrit user"
   file:
-    path=/root/.ssh
-    state=directory
-    owner=root group=root mode=0700
+    owner: "{{ item.name }}"
+    group: "{{ item.group }}"
+    path: "{{ item.path }}"
+    state: directory
+    mode: 0700
+  with_items: "{{ users }}"
 
-- name: "system: ensure id_rsa private key for root user is present"
+- name: "system: ensure id_rsa private key for root and gerrit user is present"
   copy:
-    content: "{{ service_rsa }}"
-    dest: /root/.ssh/id_rsa
-    owner: root
-    group: root
+    owner: "{{ item.name }}"
+    group: "{{ item.group }}" 
+    content: "{{ item.private_key }}"
+    dest: "{{ item.filename}}"
     mode: 0600
+  with_items: "{{ users }}"
 
-- name: "system: set authorized key to allow config update from jenkins"
+- name: "system: set authorized key for root and gerrit users"
+  authorized_key: "user={{ item.0.name }} key={{ item.1 }}"
+  with_subelements:
+      - "{{ users }}"
+      - authorized
+
+- name: "system: set authorized key to allow config update from jenkins for root user"
   authorized_key:
     user: root
     key: "{{ jenkins_rsa_pub }}"
     key_options: 'command="/usr/local/bin/sf-config-update.sh",no-port-forwarding,no-x11-forwarding,no-agent-forwarding'
 
-- name: "system: set authorized key to allow root access from managesf to other nodes"
-  authorized_key:
-    user: root
-    key: "{{ service_rsa_pub }}"

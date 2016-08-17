@@ -1,0 +1,16 @@
+---
+users:
+  - name: root
+    authorized:
+        - "{{ service_rsa_pub }}"
+    group: root
+    path: "/root/.ssh/"
+    private_key: "{{ service_rsa }}"
+    filename: "/root/.ssh/id_rsa"
+  - name: gerrit
+    authorized:
+        - "{{ gerrit_admin_rsa_pub }}"
+    group: gerrit
+    path: "/home/gerrit/.ssh"
+    private_key: "{{ gerrit_admin_rsa }}"
+    filename: "/home/gerrit/.ssh/id_rsa"
