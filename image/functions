@@ -278,9 +278,12 @@ cleanup() {
             echo -e "VERS=${version}\nROLE=${ROLE}" > ${dir}/var/lib/edeploy/conf
 
             echo ${ROLE} > ${dir}/etc/hostname
-            mkdir -p "$dir/var/lib/edeploy/${version}"
+            mkdir -p "${dir}/var/lib/edeploy/${version}"
 
-            echo > "${dir}"/etc/resolv.conf
+            echo > "${dir}/etc/resolv.conf"
+
+            # Remove sources
+            rm -Rf "${dir}/usr/src/*"
         fi
 
         clean_chroot

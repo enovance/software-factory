@@ -485,53 +485,50 @@ EOF
 }
 
 function install_nodepool {
-    # Checkout VERSION in /tmp
+    # Checkout VERSION in /usr/src
     do_chroot ${dir} virtualenv /srv/nodepool
-    [ -d ${dir}/tmp/nodepool ] || retry do_chroot ${dir} git clone ${NODEPOOL_URL} /tmp/nodepool
-    do_chroot ${dir} bash -c "cd /tmp/nodepool && git checkout -b sf_stable ${NODEPOOL_VERSION}"
+    [ -d ${dir}/usr/src/nodepool ] || {
+        retry do_chroot ${dir} git clone ${NODEPOOL_URL} /usr/src/nodepool
+        do_chroot ${dir} bash -c "cd /usr/src/nodepool && git checkout -b sf_stable ${NODEPOOL_VERSION}"
 
-    # Apply not-merged fixes
-    for patch in ./patches/nodepool_*; do
-        do_chroot ${dir} bash -c "cd /tmp/nodepool; patch -p1" < ${patch}
-    done
+        # Apply not-merged fixes
+        for patch in ./patches/nodepool_*; do
+            do_chroot ${dir} bash -c "cd /usr/src/nodepool; patch -p1" < ${patch}
+        done
+    }
 
     # Install
-    do_chroot ${dir} sed -i "s/^apscheduler>=3.0/apscheduler>=3.0,<3.1/" /tmp/nodepool/requirements.txt
+    do_chroot ${dir} sed -i "s/^apscheduler>=3.0.*/apscheduler>=3.0,<3.1/" /usr/src/nodepool/requirements.txt
 
     do_chroot ${dir} /srv/nodepool/bin/pip install --upgrade 'pbr>=1.3' 'pip<8'
-    do_chroot ${dir} /srv/nodepool/bin/pip install 'pip<8' 'funcsigs' file:///tmp/nodepool
+    do_chroot ${dir} /srv/nodepool/bin/pip install 'pip<8' 'funcsigs' file:///usr/src/nodepool
 
     # Install symlink to venv to set correct python path
     for bin in nodepool nodepoold; do
         ln -sf /srv/nodepool/bin/${bin} ${dir}/usr/bin/${bin}
     done
-
-    # Cleanup left-overs
-    rm -Rf ${dir}/tmp/nodepool*
 }
 
 function install_zuul {
-    # Checkout VERSION in /tmp
+    # Checkout VERSION in /usr/src
     do_chroot ${dir} virtualenv /srv/zuul
 
-    # Cleanup left-overs
-    rm -Rf ${dir}/tmp/zuul*
+    [ -d ${dir}/usr/src/zuul ] || {
+        retry do_chroot ${dir} git clone ${ZUUL_URL} /usr/src/zuul
+        do_chroot ${dir} bash -c "cd /usr/src/zuul && git checkout -b working ${ZUUL_VERSION}"
 
-    retry do_chroot ${dir} git clone ${ZUUL_URL} /tmp/zuul
-    do_chroot ${dir} bash -c "cd /tmp/zuul && git checkout -b working ${ZUUL_VERSION}"
-
-    # Apply temp_url_key fix
-    # Apply not-merged fixes
-    for patch in ./patches/zuul_*; do
-        do_chroot ${dir} bash -c "cd /tmp/zuul; patch -p1" < ${patch}
-    done
+        # Apply not-merged fixes
+        for patch in ./patches/zuul_*; do
+            do_chroot ${dir} bash -c "cd /usr/src/zuul; patch -p1" < ${patch}
+        done
+    }
 
     # Install
-    do_chroot ${dir} sed -i "s/^apscheduler>=3.0/apscheduler>=3.0,<3.1/" /tmp/zuul/requirements.txt
-    sudo sed -i 's/^pbr.*//' ${dir}/tmp/zuul/requirements.txt
+    do_chroot ${dir} sed -i "s/^apscheduler>=3.0.*/apscheduler>=3.0,<3.1/" /usr/src/zuul/requirements.txt
+    sudo sed -i 's/^pbr.*//' ${dir}/usr/src/zuul/requirements.txt
 
     do_chroot ${dir} /srv/zuul/bin/pip install --upgrade 'pbr' 'pip<8'
-    do_chroot ${dir} /srv/zuul/bin/pip install 'pip<8' file:///tmp/zuul
+    do_chroot ${dir} /srv/zuul/bin/pip install 'pip<8' file:///usr/src/zuul
 
     # Manually install swift and keystone client
     do_chroot ${dir} /srv/zuul/bin/pip install --upgrade 'pbr>=1.8' 'pip<8'
@@ -543,43 +540,30 @@ function install_zuul {
     done
 
     # Install zuul web virtualhost
-    rm -Rf ${dir}/var/www/zuul
-    mv ${dir}/tmp/zuul/etc/status/public_html/ ${dir}/var/www/zuul
+    rsync -a --delete ${dir}/usr/src/zuul/etc/status/public_html/ ${dir}/var/www/zuul/
     mkdir -p ${dir}/var/www/static/js
     http_fetch $JQUERY_VISIBILITY_URL ${dir}/var/www/static/js/jquery-visibility.min.js
     http_fetch $JQUERY_GRAPHITE_URL   ${dir}/var/www/static/js/jquery.graphite.js
-
-    # Cleanup left-overs
-    rm -Rf ${dir}/tmp/zuul*
 }
 
 function install_gerritbot {
-    # Checkout VERSION in /tmp
-    rm -Rf ${dir}/tmp/gerritbot
-
-    retry do_chroot ${dir} git clone ${GERRITBOT_URL} /tmp/gerritbot
-    do_chroot ${dir} bash -c "cd /tmp/gerritbot && git checkout -b working ${GERRITBOT_VERSION}"
+    # Checkout VERSION in /usr/src
+    [ -d ${dir}/usr/src/gerritbot ] || {
+        retry do_chroot ${dir} git clone ${GERRITBOT_URL} /usr/src/gerritbot
+        do_chroot ${dir} bash -c "cd /usr/src/gerritbot && git checkout -b working ${GERRITBOT_VERSION}"
+    }
 
     # Install
-    do_chroot ${dir} bash -c "cd /tmp/gerritbot && python setup.py install"
-
-    # Cleanup left-overs
-    rm -Rf ${dir}/tmp/gerritbot
+    do_chroot ${dir} bash -c "cd /usr/src/gerritbot && python setup.py install"
 }
 
 function install_gitweb_theme {
-    # Checkout VERSION in /tmp
-    rm -Rf ${dir}/tmp/kogakure
-
-    retry do_chroot ${dir} git clone ${KOGAKURE_URL} /tmp/kogakure
-    do_chroot ${dir} bash -c "cp /tmp/kogakure/gitweb.css /var/www/git/static/"
+    [ -d ${dir}/usr/src/kogakure ] || retry do_chroot ${dir} git clone ${KOGAKURE_URL} /usr/src/kogakure
+    do_chroot ${dir} bash -c "cp /usr/src/kogakure/gitweb.css /var/www/git/static/"
 
     # tweak config for gravatars and syntax highlighting
     do_chroot ${dir} bash -c "echo '\$feature{"'"'"'"avatar"'"'"'"}{"'"'"'"default"'"'"'"} = ["'"'"'"gravatar"'"'"'"];' >> /etc/gitweb.conf"
     do_chroot ${dir} bash -c "echo '\$feature{"'"'"'"highlight"'"'"'"}{"'"'"'"default"'"'"'"} = [1];' >> /etc/gitweb.conf"
-
-    # Cleanup left-overs
-    rm -Rf ${dir}/tmp/kogakure
 }
 
 function copy_sf_ansible_roles {
