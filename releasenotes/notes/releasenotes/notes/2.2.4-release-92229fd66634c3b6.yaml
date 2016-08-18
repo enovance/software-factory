@@ -1,0 +1,9 @@
+---
+other:
+  - Gerrit upgrade to 2.11.9
+  - Pre-provided zuul layout and Jenkins jobs are now stored respectively
+    in zuul/_layout.yaml and jobs/_default_jobs.yaml. Files with an
+    underscore as prefix must be considered by the operator "read only".
+upgrade:
+  - zuul/layout.yaml file will be renamed zuul/_layout.yaml
+  - jobs/sf_jjb_conf.yaml will be renamed jobs/_default_jobs.yaml
