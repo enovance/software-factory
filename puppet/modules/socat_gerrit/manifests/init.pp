@@ -30,6 +30,6 @@ class socat_gerrit {
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    require    => Exec['reload_units'],
+    notify => [Exec['systemctl_reload']
   }
 }
