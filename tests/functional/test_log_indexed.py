@@ -137,6 +137,7 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
         self.gitu_admin.direct_push_branch(clone, 'master')
         return head
 
+    @skipIfServicePresent('elasticsearch')
     def test_log_indexation(self):
         """ Test job log are exported in Elasticsearch
         """
