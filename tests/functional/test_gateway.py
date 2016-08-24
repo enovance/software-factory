@@ -21,8 +21,8 @@ import shlex
 import config
 from utils import Base
 from utils import ManageSfUtils
-from utils import skipIfIssueTrackerMissing, has_issue_tracker
-# from utils import skipIfServiceMissing
+from utils import skipIfIssueTrackerMissing, has_issue_tracker, \
+    skipIfServiceMissing, services
 from utils import get_issue_tracker_utils, ssh_run_cmd
 from pysflib.sfgerrit import GerritUtils
 
@@ -108,8 +108,13 @@ class TestGateway(Base):
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
         """
-        subpaths = ["/r/", "/jenkins/",
-                    "/zuul/", "/etherpad/", "/paste/", "/docs/", "/app/kibana"]
+        subpaths = ["/docs/", "/r/", "/jenkins/", "/zuul/"]
+        for (service, path) in (
+                ("etherpad", "/etherpad/"),
+                ("lodgeit", "/paste/"),
+                ("kibana", "/app/kibana")):
+            if service in services:
+                subpaths.append(path)
         if has_issue_tracker():
             tracker = get_issue_tracker_utils(
                 auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
@@ -207,6 +212,7 @@ class TestGateway(Base):
         # User should be known in Jenkins if logged in with SSO
         self.assertTrue(config.USER_1 in resp.text)
 
+    @skipIfServiceMissing('kibana')
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
@@ -261,6 +267,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200,
                          "%s returned status %s" % (url, resp.status_code))
 
+    @skipIfServiceMissing('etherpad')
     def test_etherpad_accessible(self):
         """ Test if Etherpad is accessible on gateway host
         """
@@ -272,6 +279,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>SF - Etherpad</title>' in resp.text)
 
+    @skipIfServiceMissing('lodgeit')
     def test_paste_accessible(self):
         """ Test if Paste is accessible on gateway host
         """
@@ -298,6 +306,7 @@ class TestGateway(Base):
             self.assertEqual(resp.status_code, 200)
             self.assertTrue("Bootstrap v3.2.0" in resp.content)
 
+    @skipIfServiceMissing('lodgeit')
     def test_static_dir_for_paste_accessible(self):
         """ Test if static dir for paste is accessible on gateway host
         """

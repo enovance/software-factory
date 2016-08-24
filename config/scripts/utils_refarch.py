@@ -15,6 +15,10 @@ required_roles = (
     "gerrit",
 )
 
+# Roles that can be instanciated multiple times
+multi_roles = (
+)
+
 
 def fail(msg):
     print >>sys.stderr, msg
@@ -74,7 +78,8 @@ def load_refarch(filename, domain=None, install_server_ip=None):
     for requirement in required_roles:
         if requirement not in arch["roles"]:
             fail("%s role is missing" % requirement)
-        if len(arch["roles"][requirement]) > 1:
+    for role in arch["roles"]:
+        if role not in multi_roles and len(arch["roles"][role]) > 1:
             fail("Only one instance of %s is required" % requirement)
 
     # Add gateway and install-server hostname/ip for easy access
