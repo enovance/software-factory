@@ -9,7 +9,7 @@ inventory:
       - gateway
       - managesf
       - redmine
-      - statsd
+      - gerritbot
     mem: 8
     cpu: 4
     disk: 20
