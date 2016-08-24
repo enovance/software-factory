@@ -198,8 +198,7 @@ class TestProjectReplication(Base):
                  '/home/gerrit/.ssh/known_hosts']]
         for cmd in cmds:
             self.ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                             'root',
-                             config.GATEWAY_HOST, cmd)
+                             'root', config.GATEWAY_HOST, cmd)
 
         # Create new section for this project in replication.config
         self.create_config_section(self.pname)
