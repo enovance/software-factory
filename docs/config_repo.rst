@@ -32,3 +32,9 @@ To update the configuration repo:
    nodepool_user
    gerritbot_user
    gerrit_replication_user
+
+API access control
+==================
+
+The policy/policy.yaml file in the config repo allows an operator to define access rules
+to the managesf API. See _access_control for more details.
