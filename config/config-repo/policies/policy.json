@@ -21,5 +21,43 @@
     "managesf.project:get_one": "rule:any",
     "managesf.project:get_all": "rule:any",
     "managesf.project:create": "rule:admin_api",
-    "managesf.project:delete": "rule:admin_api or rule:ptl_api"
+    "managesf.project:delete": "rule:admin_api or rule:ptl_api",
+
+    "managesf.backup:get": "rule:admin_api",
+    "managesf.backup:create": "rule:admin_api",
+
+    "managesf.restore:restore": "rule:admin_api",
+
+    "managesf.membership:get": "rule:any",
+    "managesf.membership:create": "rule:admin_api or rule:ptl_api or (rule:core_api and (target.group:core-group or target.group:dev-group) or (rule:dev_api and target.group:dev-group)",
+    "managesf.membership:delete": "rule:admin_api or rule:ptl_api or (rule:core_api and (target.group:core-group or target.group:dev-group) or (rule:dev_api and target.group:dev-group)",
+
+    "managesf.group:get": "rule:authenticated_api",
+    "managesf.group:create": "rule:authenticated_api",
+    "managesf.group:update": "rule:admin_api or group:%(group)s",
+    "managesf.group:delete": "rule:admin_api or group:%(group)s",
+
+    "managesf.pages:get": "rule:admin_api or rule:ptl_api",
+    "managesf.pages:create": "rule:admin_api or rule:ptl_api",
+    "managesf.pages:delete": "rule:admin_api or rule:ptl_api",
+
+    "managesf.localuser:get": "rule:authenticated_api",
+    "managesf.localuser:create_update": "rule:admin_api or username:%(username)s",
+    "managesf.localuser:delete": "rule:admin_api or username:%(username)s",
+    "managesf.localuser:bind": "rule:any",
+
+    "managesf.user:get": "rule:authenticated_api",
+    "managesf.user:create": "rule:admin_api or username:%(username)s",
+    "managesf.user:delete": "rule:admin_api",
+    "managesf.user:update": "rule:admin_api or username:%(username)s",
+
+    "managesf.htpasswd:get": "rule:authenticated_api",
+    "managesf.htpasswd:create": "rule:authenticated_api",
+    "managesf.htpasswd:delete": "rule:authenticated_api",
+
+    "managesf.hooks:trigger": "rule:admin_or_service",
+
+    "managesf.tests:add": "rule:admin_api or rule:ptl_api",
+
+    "managesf.config:get": "rule:authenticated_api",
 }
