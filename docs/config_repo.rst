@@ -31,3 +31,4 @@ To update the configuration repo:
    swiftlogs_user
    nodepool_user
    gerritbot_user
+   access_control
