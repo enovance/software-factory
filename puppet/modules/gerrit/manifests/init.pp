@@ -58,8 +58,7 @@ class gerrit {
     path    => '/lib/systemd/system/gerrit.service',
     owner   => 'gerrit',
     content => template('gerrit/gerrit.service.erb'),
-    require => [Exec['gerrit-initial-init'],
-                File['wait4mariadb']],
+    require => [Exec['gerrit-initial-init']],
     notify  => Exec['systemctl_reload'],
   }
 

@@ -1,0 +1,54 @@
+[gerrit]
+    basePath = git
+    canonicalWebUrl = {{ gerrit_pub_url }}
+    gitHttpUrl =
+[database]
+    type = MYSQL
+    hostname = {{ mysql_host }}
+    database = {{ mysql_db }}
+    username = {{ mysql_user }}
+    port = {{ mysql_port }}
+    url = jdbc:mysql://{{ mysql_host }}/{{ mysql_db }}?useUnicode=yes&characterEncoding=UTF-8
+[auth]
+    type = HTTP
+    gitBasicAuth = true
+    loginUrl = /r/login
+    logoutUrl = /auth/logout
+[container]
+    user = gerrit
+    javaHome = /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/jre
+    heapLimit = {{ gerrit.gerrit_heap_limit }}
+[sshd]
+    listenAddress = "*:29418"
+[httpd]
+    listenUrl = proxy-http://0.0.0.0:8000/r/
+[commentlink "changeid"]
+  match = (I[0-9a-f]{8,40})
+  link = "#q,$1,n,z"
+[commentlink "Redmine_addressing"]
+    match = "([Bb]ug|[Ff]ix|[Ss]tory|[Ii]ssue|[Cc]loses?):\\s+#?(\\d+)"
+    html = $1<a href=\"{{ redmine_pub_url }}/issues/$2\">$2</a>
+[commentlink "Redmine_related"]
+    match = "([Rr]elated|[Rr]elated[ -][Tt]o):\\s+#?(\\d+)"
+    html = $1<a href=\"{{ redmine_pub_url }}/issues/$2\">$2</a>
+[gitweb]
+    cgi = {{ gitweb_cgi }}
+[sendemail]
+    enable = true
+    from = MIXED
+    smtpServer = 127.0.0.1
+    smtpServerPort = 25
+    smtpUser =
+[download]
+    scheme = ssh
+    scheme = http
+    scheme = anon_http
+[suggest]
+    accounts = true
+    from = 2
+[cache]
+    directory = cache
+[user]
+    email = gerrit@{{ fqdn }}
+[plugins]
+    allowRemoteAdmin = true
