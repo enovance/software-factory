@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# Copyright 2016 Red Hat
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+# This hook will update a Redmine issue by:
+# - changing its status to closed
+# - add an issue note with :
+#   - The review URL
+#   - The submitter name
+#   - The URL of the commit in cgit/gitweb using the commit id
+#   - Branch
+#   - Full commit message
+
+# https://gerrit-documentation.storage.googleapis.com/\
+#        Documentation/2.8.1/config-hooks.html
+
+# Gerrit will call the hook with the following options:
+# patchset-created --change <change id>
+#                  --change-url <change url>
+#                  --project <project name>
+#                  --branch <branch>
+#                  --topic <topic>
+#                  --submitter <uploader>
+#                  --commit <sha1>
+#                  --change-owner
+#                  --newrev
+
+QUOTE="\""
+ESCAPED="\\\""
+
+# TODO Find a better place to store these logs
+LOGFILE=/tmp/hook.log
+
+while [ $# -gt 1 ]
+do
+key="$1"
+
+case $key in
+    --change)
+    CHANGE="${2//$QUOTE/$ESCAPED}"
+    shift # past argument
+    ;;
+    --change-url)
+    CHANGEURL="${2//$QUOTE/$ESCAPED}"
+    shift # past argument
+    ;;
+    --project)
+    PROJECT="${2//$QUOTE/$ESCAPED}"
+    shift # past argument
+    ;;
+    --branch)
+    BRANCH="${2//$QUOTE/$ESCAPED}"
+    ;;
+    --topic)
+    TOPIC="${2//$QUOTE/$ESCAPED}"
+    shift # past argument
+    ;;
+    --submitter)
+    SUBMITTER="${2//$QUOTE/$ESCAPED}"
+    shift # past argument
+    ;;
+    --commit)
+    COMMIT="${2//$QUOTE/$ESCAPED}"
+    ;;
+    --change-owner)
+    CHANGEOWNER="${2//$QUOTE/$ESCAPED}"
+    ;;
+    --newrev)
+    NEWREV="${2//$QUOTE/$ESCAPED}"
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+echo $(date +'%F %T') " - $0 called for change $CHANGE" | tee -a ${LOGFILE}
+
+COMMIT_MESSAGE=`git cat-file -p $COMMIT`
+COMMIT_MESSAGE="${COMMIT_MESSAGE//$QUOTE/$ESCAPED}"
+
+MANAGESF_BASE_URL=http://managesf.{{ fqdn }}
+SF_SERVICE_PASSWORD={{ creds_sf_service_user_pwd }}
+
+PAYLOAD=`mktemp -u`
+COOKIE=`mktemp -u`
+(
+# get auth cookie
+curl -X POST http://{{ fqdn }}/auth/login/ \
+     --data '{"back": "/", "method": "Password", "args": {"username": "_SF_SERVICE_USER_", "password": "'$SF_SERVICE_PASSWORD'"}}' \
+     -c ${COOKIE} -H "Content-Type: application/json"
+# prepare JSON payload
+echo '{"change": "'$CHANGE'", "change_url": "'$CHANGEURL'", "project": "'$PROJECT'", "branch": "'$BRANCH'", "topic": "'$TOPIC'", "submitter": "'$SUBMITTER'", "commit": "'$COMMIT'", "commit_message": "'$COMMIT_MESSAGE'", "change_owner": "'$CHANGEOWNER'", "newrev": "'$NEWREV'"}' > ${PAYLOAD}
+# hook call
+curl -X POST ${MANAGESF_BASE_URL}/manage/hooks/change_merged/ \
+     -H "Accept: application/json" -H "Content-Type: application/json" \
+     -b ${COOKIE} --trace-ascii /dev/stdout \
+     -d @${PAYLOAD}
+) 2>&1 | tee -a ${LOGFILE}
+
+rm ${PAYLOAD}
+rm ${COOKIE}

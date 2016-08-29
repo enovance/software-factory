@@ -1,1 +1,31 @@
 puppet_modules: gerrit
+
+gerrit_email_pk: "{{ creds_gerrit_email_pk }}"
+gerrit_token_pk: "{{ creds_gerrit_token_pk }}"
+gerrit_local_key: "{{ creds_gerrit_local_sshkey }}"
+gerrit_admin_key: "{{ creds_gerrit_admin_sshkey }}"
+gerrit_service_rsa: "{{ gerrit_service_rsa }}"
+gerrit_service_rsa_pub: "{{ gerrit_service_rsa_pub }}"
+gerrit_admin_rsa: "{{ gerrit_admin_rsa }}"
+
+gerrit_local_sshkey_rsa: "{{ creds_gerrit_local_sshkey }}"
+gerrit_local_sshkey: "ssh-rsa {{ gerrit_local_sshkey_rsa }}"
+gerrit_admin_sshkey_rsa: "{{ creds_gerrit_admin_sshkey }}"
+gerrit_admin_sshkey: "ssh-rsa {{ gerrit_admin_sshkey_rsa }}"
+gerrit_jenkins_sshkey_rsa: "{{ creds_jenkins_pub_key }}"
+gerrit_jenkins_sshkey: "ssh-rsa {{ gerrit_jenkins_sshkey_rsa }}"
+
+issues_tracker_api_url: "{{ url.redmine_url }}"
+issues_tracker_api_key: "{{ creds_issues_tracker_api_key }}"
+gitweb_url: "{{ url.gerrit_pub_url }}"
+
+gerrit_admin_mail: "admin@{{ fqdn }}"
+gitweb_cgi: '/var/www/git/gitweb.cgi'
+
+mysql_host: "mysql.{{ fqdn }}"
+mysql_port: 3306
+mysql_user: 'gerrit'
+mysql_password: "{{ creds_gerrit_sql_pwd }}"
+mysql_db: 'gerrit'
+
+service_user_password: "{{ creds_sf_service_user_pwd }}"
