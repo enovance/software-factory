@@ -1,0 +1,30 @@
+---
+- name: "Chmod cgi file"
+  file:
+    path: /var/www/git/gitweb.cgi
+    mode: 0755
+
+- name: "Install acl update script"
+  template: 
+    src: gerrit-update-acl.j2
+    dest: /usr/share/gerrit-update-acl
+    owner: root
+    group: root
+    mode: 0700
+
+- name: "Install config files"
+  template: 
+    src: "{{ item.name }}.j2"
+    dest: "{{ item.path }}/{{ item.name }}"
+    owner: "{{ item.username }}"
+    group: "{{ item.groupname|default(item.username) }}" 
+    mode: "{{ item.mode }}"
+  with_items:
+    - { name: patchset-created,
+        username: gerrit,
+        path: /home/gerrit/site_path/hooks,
+        mode: 0740}
+    - {name: change-merged,
+        username: gerrit,
+        path: /home/gerrit/site_path/hooks,
+        mode: 0740}

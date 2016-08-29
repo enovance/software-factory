@@ -1,9 +1,11 @@
 ---
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+- include_vars: /etc/puppet/hiera/sf/gerrit.yaml
+
 - name: "Create gerrit user"
   include: /etc/ansible/tasks/create_user.yml user_name=gerrit home_dir=/home/gerrit ssh_key=gerrit_service_rsa shell=/bin/bash
 
-- name: "Create gerrit service key directory"
-  file: path=/home/gerrit/site_path/etc/ state=directory owner=gerrit group=gerrit mode=0700
+- include: install_plugins.yml
 
 - name: "Copy gerrit service key"
   copy:
@@ -21,10 +23,21 @@
     user: gerrit
     key: "{{ gerrit_service_rsa_pub }}"
 
+- include: install_files.yml
+
 # Seport fail to relabel existing port, see https://github.com/ansible/ansible-modules-extras/issues/2009
 #- seport: ports={{ item }} proto=tcp setype=http_port_t state=present
-- command: semanage port --modify -t http_port_t -p tcp {{ item }}
+- name: "Selinux: add port for gerrit service"
+  command: semanage port --modify -t http_port_t -p tcp {{ item }}
   with_items: [8000]
   when: selinuxenabled
 
-- template: src=gerrit-update-acl.j2 dest=/usr/share/gerrit-update-acl owner=root group=root mode=0700
+# TODO: need to manage wait4mariadb
+# in puppet/modules/systemctl/templates/wait4mariadb
+- name: "Install gerrit service file"
+  template:
+    src: gerrit.service.j2
+    dest: /lib/systemd/system/gerrit.service
+    owner: root
+    group: root
+    mode: 0644
