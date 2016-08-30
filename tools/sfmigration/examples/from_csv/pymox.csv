@@ -27,4 +27,3 @@
 "57","Defect","New","Medium","","","Improper handling when mocking on instances","Priority-Medium, Type-Defect"
 "58","Defect","New","Medium","","","mox release is old and full of bugs","Priority-Medium, Type-Defect"
 "59","Defect","New","Medium","","","MockObject.__eq__ behaviour causes problems when the mocks are used in lists. ","Priority-Medium, Type-Defect"
-
