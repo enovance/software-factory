@@ -40,7 +40,7 @@ function getValueOfKey(target, key) {
 
 function displayLoggedIn(username) {
     try {
-        document.getElementById("login-msg").innerHTML = "Welcome " + username;
+        document.getElementById("login-msg").innerHTML = "Welcome " + username + "&nbsp;<a href='/sf/user_settings.html'>Settings</a>";
         document.getElementById("login-msg").style.display = "block";
         document.getElementById("login-btn").style.display = "none";
         document.getElementById("logout-btn").style.display = "block";
@@ -72,6 +72,8 @@ function initAuth() {
                     // storyboard_api is already protected by cauth, the token is the username
                     localStorage.setItem("ls.access_token", username);
                     localStorage.setItem("ls.token_type", "Bearer");
+                    // store sf user info
+                    localStorage.setItem("sf.username", username);
                     displayLoggedIn(username);
                     return;
                 }
