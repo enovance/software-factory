@@ -61,6 +61,14 @@ To change the admin user password, you need to edit /etc/puppet/hiera/sf/sfconfi
 of `admin_password`. Then call `sfconfig.sh` to set the password.
 
 
+Identity provider data sync
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, user data such as full name or email address are synchronized upon each successful login. Users
+can disable this behavior in the user settings page (available from top right menu). When disabled, users
+can manage the email addressed used in Software Factory service indepently from the identity provider data.
+
+
 Redmine API key change
 ^^^^^^^^^^^^^^^^^^^^^^
 
