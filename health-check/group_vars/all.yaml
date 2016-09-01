@@ -5,6 +5,7 @@ keep: true
 suffix: "-{{ ansible_date_time.epoch }}"
 # Default project name
 project: "zuul-basic{{ suffix }}"
+node: master
 # Zuul pipelines
 check: ["health-{{ project }}-unit-tests"]
 gate: ["health-{{ project }}-functional-tests", "health-{{ project }}-unit-tests"]

@@ -90,7 +90,7 @@ function run_health_base {
 #    ssh ${SF_HOST} ansible-playbook "--extra-vars='node=master'" /etc/ansible/health-check/zuul.yaml > ${ARTIFACTS_DIR}/integration_tests.txt \
 #        && echo "Basic integration test SUCCESS"                        \
 #        || fail "Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
-    ssh ${SF_HOST} ansible-playbook /etc/ansible/health-check/gerritbot.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
+    ssh -o StrictHostKeyChecking=no ${SF_HOST} ansible-playbook /etc/ansible/health-check/gerritbot.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "Gerritbot integration test SUCCESS"                        \
         || fail "Gerritbot integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     checkpoint "run_health_base"
@@ -101,10 +101,10 @@ function run_health_openstack {
     export OS_AUTH_URL=${OS_AUTH_URL:-"http://192.168.42.1:5000/v2.0"}
     EXTRA_VARS="node=base_centos base_image_name=sf-latest os_slave_network=${HEAT_SLAVE_NETWORK}"
     EXTRA_VARS+=" os_auth_url=${OS_AUTH_URL} os_username=${OS_USERNAME} os_password=${OS_PASSWORD} os_tenant_name=${OS_TENANT_NAME}"
-    ssh ${SF_HOST} ansible-playbook "--extra-vars='${EXTRA_VARS}'" /etc/ansible/health-check/nodepool.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
+    ssh -o StrictHostKeyChecking=no ${SF_HOST} ansible-playbook "--extra-vars='${EXTRA_VARS}'" /etc/ansible/health-check/nodepool.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "(non-voting) Nodepool integration test SUCCESS"    \
         || { EXTRA_VARS=''; echo "(non-voting) Nodepool integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt; }
-    ssh ${SF_HOST} ansible-playbook "--extra-vars='${EXTRA_VARS}'" /etc/ansible/health-check/zuul.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
+    ssh -o StrictHostKeyChecking=no ${SF_HOST} ansible-playbook "--extra-vars='${EXTRA_VARS}'" /etc/ansible/health-check/zuul.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "(non-voting) Basic integration test SUCCESS"                        \
         || fail "(non-voting) Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     checkpoint "run_it_openstack"
