@@ -1,4 +1,4 @@
 ---
-- name: "Apply new policy.json"
-  copy: src=/root/config/policies/policy.json dest=/var/www/managesf/policy.json
+ name: "Apply new policy.json"
+  copy: src=/root/config/policies/policy.yaml dest=/var/www/managesf/policy.yaml
   register: policy
