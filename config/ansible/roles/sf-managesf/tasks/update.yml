@@ -1,4 +1,5 @@
 ---
+- include_vars: /root/config/policies/policy.yaml
+
 - name: "Apply new policy.json"
-  copy: src=/root/config/policies/policy.json dest=/var/www/managesf/policy.json
-  register: policy
+  copy: content="{{ policy|to_nice_json }}" dest=/var/www/managesf/policy.json
