@@ -109,6 +109,11 @@ def update_sfconfig(data):
         data['mirrors']['swift_mirror_ttl'] = 15811200
         dirty = True
 
+    # Mumble is enable when the role is defined in arch
+    if 'disabled' in data['mumble']:
+        del data['mumble']['disabled']
+        dirty = True
+
     return dirty
 
 
