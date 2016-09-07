@@ -110,7 +110,7 @@ You need a CentOS 7 VM or physical machine. The libvirtd-lxc package is needed.
 
 .. code-block:: bash
 
- $ git clone https://softwarefactory-project.io/r/software-factory
+ $ git clone http://softwarefactory-project.io/r/software-factory
  $ cd software-factory
  $ git checkout 2.2.3
  $ ./sfstack.sh
