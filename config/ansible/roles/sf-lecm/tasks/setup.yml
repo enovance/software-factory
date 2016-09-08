@@ -1,0 +1,24 @@
+---
+- name: "Setup configuration"
+  template: src=lecm.conf.j2 dest=/etc/lecm.conf
+
+- name: "Setup apache redirection"
+  template: src=gateway-lecm.conf.j2 dest=/etc/httpd/conf.d/gateway-lecm.conf
+  register: lecmgateway
+
+- name: "Reload apache"
+  service: name=httpd state=reloaded
+  when: lecmgateway|changed
+
+- name: "Patch acme-tiny"
+  patch: src=files/acme-tiny.patch dest=/srv/lecm/lib/python2.7/site-packages/acme_tiny.py
+  ignore_errors: yes
+
+- name: "Ensure certificate are generated"
+  command: lecm --generate
+
+- name: "Install renew crontab"
+  cron:
+    name: "Renew let's encrypt with lecm"
+    special_time: weekly
+    job: lecm --renew
