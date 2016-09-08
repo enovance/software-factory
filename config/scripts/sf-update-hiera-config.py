@@ -109,6 +109,10 @@ def update_sfconfig(data):
         data['mirrors']['swift_mirror_ttl'] = 15811200
         dirty = True
 
+    if 'use_letsencrypt' not in data['network']:
+        data['network']['use_lestencrypt'] = False
+        dirty = True
+
     return dirty
 
 

@@ -1,0 +1,13 @@
+---
+path: /etc/letsencrypt
+type: RSA
+size: 4096
+digest: sha256
+version: 3
+service_name: httpd
+remaining_days: 10
+emailAddress: admin@{{ fqdn }}
+account_key_name: managesf.{{ fqdn }}.key
+
+certificates:
+  {{fqdn}}:
