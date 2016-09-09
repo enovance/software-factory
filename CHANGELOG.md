@@ -2,6 +2,49 @@
 Release Notes
 =============
 
+2.2.4
+========
+
+New Features
+------------
+
+- Implemented a 'gerrit_connections' option to enable third-party-CI use case.
+- Reduced the amount of system notification sent by the SF plaform
+- Revamp the documentation organization to seperator operate and user parts.
+- Minor fixes such as better names of defaults file (sf_jjb_jobs.yaml renamed to _default_jobs.yaml).
+- Integrate a periodic trigger to update user configured swift mirror.
+- Platform wide oslo.policy implementation in progress, project CRUD-related policies are now in place.
+- Add a setting page so that users can manage their email address independently from Identity Provider
+- Add a use_letsencrypt option to automate TLS certificate renewal
+- Enable commit message issue link render to custom endpoints, such as bugzilla.redhat.com
+- Increase coverage of managesf API by the policy engine
+- Add the ELK stack for the usage of exporting job logs to ElasticSearch via Logstash (tech preview)
+- Added OAuth2 authentication with Google (G+ API)
+- Added OAuth2 authentication with BitBucket
+- A new 'gerrit_connections' option is added to sfconfig to enable third party CI use-case.
+
+Known Issues
+------------
+
+- Deployers might run into data collision when more than one external provider (OAuth, OpenID) is enabled. It is advised to use only one Identity Provider at a time.
+
+Upgrade Notes
+-------------
+
+- zuul/layout.yaml file will be renamed zuul/_layout.yaml
+- jobs/sf_jjb_conf.yaml will be renamed jobs/_default_jobs.yaml
+
+Deprecation Notes
+-----------------
+
+- All OAuth2 providers must use the callback URL https://fqdn/auth/login/oauth2/callback - The configuration of the 3rd party app on github must be modified accordingly.
+
+Other Notes
+-----------
+
+- Gerrit upgrade to 2.11.9
+- Pre-provided zuul layout and Jenkins jobs are now stored respectively in zuul/_layout.yaml and jobs/_default_jobs.yaml. Files with an underscore as prefix must be considered by the operator "read only".
+
 2.2.3 2016-07-20
 ================
 
