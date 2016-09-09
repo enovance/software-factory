@@ -1,0 +1,15 @@
+---
+features:
+  - Implemented a 'gerrit_connections' option to enable third-party-CI use case.
+  - Improved image build to better use rpm mirror2swift cache and enable managesf oslo.policy usage for better role management.
+  - Reduced the amount of system notification sent by the SF plaform
+  - Revamp the documentation organization to seperator operate and user parts.
+  - Minor fixes such as better names of defaults file (sf_jjb_jobs.yaml renamed to _default_jobs.yaml).
+  - Integrate a periodic trigger to update user configured swift mirror.
+  - Platform wide oslo.policy implementation in progress, project CRUD-related policies are now in place.
+  - Add a setting page so that users can manage their email address independently from Identity Provider
+  - Add a use_letsencrypt option to automate TLS certificate renewal
+  - Improved config-update job to update services only when their settings change
+  - Enable commit message issue link render to custom endpoints, such as bugzilla.redhat.com
+  - Continue the on-going conversion of puppet manifests to ansible playbooks.
+  - Increase coverage of managesf API by the policy engine
