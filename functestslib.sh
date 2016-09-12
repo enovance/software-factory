@@ -103,7 +103,7 @@ function run_health_openstack {
     EXTRA_VARS+=" os_auth_url=${OS_AUTH_URL} os_username=${OS_USERNAME} os_password=${OS_PASSWORD} os_tenant_name=${OS_TENANT_NAME}"
     ssh ${SF_HOST} ansible-playbook "--extra-vars='${EXTRA_VARS}'" /etc/ansible/health-check/nodepool.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "(non-voting) Nodepool integration test SUCCESS"    \
-        || { EXTRA_VARS=''; echo "(non-voting) Nodepool integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt; }
+        || fail "(non-voting) Nodepool integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     ssh ${SF_HOST} ansible-playbook "--extra-vars='${EXTRA_VARS}'" /etc/ansible/health-check/zuul.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "(non-voting) Basic integration test SUCCESS"                        \
         || fail "(non-voting) Basic integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
