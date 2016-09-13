@@ -14,24 +14,24 @@
 <body ng-app="sfSettings" ng-controller="mainController">
     <div class="container">
         <h3>User {{user.username}} informations</h3>
-        <form ng-submit="save()"><table>
+        <form ng-submit="save()"><table width="80%">
             <tr data-toggle="tooltip" data-placement="right" title="The username is immutable!">
                 <td><label>Username</label></td>
-                <td><input type="text" ng-model="user.username" ng-disabled="true" /></td>
+                <td style="text-align: right"><input type="text" ng-model="user.username" ng-disabled="true" size=32 /></td>
             </tr>
             <tr>
                 <td><label>Full name</label></td>
-                <td><input type="text" ng-model="user.fullname" ng-disabled="user.idp_sync" /></td>
+                <td style="text-align: right"><input type="text" ng-model="user.fullname" ng-disabled="user.idp_sync" size=32  /></td>
             </tr>
             <tr>
                 <td><label>eMail</label></td>
-                <td><input type="text" ng-model="user.email" ng-disabled="user.idp_sync" /></td>
+                <td style="text-align: right"><input type="text" ng-model="user.email" ng-disabled="user.idp_sync" size=32  /></td>
             </tr>
             <tr data-toggle="tooltip" data-placement="bottom" title="When disabled, eMail and full name are not updated with Identity Provider data">
                 <td><label>Synchronize user data with the Identity Provider&nbsp;</label></td>
-                <td><input type="checkbox" ng-model="user.idp_sync" /></td>
+                <td style="text-align: right"><input type="checkbox" ng-model="user.idp_sync" /></td>
             </tr>
-            <tr><td style="text-align: center" colspan="2">
+            <tr><td style="text-align: right" colspan="2">
                 <input type="submit" value="Save" />
                 <div class="alert alert-success" ng-show="showSuccessAlert">
                     <strong>Saved!</strong> {{successTextAlert}}
@@ -45,5 +45,35 @@
             </td></tr>
         </table></form>
     </div>
+    <div class="container" id="api_key">
+        <h3>API key</h3>
+        <form ng-submit="regen_api_key()"><table width="80%">
+            <tr data-toggle="tooltip" data-placement="bottom" title="This key is personal and can be used with the sfmanager command line interface to perform allowed operations" >
+                <td><label>Key</label></td>
+                <td style="text-align: right" id="api_key_value">{{user.api_key}}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td style="text-align: right"><input type="submit" value="generate new API key"></td>
+            </tr>
+        </table></form>
+    </div>
+    <div class="container" id="gerrit_key">
+        <h3>Gerrit API key</h3>
+        <form><table width="80%">
+            <tr data-toggle="tooltip" data-placement="bottom" title="This key is personal and can be used with the Gerrit REST API to perform allowed operations" >
+                <td><label>Key</label></td>
+                <td style="text-align: right" id="gerrit_key_value">{{user.gerrit_api_key}}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td style="text-align: right">
+                    <button class="btn btn-success btn-xs" ng-if="htpasswd_set" ng-click="htpasswd_disable()">Disable</button>
+                    <button class="btn btn-default btn-xs" ng-if="!htpasswd_set" ng-click="htpasswd_enable()">Enable</button>
+                </td>
+            </tr>
+        </table></form>
+    </div>
+
 </body>
 </html>
