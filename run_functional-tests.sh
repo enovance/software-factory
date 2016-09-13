@@ -63,10 +63,14 @@ fi
 unset http_proxy
 unset https_proxy
 
+TECH_PREVIEW="elasticsearch job-logs-gearman-client job-logs-gearman-worker logstash kibana mirror"
+
 case "${TEST_TYPE}" in
     "functional")
-        # temporary adds elasticsearch and mirror until it's fully integrated
-        sed -i ${REFARCH_FILE} -e "s#      - murmur#      - murmur\n      - elasticsearch\n      - mirror\n      - job-logs-gearman-client\n      - job-logs-gearman-worker\n      - logstash\n      - kibana#"
+        # Add tech preview compenent until they are fully integrated in the refarch
+        DEST_REFARCH_FILE="/tmp/arch.yaml"
+        python -c "import sys,yaml;f=sys.argv[1];comps=sys.argv[2:];cont=yaml.load(file(f));cont['inventory'][0]['roles'].extend(comps);yaml.dump(cont,sys.stdout,default_flow_style=False,indent=4);" $REFARCH_FILE $TECH_PREVIEW > $DEST_REFARCH_FILE
+        REFARCH_FILE=$DEST_REFARCH_FILE
         lxc_init
         run_bootstraps
         run_serverspec_tests
@@ -94,7 +98,11 @@ case "${TEST_TYPE}" in
         lxc_init ${SF_PREVIOUS_VER}
         run_bootstraps
         run_provisioner
-        ssh sftests.com 'echo -e "  - elasticsearch\n  - job-logs-gearman-client\n  - job-logs-gearman-worker\n  - logstash\n  - kibana" >> /etc/puppet/hiera/sf/arch.yaml'
+        # modifying /etc/puppet/hiera/sf/_arch.yaml only needed for upgrade from 2.2.2 and 2.2.3
+        for ARCH_FILE in /etc/puppet/hiera/sf/_arch.yaml /etc/puppet/hiera/sf/arch.yaml; do
+            ssh sftests.com cp $ARCH_FILE ${ARCH_FILE}.before_techpreview_additions
+            ssh sftests.com "python -c \"import sys,yaml;f=sys.argv[1];comps=sys.argv[2:];cont=yaml.load(file(f));cont['inventory'][0]['roles'].extend(comps);yaml.dump(cont,file(f,'w'),default_flow_style=False,indent=4);\" $ARCH_FILE $TECH_PREVIEW"
+        done
         run_upgrade
         run_checker "checksum_warn_only"
         run_serverspec_tests
