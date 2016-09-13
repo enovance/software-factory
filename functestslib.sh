@@ -383,7 +383,6 @@ SCRIPT
         || { kill -9 $SSH_AGENT_PID; fail "sfconfig.sh failed" ${ARTIFACTS_DIR}/sfconfig.log; }
     kill -9 $SSH_AGENT_PID
     checkpoint "run_bootstraps"
-    fetch_bootstraps_data
 }
 
 function run_heat_bootstraps {

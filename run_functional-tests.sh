@@ -67,10 +67,11 @@ TECH_PREVIEW="elasticsearch job-logs-gearman-client job-logs-gearman-worker logs
 
 case "${TEST_TYPE}" in
     "functional")
-        # Add tech preview compenent until they are fully integrated in the refarch
+        # Add tech preview components until they are fully integrated in the refarch
         enable_arch_components locally $REFARCH_FILE "$TECH_PREVIEW"
         lxc_init
         run_bootstraps
+        fetch_bootstraps_data
         run_serverspec_tests
         run_health_base
         lxc_poweroff
@@ -82,6 +83,7 @@ case "${TEST_TYPE}" in
         lxc_stop
         lxc_init
         run_bootstraps
+        fetch_bootstraps_data
         run_backup_restore
         run_checker
         run_sfconfig
@@ -95,10 +97,11 @@ case "${TEST_TYPE}" in
         sed -i ${REFARCH_FILE} -e "s/.*storyboard.*//g"
         lxc_init ${SF_PREVIOUS_VER}
         run_bootstraps
-        run_provisioner
-        # Add tech preview compenents until they are fully integrated in the refarch
+        # Add tech preview components until they are fully integrated in the refarch
         TECH_PREVIEW="elasticsearch job-logs-gearman-client job-logs-gearman-worker logstash kibana"
         enable_arch_components remote /etc/puppet/hiera/sf/arch.yaml "$TECH_PREVIEW"
+        fetch_bootstraps_data
+        run_provisioner
         run_upgrade
         run_checker "checksum_warn_only"
         run_serverspec_tests
@@ -116,6 +119,7 @@ case "${TEST_TYPE}" in
     "gui")
         lxc_init
         run_bootstraps
+        fetch_bootstraps_data
         d=$DISPLAY
         pre_gui_tests
         run_gui_test guiTests tests/gui
@@ -128,6 +132,7 @@ case "${TEST_TYPE}" in
         . tests/gui/user_stories/user_stories
         lxc_init
         run_bootstraps
+        fetch_bootstraps_data
         d=$DISPLAY
         pre_gui_tests
         failed=0
