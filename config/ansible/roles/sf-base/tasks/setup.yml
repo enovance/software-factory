@@ -46,9 +46,6 @@
   copy: src={{ item }} dest=/usr/libexec/{{ item }} mode=0555
   with_items: [wait4port, wait4mariadb, wait4gerrit]
 
-- name: "puppet: add include statement (puppet: apply 'include ::sfbase) "
-  include: /etc/ansible/tasks/puppet.yml puppet_statement="include ::sfbase"
-
 - name: "rsyslog: configure ommail (mail output module)"
   template: src=mail-ssh-login.j2 dest=/etc/rsyslog.d/mail-ssh-login.conf
   register: rsyslog_config
@@ -66,6 +63,29 @@
       dest: "/srv/cauth_keys/pubkey.pem"
       mode: 0444
       setype: httpd_sys_content_t
+
+- name: "http: install crt"
+  copy:
+      content: "{{ gateway_crt }}"
+      dest: "/etc/pki/ca-trust/source/anchors/gateway.crt"
+      mode: 0644
+      owner: root
+      group: root
+  register: new_crt
+
+- name: "trust crt"
+  shell: update-ca-trust
+  register: new_cacert
+  when: new_crt|changed
+
+- name: "Update CA list for python-requests"
+  copy:
+      src: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+      dest: /usr/lib/python2.7/site-packages/requests/cacert.pem
+      mode: 0444
+      owner: root
+      group: root
+  when: new_cacert
 
 - name: "Set edeploy server ip address"
   lineinfile:
