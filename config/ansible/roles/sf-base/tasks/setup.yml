@@ -78,3 +78,24 @@
       dest: /var/lib/edeploy/conf
       regexp: ^RSERV_PORT=
       line: "RSERV_PORT={{ edeploy_service_port }}"
+
+- name: "ntpd: remove unused servers from ntp.conf"
+  lineinfile:
+      dest: /etc/ntp.conf
+      regexp: "^server [123].*$"
+      state: absent
+  register: ntp_config
+
+- name: "ntpd: add ntp server in ntp.conf"
+  replace:
+      dest: /etc/ntp.conf
+      regexp: "^server.*$"
+      replace: "server {{ network.ntp_main_server}}"
+  register: ntp_config
+
+- name: "ntpd: manage service"
+  service:
+      name: ntpd
+      enabled: true
+      state: restarted
+  when: ntp_config|changed
