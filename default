@@ -2,7 +2,7 @@
 title = Software Factory
 description = Software Factory and related projects
 [section "Needs final +2"]
-    query = status:open NOT label:Code-Review>=0,self label:Verified>=1,jenkins NOT label:Code-Review<=-1 label:Code-Review>=2 NOT label:Workflow<=-1 limit:50 (project:software-factory OR project:cauth OR project:managesf OR project:pysflib)
+    query = status:open NOT label:Code-Review>=0,self label:Verified>=1,jenkins NOT label:Code-Review<=-1 label:Code-Review>=1 NOT label:Workflow<=-1 limit:50 (project:software-factory OR project:cauth OR project:managesf OR project:pysflib)
 [section "Passed Jenkins, No Negative Feedback"]
     query = status:open NOT label:Code-Review>=0,self label:Verified>=1,jenkins NOT label:Code-Review<=-1 NOT label:Workflow<=-1 limit:50 (project:software-factory OR project:cauth OR project:managesf OR project:pysflib)
 [section "Wayward Changes"]
