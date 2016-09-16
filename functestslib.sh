@@ -495,24 +495,22 @@ import json
 import yaml
 import os
 import subprocess
-os.chdir('/root/config')
-f = 'policies/policy.yaml'
-commit = True
-if not os.path.isfile(f):
-    commit = False
-    f = "${IMAGE_PATH}/usr/local/share/sf-config-repo/policies/policy.yaml"
+import shutil
+os.chdir('/tmp')
+f = '/tmp/config/policies/policy.yaml'
+print "Cloning the config repo to adapt policies for tests..."
+subprocess.Popen(['git', 'clone', 'git+ssh://sftests.com/config'])
 d = yaml.load(open(f))
 d['managesf.project:create'] = 'rule:authenticated_api'
 d['managesf.project:delete'] = 'rule:authenticated_api'
 json.dump(d, file(f, 'w'), indent=1)
-if commit:
-    for cmd in [
-        ['git', 'add', 'policies'],
-        ['git', 'commit', '-m', 'test policy...'],
-        ['git', 'push', 'git+ssh://sftests.com/config', 'master']
-        ]:
-        subprocess.Popen(cmd).wait()
-print "POLICY: prepared policy to support project creation by any user..."
+for cmd in [
+    ['git', 'add', 'policies'],
+    ['git', 'commit', '-m', 'test policy...'],
+    ['git', 'push', 'git+ssh://sftests.com/config', 'master']]:
+    subprocess.Popen(cmd).wait()
+shutil.rmtree('/tmp/config', ignore_errors=True)
+print "Done."
 SCRIPT
 
     echo "[+] Running upgrade"
