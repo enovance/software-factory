@@ -45,7 +45,7 @@ def snapshot_if_failure(func):
         try:
             func(self, *args, **kwargs)
         except Exception as e:
-            path = '/tmp/gui/'
+            path = os.environ.get("SCREENSHOT_DIR", '/tmp/gui/')
             if not os.path.isdir(path):
                 os.makedirs(path)
             screenshot = os.path.join(path, '%s.png' % func.__name__)
