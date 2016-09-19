@@ -10,6 +10,11 @@
     RewriteRule ^(.*)$ /auth/login [R,NC,L]
     </LocationMatch>
 
+    # Don't login to Storyboard itself, use cauth instead
+    <LocationMatch "/storyboard_api/openid/">
+    RewriteEngine On
+    RewriteRule ^(.*)$ /auth/login [R,NC,L]
+    </LocationMatch>
 
     # TODO: make /issues/ location bug-tracker awar
     <Location "/issues/">
@@ -174,11 +179,6 @@
         # Make sure the access_token is set to username
         Header set Authorization "Bearer %{REMOTE_USER}e"
         Header set Cache-Control "no-cache, must-revalidate"
-        AuthType mod_auth_pubtkt
-        TKTAuthFakeBasicAuth on
-        TKTAuthLoginURL /auth/login
-        TKTAuthDebug 1
-        require valid-user
     </LocationMatch>
 
     <LocationMatch "^/dashboard">
