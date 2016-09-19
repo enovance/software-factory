@@ -29,8 +29,9 @@ bash ./rpm-test-requirements.sh
 
 TEST_TYPE="${1:-functional}"
 
-# Backward compatibility with jjb jobs
-[ ${TEST_TYPE} == "1node-allinone" ] && TEST_TYPE=$2
+if [ ${TEST_TYPE} == "gui" ] || [ ${TEST_TYPE} == "video_docs" ]; then
+    bash ./gui-test-requirements.sh
+fi
 
 REFARCH_FILE=${SF_ARCH:-$(pwd)/config/refarch/allinone.yaml}
 
@@ -47,6 +48,7 @@ display_head
 prepare_artifacts
 checkpoint "Running tests on $(hostname)"
 
+# Make sure things are stopped before moving on
 if [ ${TEST_TYPE} == "openstack" ]; then
     export BUILD_QCOW=1
     which ansible-playbook &> /dev/null || sudo pip install ansible
@@ -55,6 +57,7 @@ if [ ${TEST_TYPE} == "openstack" ]; then
 else
     lxc_stop
 fi
+post_gui_tests
 
 [ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
 
@@ -115,33 +118,20 @@ case "${TEST_TYPE}" in
     "gui")
         lxc_init
         run_bootstraps
-        d=$DISPLAY
         pre_gui_tests
         run_gui_test guiTests tests/gui
-        failed=$?
         post_gui_tests
-        DISPLAY=$d
-        if_gui_tests_failure $failed
         ;;
     "video_docs")
         . tests/gui/user_stories/user_stories
         lxc_init
         run_bootstraps
-        d=$DISPLAY
         pre_gui_tests
-        failed=0
-        for video_path in ${!user_stories[@]}; do
-            run_gui_test $video_path ${user_stories["$video_path"]}
-            a=$?
-            if [[ $a > $failed ]]; then
-                failed=$a
-            fi
-            # wait for tmux to be discarded
+        for story in ${!user_stories[@]}; do
+            run_gui_test $story ${user_stories["$story"]}
             sleep 5
         done
         post_gui_tests
-        DISPLAY=$d
-        if_gui_tests_failure $failed
         ;;
     *)
         echo "[+] Unknown test type ${TEST_TYPE}"

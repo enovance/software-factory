@@ -4,6 +4,12 @@
 
 export SF_HOST=${SF_HOST:-sftests.com}
 export SKIP_CLEAN_ROLES="y"
+export LC_CTYPE="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+export TERM=xterm
+# Disable TMUX environment to avoid conflict with gui tests
+unset TMUX
 
 MANAGESF_URL=https://${SF_HOST}
 JENKINS_URL="http://${SF_HOST}/jenkinslogs/${JENKINS_IP}:8081/"
@@ -256,13 +262,10 @@ function get_logs {
     # Copy relevant local file to artifacts_dir
     sudo cp ${IMAGE_PATH}.description ${ARTIFACTS_DIR}/image.description &> /dev/null
     sudo cp ${IMAGE_PATH}.description_diff ${ARTIFACTS_DIR}/image.description_diff &> /dev/null
-    [ -d /var/log/selenium ] && cp -r /var/log/selenium/ ${ARTIFACTS_DIR}/selenium
-    [ -d /var/log/Xvfb ] && cp -r /var/log/Xvfb/ ${ARTIFACTS_DIR}/Xvfb
-    cp -r /tmp/gui/ ${ARTIFACTS_DIR}/screenshots
 
     # Compress gui test
-    (ls /tmp/gui/*.avi 1> /dev/null 2>&1) && gzip -9 ${ARTIFACTS_DIR}/screenshots/*.avi
-    (ls /tmp/gui/*.mp* 1> /dev/null 2>&1) && gzip -9 ${ARTIFACTS_DIR}/screenshots/*.mp*
+    ls ${SCREENSHOT_DIR}/*.avi &> /dev/null && gzip -9 ${SCREENSHOT_DIR}/*.avi
+    ls ${SCREENSHOT_DIR}/*.mp* &> /dev/null && gzip -9 ${SCREENSHOT_DIR}/*.mp*
 
     sudo chown -R ${USER} ${ARTIFACTS_DIR}
     checkpoint "get_logs"
@@ -402,7 +405,7 @@ function run_heat_bootstraps {
 
 function prepare_functional_tests_utils {
     # TODO: replace this prepare_functional_tests_utils by a python-sfmanager package
-    cat ${PYSFLIB_CLONED_PATH}/requirements.txt ${SFMANAGER_CLONED_PATH}/requirements.txt tests/requirements.txt | sort | uniq | grep -v '\(requests\|pysflib\)' > ${ARTIFACTS_DIR}/test-requirements.txt
+    cat ${PYSFLIB_CLONED_PATH}/requirements.txt ${SFMANAGER_CLONED_PATH}/requirements.txt | sort | uniq | grep -v '\(requests\|pysflib\)' > ${ARTIFACTS_DIR}/test-requirements.txt
     (
         set -e
         cd ${PYSFLIB_CLONED_PATH}; pip install --user -r ${ARTIFACTS_DIR}/test-requirements.txt || {
@@ -560,46 +563,51 @@ function run_functional_tests {
 }
 
 function pre_gui_tests {
-    echo "$(date) ======= run_gui_tests"
+    export SCREENSHOT_DIR="${ARTIFACTS_DIR}/screenshots"
+    mkdir -p ${SCREENSHOT_DIR} ${SCREENSHOT_DIR}/debug
     echo "Starting Selenium server in background ..."
-    ( sudo sh -c '/usr/bin/java -jar /usr/lib/selenium/selenium-server.jar -host 127.0.0.1 >/var/log/selenium/selenium.log 2>/var/log/selenium/error.log' ) &
-    if [[ "$DISPLAY" == "localhost"* ]]; then
-        echo "X Forwarding detected"
-    else
-        echo "Starting Xvfb in background ..."
-        ( sudo sh -c 'Xvfb :99 -ac -screen 0 1920x1080x24 >/var/log/Xvfb/Xvfb.log 2>/var/log/Xvfb/error.log' ) &
+    /usr/bin/java -jar /usr/lib/selenium/selenium-server.jar -host 127.0.0.1 &> ${SCREENSHOT_DIR}/debug/selenium.log &
+    echo "Starting Xvfb in background ..."
+    Xvfb :99 -ac -screen 0 1920x1080x24 &> ${SCREENSHOT_DIR}/debug/Xvfb.log &
+    export DISPLAY=:99
+    sleep 3
+    if [ "$(jobs -p | wc -l)" != "2" ]; then
+        GUI_TEST_SUCCESS=0
+        echo "Xvfb or Selenium failed to start"
+        jobs
+        post_gui_tests
     fi
-    mkdir -p /tmp/gui/
 }
 
 function post_gui_tests {
     echo "Stopping Xvfb if running ..."
-    sudo pkill Xvfb
+    pkill Xvfb &> /dev/null
     echo "Stopping Selenium server ..."
-    for i in $(ps ax | grep selenium | awk '{print $1}'); do
-        sudo kill $i > /dev/null
+    for i in $(ps ax | grep selenium | grep -v grep | awk '{print $1}'); do
+        kill $i > /dev/null
     done
-}
-
-function run_gui_test {
-    export DISPLAY=:99
-    # if ffmpeg is installed on the system, record a video
-    command -v ffmpeg > /dev/null && tmux new-session -d -s guiTestRecording_$(tr -cd 0-9 </dev/urandom | head -c 3) 'export FFREPORT=file=/tmp/gui/ffmpeg-$(date +%Y%m%s).log && ffmpeg -f x11grab -video_size 1920x1080 -i 127.0.0.1'$DISPLAY' -codec:v mpeg4 -r 16 -vtag xvid -q:v 8 /tmp/gui/'$1'.avi && sleep 5'
-    export LC_CTYPE="en_US.UTF-8"
-    export LC_ALL="en_US.UTF-8"
-    export LANG="en_US.UTF-8"
-    locale
-    nosetests --with-timer --with-xunit -v $2
-    failed=$?
-    # stop recording by sending q to ffmpeg process
-    command -v ffmpeg > /dev/null && tmux send-keys -t guiTestRecording q
-    return $failed
-}
-
-function if_gui_tests_failure {
-    if [[ "$1" == "1" ]]; then
-        fail "GUI tests failed" ${ARTIFACTS_DIR}/gui-tests.debug
+    if [ "${GUI_TEST_SUCCESS}" == "0" ]; then
+        more ${SCREENSHOT_DIR}/debug/selenium.log ${SCREENSHOT_DIR}/debug/Xvfb.log | cat
+        fail "GUI tests failed"
     fi
+}
+
+GUI_TEST_SUCCESS=1
+function run_gui_test {
+    echo "$(date) ======= run_gui_test:$1"
+    [ -z "${SKIP_RECORDING}" ] && {
+        tmux kill-session -t guiTestRecording &> /dev/null
+        REPORT="FFREPORT=file=${SCREENSHOT_DIR}/debug/ffmpeg-$(date +%Y%m%s).log"
+        FFMPEG="ffmpeg -f x11grab -video_size 1920x1080 -i 127.0.0.1$DISPLAY -codec:v mpeg4 -r 16 -vtag xvid -q:v 8"
+        CMD="${REPORT} ${FFMPEG} ${SCREENSHOT_DIR}/$1.avi"
+        tmux new-session -d -s guiTestRecording "${CMD}"
+        # Give a few second for ffmpeg to start
+        sleep 4
+    }
+    nosetests --with-timer --with-xunit -s -v $2 || GUI_TEST_SUCCESS=0
+    # stop recording by sending q to ffmpeg process
+    [ -z "${SKIP_RECORDING}" ] && tmux send-keys -t guiTestRecording q
+    checkpoint "run_gui_test:$1"
 }
 
 function run_serverspec_tests {
