@@ -2,4 +2,3 @@ bash8
 tox
 nose
 nose-timer
-selenium
