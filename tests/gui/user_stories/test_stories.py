@@ -19,6 +19,7 @@ import codecs
 import json
 import os
 import subprocess
+import time
 from unittest import skipIf
 
 try:
@@ -33,13 +34,8 @@ from tests.functional import config
 from tests.functional import utils
 
 
+rdir = os.environ.get("SCREENSHOT_DIR", '/tmp/gui/')
 test_project = "DemoProject"
-
-
-ENV = os.environ
-ENV['LANG'] = 'en_US.UTF-8'
-ENV['LC_CTYPE'] = ENV['LANG']
-
 
 writer = codecs.getwriter('utf8')
 
@@ -55,58 +51,53 @@ class MockMovie:
 class ShellRecorder(BaseGuiTest):
 
     def make_reel(self, session_name):
-        reel = subprocess.Popen('tmux new-session -d -s %s' % session_name,
-                                stdout=writer(subprocess.PIPE),
-                                stderr=subprocess.PIPE,
-                                shell=True, env=ENV)
-        return reel
+        if 'REQUESTS_CA_BUNDLE' in os.environ:
+            subprocess.Popen(['tmux', 'setenv', '-g', 'REQUESTS_CA_BUNDLE',
+                              os.environ['REQUESTS_CA_BUNDLE']]).wait()
+        subprocess.Popen(['tmux', 'new-session', '-d', '-s',
+                          session_name]).wait()
 
     def start_movie(self, session_name, title, output_file):
-        asciinema_cmd = 'asciinema rec -c "tmux attach -t %s"' % session_name
-        asciinema_cmd += ' -y -t "%s"' % title
-        asciinema_cmd += ' %s' % output_file
+        asciinema_cmd = [
+            'asciinema', 'rec', '-c', "tmux attach -t %s" % session_name,
+            '-y', '-t', title, output_file
+        ]
         movie = subprocess.Popen(asciinema_cmd,
                                  stdout=writer(subprocess.PIPE),
-                                 stderr=subprocess.PIPE,
-                                 shell=True,
-                                 env=ENV)
+                                 stderr=subprocess.PIPE)
         return movie
 
     def start_display(self, session_name):
-        ENV.update({'DISPLAY': ':99', })
-        xterm = 'xterm -u8 -e "tmux attach -t %s"'
-        display = subprocess.Popen(xterm % session_name,
-                                   stdout=writer(subprocess.PIPE),
-                                   stderr=subprocess.PIPE,
-                                   shell=True,
-                                   env=ENV)
-        return display
+        return subprocess.Popen(['xterm', '-u8', '-e',
+                                 "tmux attach -t %s" % session_name])
 
     def record(self, session_name, title, output_file):
-        reel = self.make_reel(session_name)
+        self.make_reel(session_name)
         display = self.start_display(session_name)
         movie = self.start_movie(session_name, title, output_file)
-        return reel, display, movie
+        return display, movie
 
-    def stop_recording(self, session_name, reel, display, movie, output_file):
+    def stop_recording(self, session_name, display, movie, output_file):
         spielbash.TmuxSendKeys(session_name, 'exit')
         spielbash.TmuxSendKeys(session_name, 'C-m')
-        reel.communicate('exit')
-        out, err = movie.communicate()
-        print out
-        print err
-        display.communicate()
+        movie.wait()
+        j = None
         with open(output_file, 'r') as m:
             j = json.load(m)
+        if j is None:
+            print "[ERROR] couldn't find asciinema json file"
+            return
         if not j.get('width'):
+            print "[WARNING] asciinema json file is missing width"
             j['width'] = 80
         if not j.get('height'):
+            print "[WARNING] asciinema json file is missing height"
             j['height'] = 25
         with open(output_file, 'w') as m:
             json.dump(j, m)
 
     def play_scene(self, session_name, scene, mock_movie):
-        spielbash.pause(0.4)
+        time.sleep(0.4)
         s = None
         if 'action' in scene:
             s = spielbash.Scene(scene['name'], scene.get('action', ''),
@@ -184,25 +175,31 @@ class TestAdministratorTasks(ShellRecorder):
                "next to the project on which your user will work.")
         with caption(self.driver, msg):
             mgmt_btn_xpath = '//table/tbody/tr[td="%s"]/td[4]/button[1]'
-            self.highlight_by_xpath(mgmt_btn_xpath % test_project).click()
+            b = self.highlight_by_xpath(mgmt_btn_xpath % test_project)
+            self.assertNotEqual(b, None)
+            b.click()
 
         msg = ("Look for the user to add in the search box.")
         with caption(self.driver, msg):
             user_search_xpath = (".//*[@id='modal_create_members']/div/div/"
                                  "form/div[1]/input")
             searchbox = self.highlight_by_xpath(user_search_xpath)
+            self.assertNotEqual(searchbox, None)
             searchbox.send_keys(config.USER_2)
 
         msg = ("The user appears in the list below the search box.")
         with caption(self.driver, msg):
             user_found = (".//*[@id='modal_create_members']/div/div/form/"
                           "div[1]/table/tbody/tr[contains(.,'%s')]")
-            self.highlight_by_xpath(user_found % config.USER_2)
+            u = self.highlight_by_xpath(user_found % config.USER_2)
+            self.assertNotEqual(u, None)
 
         msg = ("Let's add the user as a Core Developer...")
         with caption(self.driver, msg):
             core_btn = (user_found + "/td[3]/input")
-            self.highlight_by_xpath(core_btn % config.USER_2).click()
+            b = self.highlight_by_xpath(core_btn % config.USER_2)
+            self.assertNotEqual(b, None)
+            b.click()
 
         msg = ("...And submit it.")
         with caption(self.driver, msg):
@@ -229,15 +226,15 @@ class TestAdministratorTasks(ShellRecorder):
              'line': 'Now we can switch to the GUI...'},
         ]
         session_name = 'create_project_from_CLI'
-        r, d, m = self.record(session_name,
-                              'Create a project from the CLI',
-                              '/tmp/gui/create_project_from_CLI.json')
+        d, m = self.record(session_name,
+                           'Create a project from the CLI',
+                           '%s/create_project_from_CLI.json' % rdir)
         mock_movie = MockMovie()
         for scene in scenes:
             self.play_scene(session_name, scene, mock_movie)
 
-        self.stop_recording(session_name, r, d, m,
-                            '/tmp/gui/create_project_from_CLI.json')
+        self.stop_recording(session_name, d, m,
+                            '%s/create_project_from_CLI.json' % rdir)
 
         self.driver.get(config.GATEWAY_URL)
         self.login_as(config.ADMIN_USER, config.ADMIN_PASSWORD)
@@ -245,7 +242,7 @@ class TestAdministratorTasks(ShellRecorder):
         self.driver.get("%s/dashboard/" % config.GATEWAY_URL)
         with loading_please_wait(self.driver):
             project = self.highlight_link(test_project)
-            spielbash.pause(0.5)
+            time.sleep(0.5)
             project.click()
 
     @skipIf(spielbash is None,
@@ -272,15 +269,15 @@ class TestAdministratorTasks(ShellRecorder):
              'line': 'Now we can switch to the GUI...'},
         ]
         session_name = 'add_user_to_project_from_CLI'
-        r, d, m = self.record(session_name,
-                              'add user to project from the CLI',
-                              '/tmp/gui/add_user_to_project_from_CLI.json')
+        d, m = self.record(session_name,
+                           'add user to project from the CLI',
+                           '%s/add_user_to_project_from_CLI.json' % rdir)
         mock_movie = MockMovie()
         for scene in scenes:
             self.play_scene(session_name, scene, mock_movie)
 
-        self.stop_recording(session_name, r, d, m,
-                            '/tmp/gui/add_user_to_project_from_CLI.json')
+        self.stop_recording(session_name, d, m,
+                            '%s/add_user_to_project_from_CLI.json' % rdir)
 
         self.driver.get(config.GATEWAY_URL)
         self.login_as(config.ADMIN_USER, config.ADMIN_PASSWORD)
@@ -289,12 +286,14 @@ class TestAdministratorTasks(ShellRecorder):
         with loading_please_wait(self.driver):
             mgmt_btn_xpath = '//table/tbody/tr[td="%s"]/td[4]/button[1]'
             u = self.highlight_by_xpath(mgmt_btn_xpath % test_project)
-            spielbash.pause(0.5)
+            self.assertNotEqual(u, None)
+            time.sleep(0.5)
             u.click()
             user_found = (".//*[@id='modal_create_members']/div/div/form/"
                           "div[1]/table/tbody/tr[contains(.,'%s')]")
-            self.highlight_by_xpath(user_found % config.USER_2)
-            spielbash.pause(1)
+            u = self.highlight_by_xpath(user_found % config.USER_2)
+            self.assertNotEqual(u, None)
+            time.sleep(1)
 
     @skipIf(spielbash is None,
             'missing spielbash dependency')
@@ -345,15 +344,15 @@ class TestAdministratorTasks(ShellRecorder):
              'line': 'Now on to Gerrit...'}, ]
 
         session_name = 'prepare_dev_env'
-        r, d, m = self.record(session_name,
-                              'prepare the dev environment',
-                              '/tmp/gui/prepare_dev_env.json')
+        d, m = self.record(session_name,
+                           'prepare the dev environment',
+                           '%s/prepare_dev_env.json' % rdir)
         mock_movie = MockMovie()
         for scene in scenes:
             self.play_scene(session_name, scene, mock_movie)
 
-        self.stop_recording(session_name, r, d, m,
-                            '/tmp/gui/prepare_dev_env.json')
+        self.stop_recording(session_name, d, m,
+                            '%s/prepare_dev_env.json' % rdir)
 
         with open('/tmp/user2_rsa.pub') as f:
             ssh_key = f.read()
@@ -368,10 +367,10 @@ class TestAdministratorTasks(ShellRecorder):
         msg = 'Click on the user settings page.'
         with caption(self.driver, msg):
             panel = self.highlight("div.menuBarUserNamePanel")
-            spielbash.pause(1)
+            time.sleep(1)
             panel.click()
             settings = self.highlight_link("Settings")
-            spielbash.pause(1)
+            time.sleep(1)
             settings.click()
 
         msg = 'Click on "SSH public keys" then "Add key".'
