@@ -33,13 +33,8 @@ from tests.functional import config
 from tests.functional import utils
 
 
+rdir = os.environ.get("SCREENSHOT_DIR", '/tmp/gui/')
 test_project = "DemoProject"
-
-
-ENV = os.environ
-ENV['LANG'] = 'en_US.UTF-8'
-ENV['LC_CTYPE'] = ENV['LANG']
-
 
 writer = codecs.getwriter('utf8')
 
@@ -58,7 +53,7 @@ class ShellRecorder(BaseGuiTest):
         reel = subprocess.Popen('tmux new-session -d -s %s' % session_name,
                                 stdout=writer(subprocess.PIPE),
                                 stderr=subprocess.PIPE,
-                                shell=True, env=ENV)
+                                shell=True, env=os.environ)
         return reel
 
     def start_movie(self, session_name, title, output_file):
@@ -69,17 +64,16 @@ class ShellRecorder(BaseGuiTest):
                                  stdout=writer(subprocess.PIPE),
                                  stderr=subprocess.PIPE,
                                  shell=True,
-                                 env=ENV)
+                                 env=os.environ)
         return movie
 
     def start_display(self, session_name):
-        ENV.update({'DISPLAY': ':99', })
         xterm = 'xterm -u8 -e "tmux attach -t %s"'
         display = subprocess.Popen(xterm % session_name,
                                    stdout=writer(subprocess.PIPE),
                                    stderr=subprocess.PIPE,
                                    shell=True,
-                                   env=ENV)
+                                   env=os.environ)
         return display
 
     def record(self, session_name, title, output_file):
@@ -231,13 +225,13 @@ class TestAdministratorTasks(ShellRecorder):
         session_name = 'create_project_from_CLI'
         r, d, m = self.record(session_name,
                               'Create a project from the CLI',
-                              '/tmp/gui/create_project_from_CLI.json')
+                              '%s/create_project_from_CLI.json' % rdir)
         mock_movie = MockMovie()
         for scene in scenes:
             self.play_scene(session_name, scene, mock_movie)
 
         self.stop_recording(session_name, r, d, m,
-                            '/tmp/gui/create_project_from_CLI.json')
+                            '%s/create_project_from_CLI.json' % rdir)
 
         self.driver.get(config.GATEWAY_URL)
         self.login_as(config.ADMIN_USER, config.ADMIN_PASSWORD)
@@ -274,13 +268,13 @@ class TestAdministratorTasks(ShellRecorder):
         session_name = 'add_user_to_project_from_CLI'
         r, d, m = self.record(session_name,
                               'add user to project from the CLI',
-                              '/tmp/gui/add_user_to_project_from_CLI.json')
+                              '%s/add_user_to_project_from_CLI.json' % rdir)
         mock_movie = MockMovie()
         for scene in scenes:
             self.play_scene(session_name, scene, mock_movie)
 
         self.stop_recording(session_name, r, d, m,
-                            '/tmp/gui/add_user_to_project_from_CLI.json')
+                            '%s/add_user_to_project_from_CLI.json' % rdir)
 
         self.driver.get(config.GATEWAY_URL)
         self.login_as(config.ADMIN_USER, config.ADMIN_PASSWORD)
@@ -347,13 +341,13 @@ class TestAdministratorTasks(ShellRecorder):
         session_name = 'prepare_dev_env'
         r, d, m = self.record(session_name,
                               'prepare the dev environment',
-                              '/tmp/gui/prepare_dev_env.json')
+                              '%s/prepare_dev_env.json' % rdir)
         mock_movie = MockMovie()
         for scene in scenes:
             self.play_scene(session_name, scene, mock_movie)
 
         self.stop_recording(session_name, r, d, m,
-                            '/tmp/gui/prepare_dev_env.json')
+                            '%s/prepare_dev_env.json' % rdir)
 
         with open('/tmp/user2_rsa.pub') as f:
             ssh_key = f.read()
