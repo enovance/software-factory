@@ -45,7 +45,7 @@ def snapshot_if_failure(func):
         try:
             func(self, *args, **kwargs)
         except Exception as e:
-            path = '/tmp/gui/'
+            path = os.environ.get("SCREENSHOT_DIR", '/tmp/gui/')
             if not os.path.isdir(path):
                 os.makedirs(path)
             screenshot = os.path.join(path, '%s.png' % func.__name__)
@@ -72,6 +72,8 @@ def loading_please_wait(driver):
 
 class BaseGuiTest(unittest.TestCase):
     def setUp(self):
+        if "TMUX" in os.environ:
+            del os.environ["TMUX"]
         self.driver = webdriver.Firefox()
         self.driver.maximize_window()
         self.driver.implicitly_wait(20)
@@ -95,9 +97,17 @@ class BaseGuiTest(unittest.TestCase):
                 switch = self.driver.find_element_by_name('username')
             except ElementNotVisibleException:
                 count += 1
-        self.driver.find_element_by_name("username").send_keys(username)
-        self.driver.find_element_by_name("password").send_keys(passwd)
-        self.driver.find_element_by_name("password").submit()
+        try:
+            self.driver.find_element_by_name("username").send_keys(username)
+        except ElementNotVisibleException:
+            print "Couldn't find username element"
+            raise
+        try:
+            self.driver.find_element_by_name("password").send_keys(passwd)
+            self.driver.find_element_by_name("password").submit()
+        except ElementNotVisibleException:
+            print "Couldn't find password element"
+            raise
 
     def _highlight_element(self, element):
         style = element.get_attribute('style')
@@ -124,5 +134,9 @@ class BaseGuiTest(unittest.TestCase):
         return self._highlight_element(element)
 
     def highlight_by_xpath(self, xpath):
-        element = self.driver.find_element_by_xpath(xpath)
+        try:
+            element = self.driver.find_element_by_xpath(xpath)
+        except NoSuchElementException:
+            print "[ERROR] NoSuchElementException: xpath %s" % xpath
+            return None
         return self._highlight_element(element)
