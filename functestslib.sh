@@ -244,49 +244,26 @@ function get_logs {
     #This delay is used to wait a bit before fetching log file from hosts
     #in order to not avoid so important logs that can appears some seconds
     #after a failure.
+    sleep 2
     set +e
+
+    # Run get_logs from install-server and copy resulting logs
+    ssh sftests.com ansible-playbook /etc/ansible/get_logs.yml &> ${ARTIFACTS_DIR}/get_logs.log && \
+    rsync -avi sftests.com:sf-logs/ ${ARTIFACTS_DIR}/ &>> ${ARTIFACTS_DIR}/get_logs.log || {
+        cat ${ARTIFACTS_DIR}/get_logs.log; echo "get_logs failed...";
+    }
+
+    # Copy relevant local file to artifacts_dir
     sudo cp ${IMAGE_PATH}.description ${ARTIFACTS_DIR}/image.description &> /dev/null
     sudo cp ${IMAGE_PATH}.description_diff ${ARTIFACTS_DIR}/image.description_diff &> /dev/null
-    ssh sftests.com hostname > /dev/null && {
-        echo "Collecting log from test instance"
-        sleep 1
-        (
-        scp sftests.com:/var/log/messages ${ARTIFACTS_DIR}/
-        scp sftests.com:/var/log/audit/audit.log ${ARTIFACTS_DIR}/
-        ssh sftests.com ps auxZ | grep -i 'unconfin' > ${ARTIFACTS_DIR}/unconfined_process.txt
-        scp sftests.com:/var/log/upgrade-bootstrap.log ${ARTIFACTS_DIR}/
-        scp sftests.com:/var/log/cloud-init* ${ARTIFACTS_DIR}/
-        scp sftests.com:/var/log/puppet_apply.log ${ARTIFACTS_DIR}/
-        scp -r sftests.com:/home/gerrit/site_path/logs/ ${ARTIFACTS_DIR}/gerrit/
-        scp -r sftests.com:/home/gerrit/site_path/etc/*.config ${ARTIFACTS_DIR}/gerrit/
-        scp -r sftests.com:/usr/share/redmine/log/ ${ARTIFACTS_DIR}/redmine/
-        scp -r sftests.com:/usr/share/redmine/config ${ARTIFACTS_DIR}/redmine/
-        scp -r sftests.com:/var/log/managesf/ ${ARTIFACTS_DIR}/managesf/
-        scp -r sftests.com:/var/log/cauth/ ${ARTIFACTS_DIR}/cauth/
-        scp -r sftests.com:/var/log/gerritbot/ ${ARTIFACTS_DIR}/gerritbot/
-        scp sftests.com:/var/log/fakeircd.log ${ARTIFACTS_DIR}/gerritbot/ || true
-        scp sftests.com:/var/www/managesf/config.py ${ARTIFACTS_DIR}/managesf/
-        scp sftests.com:/var/www/cauth/config.py ${ARTIFACTS_DIR}/cauth/
-        scp -r sftests.com:/var/log/httpd/ ${ARTIFACTS_DIR}/httpd/
-        scp -r sftests.com:/var/log/zuul/ ${ARTIFACTS_DIR}/zuul/
-        scp sftests.com:/etc/zuul/* ${ARTIFACTS_DIR}/zuul/
-        scp -r sftests.com:/var/log/nodepool/ ${ARTIFACTS_DIR}/nodepool/
-        scp sftests.com:/etc/nodepool/*.yaml ${ARTIFACTS_DIR}/nodepool/
-        scp -r sftests.com:/var/lib/jenkins/jobs/ ${ARTIFACTS_DIR}/jenkins-jobs/
-        scp sftests.com:/var/lib/jenkins/*.xml ${ARTIFACTS_DIR}/jenkins/
-        scp -r sftests.com:/root/config/ ${ARTIFACTS_DIR}/config-project
-        scp -r sftests.com:/etc/puppet/hiera/sf/ ${ARTIFACTS_DIR}/hiera
-        scp -r sftests.com:/var/log/mariadb/ ${ARTIFACTS_DIR}/mariadb
-        scp -r sftests.com:/root/sf-bootstrap-data/hiera/ ${ARTIFACTS_DIR}/sf-bootstrap-data-hiera
-        cp -r /var/log/selenium/ ${ARTIFACTS_DIR}/selenium
-        cp -r /var/log/Xvfb/ ${ARTIFACTS_DIR}/Xvfb
-        cp -r /tmp/gui/ ${ARTIFACTS_DIR}/screenshots
-        (ls /tmp/gui/*.avi 1> /dev/null 2>&1) && gzip -9 ${ARTIFACTS_DIR}/screenshots/*.avi
-        (ls /tmp/gui/*.mp* 1> /dev/null 2>&1) && gzip -9 ${ARTIFACTS_DIR}/screenshots/*.mp*
-        ) || true &> /dev/null
-    } || echo "Skip fetching logs..."
-    # get config repo git logs
-    ssh sftests.com "cd /root/config && git log --name-only" > ${ARTIFACTS_DIR}/config-project.git.log
+    [ -d /var/log/selenium ] && cp -r /var/log/selenium/ ${ARTIFACTS_DIR}/selenium
+    [ -d /var/log/Xvfb ] && cp -r /var/log/Xvfb/ ${ARTIFACTS_DIR}/Xvfb
+    cp -r /tmp/gui/ ${ARTIFACTS_DIR}/screenshots
+
+    # Compress gui test
+    (ls /tmp/gui/*.avi 1> /dev/null 2>&1) && gzip -9 ${ARTIFACTS_DIR}/screenshots/*.avi
+    (ls /tmp/gui/*.mp* 1> /dev/null 2>&1) && gzip -9 ${ARTIFACTS_DIR}/screenshots/*.mp*
+
     sudo chown -R ${USER} ${ARTIFACTS_DIR}
     checkpoint "get_logs"
 }
