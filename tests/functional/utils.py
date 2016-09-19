@@ -179,7 +179,6 @@ class Tool:
         if cwd:
             os.chdir(cwd)
         try:
-            self.env['LC_ALL'] = 'en_US.UTF-8'
             output = subprocess.check_output(
                 cmd, stderr=subprocess.STDOUT,
                 env=self.env)
