@@ -4,6 +4,11 @@
 
     RewriteMap base64helper "prg:/usr/local/sbin/base64helper"
 
+    #Flush javascript from cache every 12 hours
+    <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "max-age=43200, public"
+    </FilesMatch>
+
     # Don't login to Redmine itself, use cauth instead
     <LocationMatch "/redmine/login">
     RewriteEngine On
