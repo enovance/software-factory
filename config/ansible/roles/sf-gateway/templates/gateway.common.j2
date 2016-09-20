@@ -4,6 +4,11 @@
 
     RewriteMap base64helper "prg:/usr/local/sbin/base64helper"
 
+    # Disable caching of static files
+    <LocationMatch */static>
+    CacheDisable on
+    </LocationMatch>
+
     # Don't login to Redmine itself, use cauth instead
     <LocationMatch "/redmine/login">
     RewriteEngine On
