@@ -42,6 +42,7 @@
     - restart postfix
 
 - name: "postfix: manage virtual file"
+  register: postfix_virtual
   template:
     src: virtual.j2
     dest: /etc/postfix/virtual
@@ -50,6 +51,7 @@
     mode: 0644
 
 - name: "postfix: generate virtual database"
+  when: postfix_virtual|changed
   shell: /usr/sbin/postmap /etc/postfix/virtual
   notify:
     - restart postfix
