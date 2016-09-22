@@ -2,10 +2,10 @@
 #
 
 # Current development version of SF
-VER=2.2.5
+VER=2.2.6
 
 # Version string
-PREVIOUS_VER=2.2.4
+PREVIOUS_VER=2.2.5
 SF_PREVIOUS_VER=C7.0-${PREVIOUS_VER}
 
 # A tagged release of SF is defined by the string "TaggedRelease" in the commit msg
@@ -13,13 +13,13 @@ REL_VER=$(git log --simplify-merges -n 1 | grep -i 'TaggedRelease:' | awk '{ pri
 if [ ! -z "${REL_VER}" ]; then
     echo "This is release: ${REL_VER}."
     VER=${REL_VER}
-    SF_PREVIOUS_VER=C7.0-2.2.2
+    SF_PREVIOUS_VER=C7.0-2.2.4
     echo "Previous stable version is ${SF_PREVIOUS_VER}"
     TAGGED_RELEASE=1
     # Pinned versions of the subprojects to go with the current release
-    PYSFLIB_PINNED_VERSION=46c90a6a334d0487acd9fe38561b7b325ed47e54
-    MANAGESF_PINNED_VERSION=2c48c5de3d37a8be2325c7d7971016200bcb7d53
-    CAUTH_PINNED_VERSION=b23c114f918892ea36e24072bda1be79b44a8f18
+    PYSFLIB_PINNED_VERSION=5f0fb72a6f495f329374057e4b93d7e54bc4ef91
+    MANAGESF_PINNED_VERSION=fcc87a1e986921a720f932a95cba98dd14630e70
+    CAUTH_PINNED_VERSION=796266b6240ad3b4642a41bb3e550d3c548c256d
     SFMANAGER_PINNED_VERSION=8a1256a19644b611abeda87bfc6b390d2dadc686
 else
     TAGGED_RELEASE=0
