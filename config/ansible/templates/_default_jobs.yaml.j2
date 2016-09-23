@@ -112,6 +112,10 @@
 
           echo "[+] Checking syntax errors in policy file"
           python -c "import yaml; yaml.safe_load(open('policies/policy.yaml'))"
+
+          echo "[+] Checking resources changes"
+          /usr/local/bin/resources.sh validate
+
     triggers:
       - zuul
     node: master
