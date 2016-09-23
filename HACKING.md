@@ -3,16 +3,29 @@ Software Factory coding guidelines
 
 This is a list of good practices to fix and follow:
 
+
+# Commit
+
+* Prefix commit's title by the affected component, e.g.:
+  * A change in a role: "role_name: the change"
+  * A fix in test: "tests: what it fixes"
+  * A general ansible refactor: "ansible: ..."
+  * A new option: "sfconfig: add this option"
+  * A documentation change: "docs: ..."
+
+* Adds a release note when appropriate: "reno new"
+
+
 # System
 
 ## Service user
 
-* Do not use root user to run a service or action of any kind.
+* Do not use root user to run a service or an action of any kind.
   Instead always create a user:
     - include: /etc/ansible/tasks/create_user.yml user_name=mirror2swift
 
   Then either configure the service to run as this user, either
-  perform ansible task using:
+  perform an ansible task using:
     - name: "Update mirrors"
       become: true
       become_user: mirror2swift
@@ -22,10 +35,10 @@ This is a list of good practices to fix and follow:
 
 * Logs shall be written to /var/log
 * Service state data shall be written to /var/lib
-* Most file do not need write permission, use 0444 for regular and 0555 for executable.
+* Most files do not need write permission, use 0444 for regular and 0555 for executable.
   This adds a nice extra layer of protection against invalid modification.
 * Never give ownership to the service user unless the file can be edited. Always use root:root.
-* When a configuration contain secret, use 0440 with root:$servicename
+* When a configuration contains secret, use 0440 with root:$servicename
 
 ## Run action as root
 
