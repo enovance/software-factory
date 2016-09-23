@@ -1,0 +1,55 @@
+#!/bin/bash
+
+set -e
+
+SPASS={{ creds_sf_service_user_pwd }}
+FQDN={{ fqdn }}
+
+
+[ -z "$1" ] && {
+    echo "Valable arguments are validate, apply, get. Exit."
+    exit 1
+}
+
+curl -s -X POST -c /tmp/cookie --data '{"back": "/", "method": "Password", "args": {"username": "_SF_SERVICE_USER_", "password": "'$SPASS'"}}' \
+ -H "Content-Type: application/json" http://$FQDN/auth/login/
+[ ! -f /tmp/cookie ] && {
+    echo "Unable to get a cookie ..."
+    exit 1
+}
+case $1 in
+    validate)
+        [ -z "$ZUUL_URL" -o -z "$ZUUL_REF" ] && {
+            echo "ZUUL_URL and ZUUL_REF need to set. Exit."
+            exit 1
+        }
+        http_code=$(curl -s -w "%{http_code}" -b /tmp/cookie -H "Content-Type: application/json" \
+         -d '{"zuul_url": "'$ZUUL_URL'/config", "zuul_ref": "'$ZUUL_REF'"}' \
+         -X POST http://$FQDN/manage/resources/ -o /tmp/validated-output)
+        cat /tmp/validated-output | python -m json.tool
+        rm /tmp/validated-output
+        [ "$http_code" != "200" ] && {
+            echo "Resource modifications validation failed (API return code: $http_code)."
+            exit 1
+        }
+        exit 0
+        ;;
+    apply)
+        http_code=$(curl -s -w "%{http_code}" -b /tmp/cookie \
+         -X PUT http://$FQDN/manage/resources/ -o /tmp/applied-output)
+        cat /tmp/applied-output | python -m json.tool
+        rm /tmp/applied-output
+        [ "$http_code" != "201" ] && {
+            echo "Resource modifications apply failed (API return code: $http_code)."
+            exit 1
+        }
+        exit 0
+        ;;
+    get)
+        curl -s -b /tmp/cookie http://$FQDN/manage/resources/ | python -m json.tool
+        ;;
+    *)
+        echo "Action not supported."
+        ;;
+esac
+
