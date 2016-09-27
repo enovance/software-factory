@@ -9,4 +9,4 @@
   include_vars: /etc/puppet/hiera/sf/sfconfig.yaml
 
 - name: Trigger init config repo with the upgrade option
-  shell: /usr/local/bin/init-config-repo.sh upgrade {{ fqdn }}
+  shell: /usr/local/bin/upgrade-config-repo.sh {{ fqdn }}
