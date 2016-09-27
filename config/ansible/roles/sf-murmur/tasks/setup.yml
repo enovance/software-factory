@@ -1,13 +1,20 @@
 ---
-- group: name=murmur
+- name: Create group
+  group: name=murmur
 
-- user: name=murmur group=murmur shell=/sbin/nologin home=/var/lib/murmur
+- name: Create user
+  user: name=murmur group=murmur shell=/sbin/nologin home=/var/lib/murmur
 
-- file: path=/var/log/murmur state=directory mode=0750 owner=murmur group=murmur
+- name: Create log directory
+  file: path=/var/log/murmur state=directory mode=0750 owner=murmur group=murmur
 
-- template: src=../files/murmur.ini.j2 dest=/etc/murmur.ini owner=murmur group=murmur mode=0400
+- name: Install config file
+  template: src=../files/murmur.ini.j2 dest=/etc/murmur.ini owner=murmur group=murmur mode=0400
+  register: murmur_config
 
-- name: Super user password
+- name: Manage service
+  service: name=murmurd state=restarted enabled=yes
+  when: murmur_config|changed
+
+- name: Set super user password
   command: /usr/local/murmur/murmur.x86 -ini /etc/murmur.ini -supw {{ mumble['super_user_password'] }}
-
-- service: name=murmurd state=restarted enabled=yes
