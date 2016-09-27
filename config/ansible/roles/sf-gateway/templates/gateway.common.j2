@@ -12,6 +12,11 @@
 
 
     # TODO: make /issues/ location bug-tracker awar
+    <Location "/rb/">
+        RewriteEngine On
+        RewriteRule "/rb/(.*$)" "{{ redmine_internal_url }}/rb/$1" [P]
+    </Location>
+
     <Location "/issues/">
         RewriteEngine On
         RewriteRule "/issues(.*$)" "/redmine/issues/$1" [R]
@@ -20,6 +25,7 @@
     <Location /redmine/>
         ProxyPassReverse /
 
+        ProxyHTMLURLMap {{ redmine_internal_url }} /redmine/
         ProxyHTMLURLMap /           /redmine/
         ProxyHTMLURLMap /redmine/   /redmine/
 
