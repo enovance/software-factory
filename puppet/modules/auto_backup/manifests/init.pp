@@ -40,7 +40,7 @@ class auto_backup {
   }
 
   cron {'auto_backup':
-    command     => '/usr/local/bin/export_backup_swift.sh',
+    command     => '/usr/local/bin/export_backup_swift.sh > /dev/null',
     environment => "MAILTO=${mail}",
     user        => root,
     hour        => 5,
