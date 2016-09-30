@@ -11,7 +11,7 @@ from jinja2.environment import Environment
 required_roles = (
     "install-server",
     "gateway",
-    "auth",
+    "cauth",
     "mysql",
     "gerrit",
 )
@@ -56,6 +56,8 @@ def load_refarch(filename, domain=None, install_server_ip=None):
                 aliases.add("api-redmine.%s" % arch['domain'])
             elif role == "gateway":
                 aliases.add(arch['domain'])
+            elif role == "cauth":
+                aliases.add("auth.%s" % arch['domain'])
             # Add role name virtual name (as cname)
             aliases.add("%s.%s" % (role, arch["domain"]))
             aliases.add(role)
