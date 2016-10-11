@@ -117,7 +117,7 @@ function generate_keys {
     [ -d "${HOME}/.ssh" ] || mkdir -m 0700 "${HOME}/.ssh"
     [ -f "${HOME}/.ssh/known_hosts" ] || touch "${HOME}/.ssh/known_hosts"
 
-    # SSL certificate
+    # Default self-signed SSL certificate
     OUTPUT=${BUILD}/certs
 
     # If localCA doesn't exists, remove all ssl files
@@ -148,6 +148,12 @@ subjectAltName=@alt_names
 [alt_names]
 DNS.1 = ${DOMAIN}
 EOF
+
+    # Gen CA
+    [ -f ${OUTPUT}/localCA.pem ] || {
+        # Remove all previously generated certs and regenerate using localCA
+        rm -f ${OUTPUT}/gateway.*
+        openssl req -nodes -days 3650 -out ${OUTPUT}/localCA.pem -keyout ${OUTPUT}/localCAkey.pem -new -x509 -subj "/C=FR/O=SoftwareFactory"
     }
 
     # Gen Key
