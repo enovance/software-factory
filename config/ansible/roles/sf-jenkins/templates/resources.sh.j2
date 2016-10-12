@@ -23,7 +23,7 @@ trap "rm -f $COOKIE_PATH && rm -f $VALIDATED_OUTPUT && rm -f $APPLIED_OUTPUT" EX
 }
 
 curl -s -X POST -c $COOKIE_PATH --data \
- '{"back": "/", "method": "Password", "args": {"username": "_SF_SERVICE_USER_", "password": "'$SPASS'"}}' \
+ '{"back": "/", "method": "Password", "args": {"username": "SF_SERVICE_USER", "password": "'$SPASS'"}}' \
  -H "Content-Type: application/json" http://$FQDN/auth/login/
 [ ! -f $COOKIE_PATH ] && {
     echo "Unable to get a cookie ..."
