@@ -19,6 +19,7 @@
 # Functions
 # -----------------
 [ -z "${DEBUG}" ] || set -x
+set -e
 
 # Defaults
 DOMAIN=$(cat /etc/puppet/hiera/sf/sfconfig.yaml | grep "^fqdn:" | cut -d: -f2 | sed 's/ //g')
@@ -94,8 +95,6 @@ function generate_yaml {
     sed -i "s#GERRIT_SERV_PUB_KEY#${GERRIT_SERV_PUB}#" ${OUTPUT}/sfcreds.yaml
     sed -i "s#GERRIT_ADMIN_PUB_KEY#${GERRIT_ADMIN_PUB_KEY}#" ${OUTPUT}/sfcreds.yaml
 
-    manage_ssh_keys_and_certs
-
     chown -R root:puppet /etc/puppet/hiera/sf
     chmod -R 0750 /etc/puppet/hiera/sf
 }
@@ -120,8 +119,22 @@ function generate_keys {
 
     # SSL certificate
     OUTPUT=${BUILD}/certs
-    # Generate self-signed Apache certificate
-    [ -f openssl.cnf ] || cat > openssl.cnf << EOF
+
+    # If localCA doesn't exists, remove all ssl files
+    [ -f ${OUTPUT}/localCA.pem ] || rm -f ${OUTPUT}/gateway.*
+
+    # Gen CA
+    [ -f ${OUTPUT}/localCA.pem ] || openssl req -nodes -days 3650 -new -x509 -subj "/C=FR/O=SoftwareFactory" \
+        -keyout ${OUTPUT}/localCAkey.pem        \
+        -out ${OUTPUT}/localCA.pem
+
+    # If FQDN changed, remove all ssl files
+    [ -f ${OUTPUT}/gateway.cnf ] && [ "$(grep ' = ${DOMAIN}$' ${OUTPUT}/gateway.cnf))" == "" ] && \
+        rm -f ${OUTPUT}/gateway.*
+
+    # Gen conf
+    [ -f ${OUTPUT}/gateway.cnf ] || {
+        cat > ${OUTPUT}/gateway.cnf << EOF
 [req]
 req_extensions = v3_req
 distinguished_name = req_distinguished_name
@@ -134,15 +147,27 @@ subjectAltName=@alt_names
 
 [alt_names]
 DNS.1 = ${DOMAIN}
-DNS.2 = auth.${DOMAIN}
 EOF
-    [ -f ${OUTPUT}/gateway.key ] || {
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/O=SoftwareFactory/CN=${DOMAIN}" \
-            -keyout ${OUTPUT}/gateway.key -out ${OUTPUT}/gateway.crt -extensions v3_req -config openssl.cnf
-
-        # Trust this certificate. This is mostly required for sfmanager
-        cat ${OUTPUT}/gateway.crt >> /etc/pki/tls/certs/ca-bundle.crt
     }
+
+    # Gen Key
+    [ -f ${OUTPUT}/gateway.key ] || openssl genrsa -out ${OUTPUT}/gateway.key 2048
+    # Gen Req
+    [ -f ${OUTPUT}/gateway.req ] || openssl req -new -subj "/C=FR/O=SoftwareFactory/CN=${DOMAIN}" \
+        -extensions v3_req -config gateway.cnf  \
+        -key ${OUTPUT}/gateway.key              \
+        -out ${OUTPUT}/gateway.req
+    # Gen certificate
+    [ -f ${OUTPUT}/gateway.srl ] || echo '00' > ${OUTPUT}/gateway.srl
+    [ -f ${OUTPUT}/gateway.crt ] || openssl x509 -req -days 3650 \
+        -extensions v3_req -extfile gateway.cnf \
+        -CA ${OUTPUT}/localCA.pem               \
+        -CAkey ${OUTPUT}/localCAkey.pem         \
+        -CAserial ${OUTPUT}/gateway.srl         \
+        -in ${OUTPUT}/gateway.req               \
+        -out ${OUTPUT}/gateway.crt
+    # Gen pem
+    [ -f ${OUTPUT}/gateway.pem ] || cat ${OUTPUT}/gateway.key ${OUTPUT}/gateway.crt > ${OUTPUT}/gateway.pem
 }
 
 function manage_ssh_keys_and_certs {
