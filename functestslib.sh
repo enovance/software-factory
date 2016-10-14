@@ -446,7 +446,7 @@ function run_backup_start {
     sfmanager --url "${MANAGESF_URL}" --auth "admin:${ADMIN_PASSWORD}" system backup_get   || fail "Backup get failed"
     scp ${SF_HOST}:/var/log/managesf/managesf.log ${ARTIFACTS_DIR}/backup_managesf.log
     tar tzvf sf_backup.tar.gz > ${ARTIFACTS_DIR}/backup_content.log
-    grep -q '\.bup\/objects\/pack\/.*.pack$' ${ARTIFACTS_DIR}/backup_content.log || fail "Backup empty" ${ARTIFACTS_DIR}/backup_content.log
+    grep -q 'sfconfig.yaml$' ${ARTIFACTS_DIR}/backup_content.log || fail "Backup empty" ${ARTIFACTS_DIR}/backup_content.log
     checkpoint "run_backup_start"
 }
 
