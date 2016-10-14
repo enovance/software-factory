@@ -13,6 +13,12 @@ case $ACTION in
     sf_mirror_update)
         exec ansible-playbook -v /etc/ansible/roles/sf-mirror/files/update_playbook.yml
         ;;
+    sf_backup)
+        exec ansible-playbook -v /etc/ansible/sf_backup.yml
+        ;;
+    sf_restore)
+        exec ansible-playbook -v /etc/ansible/sf_restore.yml
+        ;;
     *)
         echo "NotImplemented"
         exit -1
