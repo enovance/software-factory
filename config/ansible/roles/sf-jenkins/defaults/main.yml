@@ -2,6 +2,8 @@ role_actions:
   - setup
   - update
   - get_logs
+  - backup
+  - restore
 
 puppet_modules:
   - jenkins
