@@ -100,13 +100,18 @@
       group: root
   when: new_crt|changed
 
-- name: "apache: create ssl.conf"
-  copy: src=files/ssl.conf dest=/etc/httpd/conf.d/ssl.conf mode=0444
-
 - name: "apache: load ssl module"
   lineinfile:
     dest=/etc/httpd/conf.modules.d/00-ssl.conf
     line="LoadModule ssl_module modules/mod_ssl.so"
+    owner=apache group=apache mode=0640
+
+- name: "apache: load cache module"
+  lineinfile:
+    dest=/etc/httpd/conf.modules.d/00-cache.conf
+    line="LoadModule cache_module modules/mod_cache.so"
+    create=True
+    state=present
     owner=apache group=apache mode=0640
 
 - name: "apache: add gateway conf"
