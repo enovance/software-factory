@@ -33,12 +33,18 @@
 
 - name: Migrate Redmine DB
   shell: /usr/bin/bundle exec rake db:migrate --trace RAILS_ENV=production chdir=/var/www/redmine
+  roles:
+    - redmine
 
 - name: Migrate Redmine plugins
   shell: /usr/bin/bundle exec rake redmine:plugins --trace RAILS_ENV=production chdir=/var/www/redmine
+  roles:
+    - redmine
 
 - name: Clear Redmine cache and sessions
   shell: /usr/bin/bundle exec rake tmp:cache:clear tmp:sessions:clear --trace RAILS_ENV=production chdir=/var/www/redmine
+  roles:
+    - redmine
 
 - name: Start Apache service
   service: name=httpd state=started
