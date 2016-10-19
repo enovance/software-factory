@@ -1,5 +1,44 @@
 resources:
   projects: {}
-  repos: {}
-  acls: {}
-  groups: {}
+  repos:
+    config:
+      name: config7
+      description: Config repository (Do not delete it)
+      acl: config-acl
+  acls:
+    config-acl:
+      file: |
+        [access "refs/*"]
+          read = group config7-core
+          owner = group config7-ptl
+        [access "refs/heads/*"]
+          label-Code-Review = -2..+2 group config7-core
+          label-Code-Review = -2..+2 group config7-ptl
+          label-Verified = -2..+2 group config7-ptl
+          label-Workflow = -1..+1 group config7-core
+          label-Workflow = -1..+1 group config7-ptl
+          label-Workflow = -1..+0 group Registered Users
+          submit = group config7-ptl
+          read = group config7-core
+          read = group Registered Users
+        [access "refs/meta/config"]
+          read = group config7-core
+          read = group Registered Users
+        [receive]
+          requireChangeId = true
+        [submit]
+          mergeContent = false
+          action = fast forward only
+      groups:
+        - config-ptl
+        - config-core
+  groups:
+    config-ptl:
+      name: config7-ptl
+      description: Team lead for the config repo
+      members:
+        - admin@sftests.com
+    config-core:
+      name: config7-core
+      description: Team core for the config repo
+      members: []
