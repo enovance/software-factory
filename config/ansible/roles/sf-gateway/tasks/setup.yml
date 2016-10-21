@@ -47,9 +47,6 @@
 - name: "copy pages-404.html"
   copy: src=files/pages-404.html dest=/var/www/pages-404.html mode=0444
 
-- name: "ensure managesf_htpasswd is present"
-  file: path=/etc/httpd/managesf_htpasswd state=touch mode=0640 owner=apache group=apache
-
 - name: "ensure pages.txt is present"
   file: path=/etc/httpd/pages.txt state=touch mode=0640 owner=apache group=apache
 
