@@ -1,15 +1,41 @@
 ---
 - include_vars: /etc/ansible/vars/common.yml
-- name: "Set /var/www/managesf context"
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+
+- name: Set /var/www/managesf context
   file: path=/var/www/managesf state=directory mode=0750 owner=apache group=apache setype=httpd_sys_content_t
 
-- name: "Copy app.wsgi"
+- name: Create directory
+  file: path={{ item }} owner=apache group=apache state=directory
+  with_items:
+    - /usr/share/httpd/.ssh
+    - /var/log/managesf
+    - /var/lib/managesf
+    - /var/www/managesf
+    - /var/www/managesf/sshconfig
+
+- name: Copy app.wsgi
   copy: src=app.wsgi dest=/var/www/managesf/app.wsgi
 
-- name: "Setup config.py"
+- name: Create apache config file
+  notify: apache reload
+  copy: src: managesf.conf dest: /etc/httpd/conf.d/managesf.conf
+
+- name: Setup config.py
   template: src=templates/config.py.j2 dest=/var/www/managesf/config.py owner=root group=apache mode=0440
 
-- name: "Initialize bup"
+- name: Copy ssh keys
+  copy:
+      content: "{{ hostvars[inventory_hostname][item.name] }}"
+      dest: "/{{ item.dir }}/{{ item.file }}"
+      mode: 0400
+      owner: apache
+      group: apache
+  with_items:
+      - {name: service_rsa, file: id_rsa, dir: /usr/share/httpd/.ssh}
+      - {name: gerrit_admin_rsa, file: gerrit_admin_rsa, dir: /var/www/managesf}
+
+- name: Initialize bup
   shell: "/usr/local/bin/bup init"
   args:
       chdir: /root
