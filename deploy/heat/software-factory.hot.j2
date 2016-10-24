@@ -69,7 +69,8 @@ resources:
     properties:
       router_id: { get_resource: router }
       subnet_id: { get_resource: sf_subnet }
-
+    DependsOn: { get_param: floatingip_id }
+router_int
   sf_secgroup_admin:
     type: OS::Neutron::SecurityGroup
     properties:
