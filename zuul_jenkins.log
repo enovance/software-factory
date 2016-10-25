@@ -1,0 +1,218 @@
+-- Logs begin at Thu 2016-10-27 16:09:44 UTC, end at Thu 2016-10-27 16:46:54 UTC. --
+Oct 27 16:39:41 managesf systemd[1]: Started Zuul Server Service.
+Oct 27 16:39:41 managesf systemd[1]: Starting Zuul Server Service...
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,717 DEBUG gear.BaseClientServer: Preparing to poll
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,718 DEBUG gear.Server: Accepting new connection
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,718 DEBUG gear.Server: Polling 0 connections
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,719 DEBUG gear.ServerConnection: Setting state to: INIT
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,719 INFO gear.Server: Accepted connection <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,719 DEBUG gear.Server: Registering <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,720 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,720 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b810 command: status>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,720 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,721 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b810 command: status>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,721 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,721 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:41 managesf zuul-server[21429]: 2016-10-27 16:39:41,721 DEBUG gear.Server: Polling 1 connections
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,273 DEBUG gear.Server: Accepting new connection
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,274 DEBUG gear.ServerConnection: Setting state to: INIT
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,274 INFO gear.Server: Accepted connection <gear.ServerConnection 0x234b810 name: None host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,274 DEBUG gear.Server: Registering <gear.ServerConnection 0x234b810 name: None host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,274 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: None host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,274 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: None host: 192.168.122.10 port: 58120>: <gear.Packet 0x234b850 type: SET_CLIENT_ID id: Zuul Merger>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,275 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,275 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,275 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,279 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,279 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x234b850 type: CAN_DO function: merger:merge>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 DEBUG gear.Server: Adding function merger:merge to <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5290 type: CAN_DO function: merger:update>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 DEBUG gear.Server: Adding function merger:update to <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,280 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,281 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,281 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,281 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,285 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,286 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x234b850 type: GRAB_JOB_UNIQ>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,286 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5290 type: NO_JOB>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,286 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,286 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,286 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,289 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,289 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x234b850 type: PRE_SLEEP>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,289 DEBUG gear.ServerConnection: Setting state to: SLEEP
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,289 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,289 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,289 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,726 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,726 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,726 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,726 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,727 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,727 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,727 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,727 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:42 managesf zuul-server[21429]: 2016-10-27 16:39:42,727 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,727 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,728 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,728 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,728 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,728 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,728 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,728 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,729 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:43 managesf zuul-server[21429]: 2016-10-27 16:39:43,729 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,732 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,734 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,735 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,735 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,735 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,735 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,735 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,735 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:44 managesf zuul-server[21429]: 2016-10-27 16:39:44,736 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,741 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,742 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,742 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,742 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,742 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,743 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,743 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,743 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:45 managesf zuul-server[21429]: 2016-10-27 16:39:45,743 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,746 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,746 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,746 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,747 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,747 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,747 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,747 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,748 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:46 managesf zuul-server[21429]: 2016-10-27 16:39:46,748 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,750 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,751 INFO gear.Server: Received admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,751 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,751 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,751 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,752 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x234b850 command: status>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,752 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,752 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,752 DEBUG gear.Server: Polling 2 connections
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,755 DEBUG gear.Server: Accepting new connection
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,756 DEBUG gear.ServerConnection: Setting state to: INIT
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,756 INFO gear.Server: Accepted connection <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,756 DEBUG gear.Server: Registering <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,756 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,757 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:39:47 managesf zuul-server[21429]: 2016-10-27 16:39:47,757 DEBUG gear.Server: Polling 3 connections
+Oct 27 16:39:47 managesf zuul-server[21429]: /usr/lib/python2.7/site-packages/paramiko/client.py:658: UserWarning: Unknown ssh-rsa host key for [gerrit.sftests.com]:29418: d614b1cc040ba674325e23b3a6b5c64f
+Oct 27 16:39:47 managesf zuul-server[21429]: (key.get_name(), hostname, hexlify(key.get_fingerprint())))
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,103 DEBUG gear.Server: Accepting new connection
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,103 DEBUG gear.ServerConnection: Setting state to: INIT
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,103 INFO gear.Server: Accepted connection <gear.ServerConnection 0x23c5290 name: None host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,103 DEBUG gear.Server: Registering <gear.ServerConnection 0x23c5290 name: None host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,104 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: None host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,104 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: None host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c52d0 type: SET_CLIENT_ID id: Zuul RPC Listener>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,104 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,104 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c5390 type: CAN_DO function: zuul:enqueue>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,105 DEBUG gear.Server: Adding function zuul:enqueue to <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,105 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,105 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c52d0 type: CAN_DO function: zuul:enqueue_ref>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,105 DEBUG gear.Server: Adding function zuul:enqueue_ref to <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,105 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,106 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c5390 type: CAN_DO function: zuul:promote>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,106 DEBUG gear.Server: Adding function zuul:promote to <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,106 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,106 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c53d0 type: CAN_DO function: zuul:get_running_jobs>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,106 DEBUG gear.Server: Adding function zuul:get_running_jobs to <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,107 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,107 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c5390 type: GRAB_JOB_UNIQ>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,107 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c53d0 type: NO_JOB>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,107 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,108 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,108 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,108 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,108 INFO gear.Server: Received packet from <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>: <gear.Packet 0x23c5390 type: PRE_SLEEP>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,108 DEBUG gear.ServerConnection: Setting state to: SLEEP
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,108 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,109 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5290 name: Zuul RPC Listener host: 192.168.122.10 port: 58130>
+Oct 27 16:39:48 managesf zuul-server[21429]: 2016-10-27 16:39:48,109 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:39:49 managesf zuul-server[21429]: 2016-10-27 16:39:49,924 ERROR gerrit.GerritWatcher: Exception on ssh event stream:
+Oct 27 16:39:49 managesf zuul-server[21429]: Traceback (most recent call last):
+Oct 27 16:39:49 managesf zuul-server[21429]: File "/srv/zuul/lib/python2.7/site-packages/zuul/connection/gerrit.py", line 178, in _run
+Oct 27 16:39:49 managesf zuul-server[21429]: self._listen(stdout, stderr)
+Oct 27 16:39:49 managesf zuul-server[21429]: File "/srv/zuul/lib/python2.7/site-packages/zuul/connection/gerrit.py", line 162, in _listen
+Oct 27 16:39:49 managesf zuul-server[21429]: self._read(stdout)
+Oct 27 16:39:49 managesf zuul-server[21429]: File "/srv/zuul/lib/python2.7/site-packages/zuul/connection/gerrit.py", line 149, in _read
+Oct 27 16:39:49 managesf zuul-server[21429]: data = json.loads(l)
+Oct 27 16:39:49 managesf zuul-server[21429]: File "/usr/lib64/python2.7/json/__init__.py", line 338, in loads
+Oct 27 16:39:49 managesf zuul-server[21429]: return _default_decoder.decode(s)
+Oct 27 16:39:49 managesf zuul-server[21429]: File "/usr/lib64/python2.7/json/decoder.py", line 365, in decode
+Oct 27 16:39:49 managesf zuul-server[21429]: obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+Oct 27 16:39:49 managesf zuul-server[21429]: File "/usr/lib64/python2.7/json/decoder.py", line 383, in raw_decode
+Oct 27 16:39:49 managesf zuul-server[21429]: raise ValueError("No JSON object could be decoded")
+Oct 27 16:39:49 managesf zuul-server[21429]: ValueError: No JSON object could be decoded
+Oct 27 16:39:54 managesf zuul-server[21429]: 2016-10-27 16:39:54,936 ERROR gerrit.GerritWatcher: Exception on ssh event stream:
+Oct 27 16:39:54 managesf zuul-server[21429]: Traceback (most recent call last):
+Oct 27 16:39:54 managesf zuul-server[21429]: File "/srv/zuul/lib/python2.7/site-packages/zuul/connection/gerrit.py", line 174, in _run
+Oct 27 16:39:54 managesf zuul-server[21429]: key_filename=self.keyfile)
+Oct 27 16:39:54 managesf zuul-server[21429]: File "/usr/lib/python2.7/site-packages/paramiko/client.py", line 324, in connect
+Oct 27 16:39:54 managesf zuul-server[21429]: raise NoValidConnectionsError(errors)
+Oct 27 16:39:54 managesf zuul-server[21429]: NoValidConnectionsError: [Errno None] Unable to connect to port 29418 on 192.168.122.10
+Oct 27 16:39:59 managesf zuul-server[21429]: 2016-10-27 16:39:59,938 ERROR gerrit.GerritWatcher: Exception on ssh event stream:
+Oct 27 16:39:59 managesf zuul-server[21429]: Traceback (most recent call last):
+Oct 27 16:39:59 managesf zuul-server[21429]: File "/srv/zuul/lib/python2.7/site-packages/zuul/connection/gerrit.py", line 174, in _run
+Oct 27 16:39:59 managesf zuul-server[21429]: key_filename=self.keyfile)
+Oct 27 16:39:59 managesf zuul-server[21429]: File "/usr/lib/python2.7/site-packages/paramiko/client.py", line 324, in connect
+Oct 27 16:39:59 managesf zuul-server[21429]: raise NoValidConnectionsError(errors)
+Oct 27 16:39:59 managesf zuul-server[21429]: NoValidConnectionsError: [Errno None] Unable to connect to port 29418 on 192.168.122.10
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,275 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,275 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>: <gear.Packet 0x23c5390 type: SUBMIT_JOB_LOW function: merger:merge unique: 8362a09060c048fead772b79f51fda07>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,276 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>: <gear.Packet 0x23c5210 type: JOB_CREATED handle: H:192.168.122.10:1>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,276 DEBUG gear.ServerConnection: Setting state to: AWAKE
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,276 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5250 type: NOOP>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,277 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,277 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,277 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,284 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,285 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5390 type: GRAB_JOB_UNIQ>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,285 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5210 type: JOB_ASSIGN_UNIQ handle: H:192.168.122.10:1 function: merger:merge unique: 8362a09060c048fead772b79f51fda07>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,285 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,286 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:18 managesf zuul-server[21429]: 2016-10-27 16:43:18,286 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,208 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,208 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5390 type: WORK_COMPLETE handle: H:192.168.122.10:1>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,208 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x234b850 name: None host: 192.168.122.10 port: 58122>: <gear.Packet 0x23c5390 type: WORK_COMPLETE handle: H:192.168.122.10:1>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,210 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,211 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,211 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,214 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,215 INFO gear.Server: Received admin request <gear.AdminRequest 0x23c5390 command: status>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,216 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:merge        0        0        1
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,217 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: zuul:get_running_jobs        0        0        1
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,220 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: merger:update        0        0        1
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,221 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: zuul:promote        0        0        1
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,222 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: zuul:enqueue        0        0        1
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,223 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: zuul:enqueue_ref        0        0        1
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,224 DEBUG gear.ServerConnection: Queuing data to <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>: .
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,225 DEBUG gear.Server: Finished handling admin request <gear.AdminRequest 0x23c5390 command: status>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,225 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,226 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x23c5310 name: None host: 192.168.122.10 port: 58118>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,226 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:43:19 managesf zuul-server[21429]: zuul_functions: set_node_reuse( <QueueItem 0x7f2300235190 for <Change 0x7f230022e8d0 1,1> in check> config-check ):
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,230 ERROR zuul.Gearman: Job <gear.Job 0x7f230022ef10 handle: None name: build:config-check unique: 1a0a9efea14642d5b1dab66d8c30dc54> is not registered with Gearman
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,247 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,249 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5390 type: GRAB_JOB_UNIQ>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,250 DEBUG gear.ServerConnection: Queuing packet to <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c53d0 type: NO_JOB>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,251 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,252 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,252 DEBUG gear.Server: Polling 4 connections
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,254 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,254 INFO gear.Server: Received packet from <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>: <gear.Packet 0x23c5390 type: PRE_SLEEP>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,256 DEBUG gear.ServerConnection: Setting state to: SLEEP
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,256 DEBUG gear.Server: Processing input on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,257 DEBUG gear.Server: Processing output on <gear.ServerConnection 0x234b810 name: Zuul Merger host: 192.168.122.10 port: 58120>
+Oct 27 16:43:19 managesf zuul-server[21429]: 2016-10-27 16:43:19,257 DEBUG gear.Server: Polling 4 connections
