@@ -344,8 +344,23 @@ function fetch_bootstraps_data {
 }
 
 function run_bootstraps {
-    # Configure lxc host network with container ip 192.168.135.101
-    configure_network 192.168.135.101
+    if [ $TEST_TYPE == 'local' ]; then
+        ipaddr=$(ip route get 8.8.8.8 | awk '/8.8.8.8/ {print $7}')
+        configure_network $ipaddr
+
+        # clean old ssh data
+        if [ -f ~/.ssh/id_rsa ]; then
+            rm -f ~/.ssh/id_rsa*
+        fi
+        sudo sed -i '/functionnal_tests/d' /root/.ssh/authorized_keys
+
+        # gen and copy ssh data
+        ssh-keygen -f ~/.ssh/id_rsa -t rsa -N '' -C functionnal_tests
+        cat  ~/.ssh/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys
+    else
+        # Configure lxc host network with container ip 192.168.135.101
+        configure_network 192.168.135.101
+    fi
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
@@ -615,7 +630,9 @@ function run_serverspec_tests {
     # Wait a few seconds for zuul to start
     sleep 5
     # Copy current serverspec
-    sudo rsync -a --delete serverspec/ ${IMAGE_PATH}/etc/serverspec/
+    if [ $TEST_TYPE != 'local' ]; then
+        sudo rsync -a --delete serverspec/ ${IMAGE_PATH}/etc/serverspec/
+    fi
     ssh ${SF_HOST} "cd /etc/serverspec; rake spec" 2>&1 | tee ${ARTIFACTS_DIR}/serverspec.output
     [ "${PIPESTATUS[0]}" != "0" ] && fail "Serverspec tests failed"
     checkpoint "run_serverspec_tests"
