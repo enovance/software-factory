@@ -18,7 +18,9 @@
 # Then will start the SF in LXC containers
 # Then will run the serverspecs and functional tests
 
-if [ "$(id -un)" == "root" ]; then
+TEST_TYPE="${1:-functional}"
+
+if [ "$(id -un)" == "root" ] && [ ${TEST_TYPE} != "localhost" ]; then
     echo "Can't run tests as root, use centos user instead"
     exit 1
 fi
@@ -26,8 +28,6 @@ fi
 source functestslib.sh
 . role_configrc
 bash ./rpm-test-requirements.sh
-
-TEST_TYPE="${1:-functional}"
 
 # Backward compatibility with jjb jobs
 [ ${TEST_TYPE} == "1node-allinone" ] && TEST_TYPE=$2
@@ -54,11 +54,13 @@ if [ ${TEST_TYPE} == "openstack" ]; then
     which ansible-playbook &> /dev/null || sudo pip install ansible
     heat stack-delete -y sf_stack &> /dev/null
     clean_nodepool_tenant
+    [ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
+elif [ ${TEST_TYPE} == "localhost" ]; then
+    echo "Running test on localhost"
 else
     lxc_stop
+    [ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
 fi
-
-[ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
 
 # nosetests should run without a proxy, otherwise REST APIs on the LXC env might
 # not be accessible
@@ -94,6 +96,12 @@ case "${TEST_TYPE}" in
         change_fqdn
         run_sfconfig
         run_serverspec_tests
+        ;;
+    "localhost")
+        prepare_local_env
+        run_sfconfig localhost
+        run_health_base localhost
+        run_functional_tests
         ;;
     "upgrade")
         ./fetch_image.sh ${SF_PREVIOUS_VER} || fail "Could not fetch ${SF_PREVIOUS_VER}"

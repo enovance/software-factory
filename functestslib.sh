@@ -86,11 +86,15 @@ function clean_nodepool_tenant {
 }
 
 function run_health_base {
+    TEST_TYPE="${1:-functional}"
+    if [ $TEST_TYPE != 'localhost' ]; then
+        ssh="ssh ${SF_HOST}"
+    fi
     echo "[+] Starting the health base check"
-    ssh ${SF_HOST} ansible-playbook /etc/ansible/health-check/zuul.yaml > ${ARTIFACTS_DIR}/integration_tests.txt \
+    $ssh ansible-playbook /etc/ansible/health-check/zuul.yaml > ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "Zuul integration test SUCCESS"                        \
         || echo "Zuul integration test failed (non-voting)"
-    ssh ${SF_HOST} ansible-playbook /etc/ansible/health-check/gerritbot.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
+    $ssh ansible-playbook /etc/ansible/health-check/gerritbot.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "Gerritbot integration test SUCCESS"                        \
         || fail "Gerritbot integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     checkpoint "run_health_base"
@@ -419,6 +423,12 @@ function prepare_functional_tests_utils {
     checkpoint "prepare_utils"
 }
 
+function prepare_local_env {
+    sf_directory=$HOME/software-factory
+    rsync -a /root/sf-bootstrap-data $sf_directory
+    rsync -a /etc/puppet/hiera/sf/ $sf_directory/sf-bootstrap-data/hiera/
+}
+
 function reset_etc_hosts_dns {
     (
         set -x
@@ -543,8 +553,12 @@ function change_fqdn {
 }
 
 function run_sfconfig {
+    TEST_TYPE="${1:-functional}"
+    if [ $TEST_TYPE != 'localhost' ]; then
+        ssh="ssh ${SF_HOST}"
+    fi
     echo "$(date) ======= run_sfconfig"
-    ssh ${SF_HOST} sfconfig.sh &> ${ARTIFACTS_DIR}/last_sfconfig.sh || fail "sfconfig.sh failed" ${ARTIFACTS_DIR}/last_sfconfig.sh
+    $ssh sfconfig.sh &> ${ARTIFACTS_DIR}/last_sfconfig.sh || fail "sfconfig.sh failed" ${ARTIFACTS_DIR}/last_sfconfig.sh
     checkpoint "run_sfconfig"
 }
 
