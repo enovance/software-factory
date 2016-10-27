@@ -54,11 +54,13 @@ if [ ${TEST_TYPE} == "openstack" ]; then
     which ansible-playbook &> /dev/null || sudo pip install ansible
     heat stack-delete -y sf_stack &> /dev/null
     clean_nodepool_tenant
-else
+elif [ ${TEST_TYPE} != "local" ]; then
     lxc_stop
 fi
 
-[ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
+if [ ${TEST_TYPE} != "local" ]; then
+    [ -z "${KEEP_GLANCE_IMAGE}" ] && build_image
+fi
 
 # nosetests should run without a proxy, otherwise REST APIs on the LXC env might
 # not be accessible
@@ -70,6 +72,21 @@ case "${TEST_TYPE}" in
         lxc_init
         run_bootstraps
         run_serverspec_tests
+        ;;
+    "local")
+        run_bootstraps
+        run_serverspec_tests
+        run_health_base
+        run_functional_tests
+        #if [ "${SF_TESTS}" != "tests/functional" ]; then
+        #    exit 0
+        #fi
+        #run_provisioner
+        #run_backup_start
+        #run_checker
+        #change_fqdn
+        #run_sfconfig
+        #run_serverspec_tests
         ;;
     "functional")
         lxc_init

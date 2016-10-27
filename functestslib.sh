@@ -189,13 +189,17 @@ function heat_wait {
     checkpoint "heat-wait"
 }
 
-function build_image {
+function fetch_subprojects {
     # Make sure subproject are available
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || \
         [ ! -d "${PYSFLIB_CLONED_PATH}" ] || [ ! -d "${SFMANAGER_CLONED_PATH}" ]; then
         echo "[+] Fetching subprocects"
         ./image/fetch_subprojects.sh
     fi
+}
+
+function build_image {
+    fetch_subprojects
     if [ -z "${SKIP_BUILD}" ]; then
         echo "[+] Building image ${IMAGE_PATH}"
         ./build_image.sh 2>&1 | tee ${ARTIFACTS_DIR}/image_build.log | grep '(STEP'
@@ -344,8 +348,23 @@ function fetch_bootstraps_data {
 }
 
 function run_bootstraps {
-    # Configure lxc host network with container ip 192.168.135.101
-    configure_network 192.168.135.101
+    if [ $TEST_TYPE == 'local' ]; then
+        ipaddr=$(ip route get 8.8.8.8 | awk '/8.8.8.8/ {print $7}')
+        configure_network $ipaddr
+
+        # clean old ssh data
+        if [ -f ~/.ssh/id_rsa ]; then
+            rm -f ~/.ssh/id_rsa*
+        fi
+        sudo sed -i '/functionnal_tests/d' /root/.ssh/authorized_keys
+
+        # gen and copy ssh data
+        ssh-keygen -f ~/.ssh/id_rsa -t rsa -N '' -C functionnal_tests
+        cat  ~/.ssh/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys
+    else
+        # Configure lxc host network with container ip 192.168.135.101
+        configure_network 192.168.135.101
+    fi
     eval $(ssh-agent)
     ssh-add ~/.ssh/id_rsa
     echo "$(date) ======= run_bootstraps" | tee -a ${ARTIFACTS_DIR}/bootstraps.log
@@ -560,6 +579,13 @@ function run_checker {
 }
 
 function run_functional_tests {
+    if [ $TEST_TYPE == 'local' ]; then
+        sudo mkdir /var/lib/sf/deps -p
+        sudo chown centos:centos /var/lib/sf/deps
+        fetch_subprojects
+        prepare_functional_tests_utils
+        sudo chown -R centos:centos /etc/software-factory
+    fi
     echo "$(date) ======= run_functional_tests"
     nosetests --with-timer --with-xunit --logging-format "%(asctime)s: %(levelname)s - %(message)s" -s -v ${SF_TESTS} \
         && echo "Functional tests: SUCCESS" \
@@ -615,7 +641,9 @@ function run_serverspec_tests {
     # Wait a few seconds for zuul to start
     sleep 5
     # Copy current serverspec
-    sudo rsync -a --delete serverspec/ ${IMAGE_PATH}/etc/serverspec/
+    if [ $TEST_TYPE != 'local' ]; then
+        sudo rsync -a --delete serverspec/ ${IMAGE_PATH}/etc/serverspec/
+    fi
     ssh ${SF_HOST} "cd /etc/serverspec; rake spec" 2>&1 | tee ${ARTIFACTS_DIR}/serverspec.output
     [ "${PIPESTATUS[0]}" != "0" ] && fail "Serverspec tests failed"
     checkpoint "run_serverspec_tests"
