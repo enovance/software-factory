@@ -27,7 +27,7 @@ function install_sf {
         install_packages ${dir} ${STAGING_PKGS}
     fi
     if [ ! -z "${STAGING_PIP}" ]; then
-        retry do_chroot ${dir} pip install 'pip<8' ${STAGING_PIP}
+        retry do_chroot ${dir} pip install ${STAGING_PIP}
     fi
 
     # Make sure subproject are available
