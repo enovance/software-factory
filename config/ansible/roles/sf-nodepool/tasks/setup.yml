@@ -16,6 +16,9 @@
 - name: "Setup conf update script"
   template: src=templates/sf-nodepool-conf-update.sh.j2 dest=/usr/local/bin/sf-nodepool-conf-update.sh mode=0755
 
+- name: "Setup localCA"
+  copy: content="{{ localCA_pem }}" dest=/etc/nodepool/scripts/localCA.pem
+
 - name: "Apply patch"
   patch: src={{ item }} basedir=/srv/nodepool/lib/python2.7/site-packages strip=1
   with_items:
