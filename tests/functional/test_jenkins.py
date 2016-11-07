@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
+
 from utils import Base
 from utils import JenkinsUtils
 
@@ -34,3 +36,13 @@ class TestJenkinsBasic(Base):
         url = '%s/job/config-update/' % self.ju.jenkins_url
         resp = self.ju.get(url)
         self.assertEquals(resp.status_code, 200)
+
+    def test_timestamped_logs(self):
+        """Test that jenkins timestamps logs"""
+        timestamp_re = re.compile('\d{2}:\d{2}:\d{2}.\d{0,3}')
+        cu_logs = self.ju.get_job_logs("config-update",
+                                       "lastBuild")
+        self.assertTrue(cu_logs is not None)
+        for l in cu_logs.split('\n'):
+            if l:
+                self.assertRegexpMatches(l, timestamp_re, msg=l)
