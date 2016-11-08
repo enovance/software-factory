@@ -27,6 +27,10 @@
       command: /usr/local/bin/resources.sh direct_apply /tmp/empty_resources.yaml /usr/local/share/sf-config-repo/resources/resources.yaml
       when: config_done.stat.exists != True
 
+    - name: Change default admin email
+      replace: dest=/usr/local/share/sf-config-repo/resources/resources.yaml regexp='@sftests.com' replace='@{{ fqdn }}'
+      when: "{{ fqdn }}" != 'sftests.com'
+
     - command: mktemp -d
       register: conf_tmp
       when: config_done.stat.exists != True
