@@ -53,6 +53,7 @@ def main():
     parser.add_argument("--recheck", action="store_const", const=True)
     parser.add_argument("--rebase", action="store_const", const=True)
     parser.add_argument("--review-id", type=int, default=0)
+    parser.add_argument("--recheck-if-timeout", action="store_const", const=False)
     args = parser.parse_args()
     os.chdir(args.repository)
 
@@ -68,14 +69,15 @@ def main():
 
     if args.review_id:
         print execute("git review -d %s" % args.review_id)
-        sha = execute("git log -n1 --pretty=format:%H")
     else:
         # Submit change
         if "Change-Id:" in execute("git log -n 1"):
             print execute("git review -y")
         else:
             print execute("git review -yi")
-        sha = open(".git/refs/heads/master").read()
+
+    sha = execute("git log -n1 --pretty=format:%H")
+#        sha = open(".git/refs/heads/master").read()
 
     # Give Jenkins some time to start test
     time.sleep(2)
@@ -93,28 +95,34 @@ def main():
     if args.approve:
         execute("%s review --code-review +2 --workflow +1 %s" % (cmd, sha))
 
-    query = "query --format JSON --current-patch-set %s" % sha
-    retry = args.delay
-    while retry > 0:
-        q = execute("%s %s" % (cmd, query))
-        # Get Jenkins CI Verify vote
-        ci_note = get_ci_verify_vote(json.loads(q.split('\n')[0]))
-        if ci_note > 0:
-            if args.failure:
-                fail("Jenkins CI voted %d in --failure mode")
-            if (args.approve and ci_note == 2) or not args.approve:
-                if args.approve:
-                    # Wait until status:MERGED when approved
-                    wait_for_merge("%s %s" % (cmd, query), retry)
-                # Jenkins CI voted +1/+2
-                exit(0)
-        elif ci_note is not None and ci_note < 0:
-            if args.failure:
-                # Ignore CI failure
-                exit(0)
-            fail("Jenkins CI voted %d" % ci_note)
-        retry -= 1
-        time.sleep(1)
+    def loop():
+        query = "query --format JSON --current-patch-set %s" % sha
+        retry = args.delay
+        while retry > 0:
+            q = execute("%s %s" % (cmd, query))
+            # Get Jenkins CI Verify vote
+            ci_note = get_ci_verify_vote(json.loads(q.split('\n')[0]))
+            if ci_note > 0:
+                if args.failure:
+                    fail("Jenkins CI voted %d in --failure mode")
+                if (args.approve and ci_note == 2) or not args.approve:
+                    if args.approve:
+                        # Wait until status:MERGED when approved
+                        wait_for_merge("%s %s" % (cmd, query), retry)
+                    # Jenkins CI voted +1/+2
+                    exit(0)
+            elif ci_note is not None and ci_note < 0:
+                if args.failure:
+                    # Ignore CI failure
+                    exit(0)
+                fail("Jenkins CI voted %d" % ci_note)
+            retry -= 1
+            time.sleep(1)
+
+    loop()
+    if args.recheck_if_timeout:
+        print execute("%s review --message recheck %s" % (cmd, sha))
+        loop()
     if args.approve and ci_note == 1:
         fail("Jenkins CI didn't +2 approved change")
     if ci_note is None:
