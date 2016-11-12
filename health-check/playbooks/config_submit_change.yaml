@@ -6,7 +6,7 @@
     - name: Submit and approve config change
       command: chdir=/root/config submit_and_wait.py --approve
       register: submit_status
-      ignore_errors: true
+      ignore_errors: false
 
     - command: chdir=/root/config cat .git/refs/heads/master
       register: commitsha
