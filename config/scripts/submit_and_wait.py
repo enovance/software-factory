@@ -68,14 +68,15 @@ def main():
 
     if args.review_id:
         print execute("git review -d %s" % args.review_id)
-        sha = execute("git log -n1 --pretty=format:%H")
     else:
         # Submit change
         if "Change-Id:" in execute("git log -n 1"):
             print execute("git review -y")
         else:
             print execute("git review -yi")
-        sha = open(".git/refs/heads/master").read()
+ 
+    sha = execute("git log -n1 --pretty=format:%H")
+#        sha = open(".git/refs/heads/master").read()
 
     # Give Jenkins some time to start test
     time.sleep(2)
