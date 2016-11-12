@@ -45,7 +45,7 @@
         - 'chmod +x run_tests.sh run_functional-tests.sh'
         - 'git add run_tests.sh run_functional-tests.sh'
         - 'git commit -m "Test {{ project }} repo"'
-        - 'submit_and_wait.py --delay 600 --failure'
+        - 'submit_and_wait.py --delay 600 --failure --recheck-if-timeout'
 
     - name: "Update change and check for test SUCCESS"
       command: chdir={{ project_path }} {{ item }}
@@ -53,7 +53,7 @@
         - 'bash -c "(echo echo TEST EXPORT \| tee ../artifacts/test_log.txt; echo exit 0; date) > run_tests.sh"' # Add date to prevent (no new changes reject)
         - 'bash -c "(echo exit 0; date) > run_functional-tests.sh"'
         - 'git commit -a --amend'
-        - 'submit_and_wait.py --delay 600 --approve'
+        - 'submit_and_wait.py --delay 600 --approve --recheck-if-timeout'
         - 'git fetch --all'
       environment: {'EDITOR':'test'}
 
