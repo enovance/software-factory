@@ -2,10 +2,10 @@
 #
 
 # Current development version of SF
-VER=2.2.7
+VER=2.2.6
 
 # Version string
-PREVIOUS_VER=2.2.6
+PREVIOUS_VER=2.2.5
 SF_PREVIOUS_VER=C7.0-${PREVIOUS_VER}
 
 # A tagged release of SF is defined by the string "TaggedRelease" in the commit msg
