@@ -1,0 +1,9 @@
+---
+- name: gnocchi reload
+  service:
+      name: "{{ item }}"
+      state: reloaded
+  with_items:
+      - openstack-gnocchi-api
+      - openstack-gnocchi-metricd
+      - openstack-gnocchi-statsd
