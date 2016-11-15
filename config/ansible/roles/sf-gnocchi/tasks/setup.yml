@@ -1,0 +1,22 @@
+---
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+
+- name: Create database
+
+- name: Sync database
+
+- name: Apply policies
+
+- name: Configure gnocchi api
+  #keystone_password => "",  # Keystone is not used, but this setting must be a string, otherwise class import fails
+  #require => File['/etc/gnocchi/api-paste.ini'],
+
+- name: Configure gnocchi statsd
+
+- name: Configure gnocchi metricd
+
+- name: Manage service
+
+- name: Create archive policy
+  # Note: should actually wait until API is ready, like wait4gerrit
+  #command => "/usr/bin/sleep 15 ; /usr/bin/curl -X POST http://127.0.0.1:8041/v1/archive_policy -H \"Content-Type: application/json\" -d '{\"back_window\": 0, \"definition\": [{ \"granularity\": \"5s\", \"timespan\": \"4 hours\" }, { \"granularity\": \"60s\", \"timespan\": \"1 week\" }, { \"granularity\": \"900s\", \"timespan\": \"90 days\" }], \"name\": \"archive\"}'",

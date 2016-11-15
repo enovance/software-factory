@@ -1,0 +1,10 @@
+role_actions:
+  - setup
+
+gnocchi_archive_policy_name: archive
+gnocchi_flush_delay: "5.0"
+gnocchi_project_id: 7815b28f-6322-4c1b-ade4-e071ef8c8045
+gnocchi_resource_id: f66370ee-be2a-451e-bf5d-45b9a554ce03
+gnocchi_user_id: 487cd2da-03e6-408a-8075-39f9df3f1707
+
+gnocchi_database_connection: "mysql://gnocchi:{{ creds_gnocchi_sql_pwd }}@mysql.{{ fqdn }}/gnocchi"
