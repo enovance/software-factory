@@ -15,7 +15,7 @@ function ansible_install {
     local ansible_debug=""
 
     [ -z "$DEBUG" ] || ansible_debug="-vvvv"
-    cat <<EOF> $dir/ansible-install-playbook
+    cat << EOF > $dir/ansible-install-playbook
 - hosts: localhost
   connection: local
   roles:
