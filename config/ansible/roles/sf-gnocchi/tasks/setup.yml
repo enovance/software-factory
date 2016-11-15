@@ -1,0 +1,72 @@
+---
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+
+- name: Create working directory
+  file:
+    path: /var/lib/gnocchi/measure
+    state: directory
+    owner: gnocchi
+    group: gnocchi
+    mode: 0755
+
+- name: Install static configuration files
+  copy:
+    src: "{{ item.name }}"
+    dest: "{{ item.dest | default('/etc/gnocchi') }}"
+    mode: "{{ item.mode | default('0444') }}"
+    owner: root
+    group: gnocchi
+  with_items:
+    - {name: api-paste.ini}
+    - {name: policy.json}
+  notify: gnocchi reload
+
+- name: Configure gnocchi.conf
+  ini_file:
+      dest: /etc/gnocchi/gnocchi.conf
+      owner: root
+      group: gnocchi
+      section: "{{ item.section }}"
+      option: "{{ item.option }}"
+      value: "{{ item.value }}"
+  with_items:
+    - {section: DEFAULT, option: log_dir, value: "{{ gnocchi_log_dir }}"}
+    - {section: api, option: port, value: "{{ gnocchi_api_port }}"}
+    - {section: api, option: host, value: "{{ gnocchi_api_host }}"}
+    - {section: api, option: workers, value: "{{ gnocchi_api_workers }}"}
+    - {section: api, option: max_limit, value: "{{ gnocchi_api_max_limit }}"}
+    - {section: indexer, option: url, value: "{{ gnocchi_url_indexer }}"}
+    - {section: statsd, option: resource_id, value: "{{ gnocchi_statsd_resource_id }}"}
+    - {section: statsd, option: user_id, value: "{{ gnocchi_statsd_user_id }}"}
+    - {section: statsd, option: project_id, value: "{{ gnocchi_statsd_project_id }}"}
+    - {section: statsd, option: archive_policy_name, value: "{{ gnocchi_statsd_archive_policy_name }}"}
+    - {section: statsd, option: flush_delay, value: "{{ gnocchi_statsd_flush_delay }}"}
+  notify: gnocchi reload
+
+- name: Sync database
+  command: /usr/bin/gnocchi-upgrade --config-file /etc/gnocchi/gnocchi.conf
+
+- name: Manage services
+  service:
+      name: "{{ item }}"
+      enabled: yes
+      state: started
+  with_items:
+      - openstack-gnocchi-api
+      - openstack-gnocchi-metricd
+      - openstack-gnocchi-statsd
+
+- name: Wait for the service
+  wait_for:
+      host: 127.0.0.1
+      port: 8041
+      delay: 10
+
+- name: Configure archive policy
+  uri:
+      url: http://127.0.0.1:8041/v1/archive_policy
+      method: POST
+      body_format: json
+      body: '{"back_window": 0, "definition": [{ "granularity": "5s", "timespan": "4 hours" }, { "granularity": "60s", "timespan": "1 week" }, { "granularity": "900s", "timespan": "90 days" }], "name": "archive"}'
+      status_code: 201
+      creates: /var/lib/gnocchi/archive_policy
