@@ -1,0 +1,57 @@
+---
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+
+#- name: Create database
+#
+
+- name: Install static configuration files
+  copy:
+    src: "{{ item.name }}"
+    dest: /home/gerrit/site_path/etc/
+    mode: 0444
+    owner: root
+    group: gnocchi
+  with_items:
+    - {name: api-paste.ini}
+    - {name: policy.json}
+
+- name: Create config file
+  ini_file:
+      dest: /etc/gnocchi/gnocchi.conf
+      owner: root
+      group: gnocchi
+      section: "{{ item.section }}"
+      option: "{{ item.option }}"
+      value: "{{ item.value }}"
+  with_items:
+    - {section: DEFAULT, option: log_dir, value: "{{ gnocchi_log_dir }}"}
+    - {section: api, option: port, value: "{{ gnocchi_api_port }}"}
+    - {section: api, option: host, value: "{{ gnocchi_api_host }}"}
+    - {section: api, option: workers, value: "{{ gnocchi_api_workers }}"}
+    - {section: api, option: max_limit, value: "{{ gnocchi_api_max_limit }}"}
+    - {section: indexer, option: url, value: "{{ gnocchi_url_indexer }}"}
+    - {section: statsd, option: resource_id, value: "{{ gnocchi_statsd_resource_id }}"}
+    - {section: statsd, option: user_id, value: "{{ gnocchi_statsd_user_id }}"}
+    - {section: statsd, option: project_id, value: "{{ gnocchi_statsd_project_id }}"}
+    - {section: statsd, option: archive_policy_name, value: "{{ gnocchi_statsd_archive_policy_name }}"}
+    - {section: statsd, option: flush_delay, value: "{{ gnocchi_statsd_flush_delay }}"}
+    - {section: keystone_authtoken, option: auth_uri, value: "{{ gnocchi_auth_uri }}"}
+    - {section: keystone_authtoken, option: admin_user, value: "{{ gnocchi_admin_user }}"}
+    - {section: keystone_authtoken, option: admin_password, value: "{{ gnocchi_admin_password }}"}
+    - {section: keystone_authtoken, option: admin_tenant_name, value: "{{ gnocchi_admin_tenant_name }}"}
+
+#- name: Configure gnocchi statsd
+#
+#- name: Configure gnocchi metricd
+#
+#- name: Manage service
+#
+#- name: Sync database
+#
+#- name: Configure gnocchi api
+#  #keystone_password => "",  # Keystone is not used, but this setting must be a string, otherwise class import fails
+#  #require => File['/etc/gnocchi/api-paste.ini'],
+#
+#- name: Create archive policy
+#  # Note: should actually wait until API is ready, like wait4gerrit
+#  #command => "/usr/bin/sleep 15 ; /usr/bin/curl -X POST http://127.0.0.1:8041/v1/archive_policy -H \"Content-Type: application/json\" -d '{\"back_window\": 0, \"definition\": [{ \"granularity\": \"5s\", \"timespan\": \"4 hours\" }, { \"granularity\": \"60s\", \"timespan\": \"1 week\" }, { \"granularity\": \"900s\", \"timespan\": \"90 days\" }], \"name\": \"archive\"}'",
