@@ -10,6 +10,9 @@ inventory:
       - managesf
       - etherpad
       - lodgeit
+      - statsd
+      - gnocchi
+      - grafana
       - gerrit
       - gerritbot
       - zuul

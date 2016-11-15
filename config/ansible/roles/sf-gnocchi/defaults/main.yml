@@ -1,0 +1,22 @@
+role_actions:
+  - setup
+
+gnocchi_log_dir: /var/log/gnocchi
+
+gnocchi_api_port: 8041
+gnocchi_api_host: 0.0.0.0
+gnocchi_api_workers: 4
+gnocchi_api_max_limit: 1000
+
+gnocchi_statsd_archive_policy_name: archive
+gnocchi_statsd_flush_delay: "5.0"
+gnocchi_statsd_project_id: 7815b28f-6322-4c1b-ade4-e071ef8c8045
+gnocchi_statsd_resource_id: f66370ee-be2a-451e-bf5d-45b9a554ce03
+gnocchi_statsd_user_id: 487cd2da-03e6-408a-8075-39f9df3f1707
+
+gnocchi_url_indexer: "mysql://gnocchi:{{ creds_gnocchi_sql_pwd }}@mysql.{{ fqdn }}/gnocchi"
+
+gnocchi_auth_uri: False
+gnocchi_admin_user: gnocchi
+gnocchi_admin_password: ""
+gnocchi_admin_tenant_name: services
