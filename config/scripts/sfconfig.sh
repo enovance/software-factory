@@ -119,7 +119,7 @@ function generate_keys {
     [ -f ${OUTPUT}/localCA.pem ] || rm -f ${OUTPUT}/gateway.*
 
     # Gen CA
-    [ -f ${OUTPUT}/localCA.pem ] || openssl req -nodes -days 3650 -new -x509 -subj "/C=FR/O=SoftwareFactory" \
+    [ -f ${OUTPUT}/localCA.pem ] || openssl req -nodes -days 3650 -new -x509 -subj "/C=FR/O=SoftwareFactory/OU=$(dmidecode -s system-uuid | cut -d- -f1)" \
         -keyout ${OUTPUT}/localCAkey.pem        \
         -out ${OUTPUT}/localCA.pem
 
