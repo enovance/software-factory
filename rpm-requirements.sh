@@ -18,6 +18,9 @@ which pip &> /dev/null          || PKGS="${PKGS} python-pip"
 [ -d "/usr/lib/python2.7/site-packages/jinja2/" ] || PKGS="${PKGS} python-jinja2"
 [ -f "/usr/lib64/libvirt/connection-driver/libvirt_driver_lxc.so" ] || PKGS="${PKGS} libvirt-daemon-driver-lxc libvirt-daemon-lxc libvirt"
 
+# activate package manager if edeploy is present
+which edeploy &> /dev/null && edeploy activate-pkgmngr
+
 if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
     echo "(+) Adds epel-release..."
     sudo yum install -y epel-release
