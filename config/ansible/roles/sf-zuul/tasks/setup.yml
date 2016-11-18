@@ -8,8 +8,6 @@
       proto: tcp
       setype: http_port_t
       state: present
-  when:
-      - selinuxenabled
 
 - name: "Apply patch"
   patch: src={{ item }} basedir=/srv/zuul/lib/python2.7/site-packages strip=1

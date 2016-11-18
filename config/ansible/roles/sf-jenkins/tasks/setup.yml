@@ -116,8 +116,6 @@
       setype: http_port_t
       state: present
   with_items: [8081, 8010]
-  when:
-      - selinuxenabled
 
 - name: Start service
   service: name=jenkins enabled=yes state=started
