@@ -1,4 +1,6 @@
 ---
+- include_vars: /etc/puppet/hiera/sf/sfcreds.yaml
+
 # Seport fail to relabel existing port, see https://github.com/ansible/ansible-modules-extras/issues/2009
 #- seport: ports={{ item }} proto=tcp setype=http_port_t state=present
 - name: "Selinux: check port labelling"
