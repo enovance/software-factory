@@ -42,8 +42,6 @@
       proto: tcp
       setype: http_port_t
       state: present
-  when:
-      - selinuxenabled
 
 - name: "Test if gerrit is already installed"
   stat:

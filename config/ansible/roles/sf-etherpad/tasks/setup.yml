@@ -7,8 +7,6 @@
       proto: tcp
       setype: http_port_t
       state: present
-  when:
-      - selinuxenabled
 
 - name: Install backup procedure
   template: src="{{ item }}.sh.j2" dest="/root/{{ item }}_etherpad.sh" mode=0555

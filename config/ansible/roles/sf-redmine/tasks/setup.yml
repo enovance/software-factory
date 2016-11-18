@@ -17,8 +17,6 @@
       proto: tcp
       setype: http_port_t
       state: present
-  when:
-      - selinuxenabled
 
 - name: "ensure directories are created"
   file: path=/var/www/redmine/public/themes/classic/javascripts/ state=directory
