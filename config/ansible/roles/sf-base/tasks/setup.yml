@@ -40,7 +40,6 @@
 - name: "system: allow apache to connect database"
   seboolean: name={{ item }} state=yes persistent=yes
   with_items: [httpd_can_network_connect, httpd_can_network_connect_db]
-  when: selinuxenabled
 
 - name: "system: install wait4 scripts"
   copy: src={{ item }} dest=/usr/libexec/{{ item }} mode=0555

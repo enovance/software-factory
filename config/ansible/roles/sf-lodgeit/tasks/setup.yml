@@ -5,8 +5,6 @@
       proto: tcp
       setype: http_port_t
       state: present
-  when:
-      - selinuxenabled
 
 - name: Copy service file
   copy: src=lodgeit.service dest=/lib/systemd/system/lodgeit.service

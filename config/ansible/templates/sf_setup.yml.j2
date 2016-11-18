@@ -27,8 +27,6 @@
 
 # Setup sf-base role on all hosts
 - hosts: all
-  pre_tasks:
-    - include: /etc/ansible/tasks/selinux_check.yml
   roles:
     - {name: "sf-postfix", action: "setup"}
     - {name: "sf-base", action: "setup"}
@@ -55,7 +53,6 @@
     - include: /etc/ansible/tasks/puppet.yml puppet_statement="{{ host['puppet_statement'] }}"
 {% endif %}
     - include: /etc/ansible/tasks/selinux_finalize.yml
-      when: selinuxenabled
 
 {% endfor %}
 
