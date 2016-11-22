@@ -83,14 +83,6 @@ class managesf ($gerrit = hiera('gerrit')) {
     require => File['/var/www/managesf/'],
   }
 
-  file { '/var/www/managesf/sshconfig':
-    ensure  => directory,
-    owner   => 'apache',
-    group   => 'apache',
-    mode    => '0640',
-    require => File['/var/www/managesf/'],
-  }
-
   file {'/root/sf-bootstrap-data/ssh_keys/gerrit_admin_rsa':
     ensure  => file,
     mode    => '0400',
