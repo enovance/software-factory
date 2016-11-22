@@ -9,3 +9,5 @@ puppet_modules:
 
 storyboardclient_url: https://git.openstack.org/openstack-infra/python-storyboardclient
 storyboardclient_commit: master
+
+managesf_port: 20001
