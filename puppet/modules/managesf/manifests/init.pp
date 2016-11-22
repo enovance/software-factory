@@ -82,12 +82,4 @@ class managesf ($gerrit = hiera('gerrit')) {
     content => inline_template('<%= @gerrit_admin_rsa %>'),
     require => File['/var/www/managesf/'],
   }
-
-  file { '/var/www/managesf/sshconfig':
-    ensure  => directory,
-    owner   => 'apache',
-    group   => 'apache',
-    mode    => '0640',
-    require => File['/var/www/managesf/'],
-  }
 }
