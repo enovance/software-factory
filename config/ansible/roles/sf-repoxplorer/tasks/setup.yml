@@ -1,0 +1,44 @@
+---
+- group: name=repoxplorer
+- user: name=repoxplorer group=repoxplorer shell=/sbin/nologin home=/var/lib/repoxplorer
+- file: path=/var/lib/repoxplorer state=directory mode=0700 owner=repoxplorer group=repoxplorer
+- file: path=/var/lib/repoxplorer/git_store state=directory mode=0700 owner=repoxplorer group=repoxplorer
+- file: path=/etc/repoxplorer state=directory mode=0700 owner=repoxplorer group=repoxplorer
+
+- name: "Install RepoXplorer default user config files"
+  copy: src={{ item }} dest=/etc/repoxplorer/{{ item }}
+  with_items:
+    - projects.yaml
+    - idents.yaml
+
+- name: "Set links to production user config files"
+  file:
+    src=/etc/repoxplorer/{{ item }}
+    dest=/srv/repoxplorer/local/share/repoxplorer/{{ item }}
+    state=link
+  with_items:
+    - idents.yaml
+    - projects.yaml
+
+- name: "Set links to production data stores"
+  file:
+    src=/var/lib/repoxplorer/{{ item }}
+    dest=/srv/repoxplorer/local/share/repoxplorer/{{ item }}
+    state=link
+  with_items:
+    - git_store
+
+- name: "Install RepoXplorer services files Indexer service"
+  copy: src={{ item }} dest=/lib/systemd/system/{{ item }}
+  register: services
+  with_items:
+    - repoxplorer-webui.service
+    - repoxplorer.service
+- command: systemctl daemon-reload
+  when: services|changed
+
+- name: "Start repoxplorer services"
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - repoxplorer-webui
+    - repoxplorer
