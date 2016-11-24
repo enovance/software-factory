@@ -11,6 +11,7 @@
 /home/
 
 # System Configuration
+/etc/software-factory
 /etc/fstab
 /etc/group
 /etc/gshadow
