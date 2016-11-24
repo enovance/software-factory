@@ -238,7 +238,9 @@ for host in $HOSTS; do
 done
 
 echo "[sfconfig] Starting configuration"
-time ansible-playbook /etc/ansible/sf_setup.yml || {
+[ -d /etc/software-factory ] || mkdir -m 0700 /etc/software-factory
+[ -f /etc/software-factory/custom-vars.yaml ] || touch /etc/software-factory/custom-vars.yaml
+time ansible-playbook --extra-vars=@/etc/software-factory/custom-vars.yaml /etc/ansible/sf_setup.yml || {
     echo "[sfconfig] sfpuppet playbook failed"
     exit 1
 }
