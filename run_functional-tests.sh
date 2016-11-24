@@ -109,7 +109,7 @@ case "${TEST_TYPE}" in
         run_bootstraps
         run_provisioner
         # Add tech preview components until they are fully integrated in the refarch
-        enable_arch_components remote /etc/puppet/hiera/sf/arch.yaml "$TECH_PREVIEW"
+        enable_arch_components remote /etc/software-factory/arch.yaml "$TECH_PREVIEW"
         run_upgrade
         run_checker "checksum_warn_only"
         run_serverspec_tests
