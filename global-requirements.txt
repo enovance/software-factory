@@ -1,0 +1,132 @@
+# Picked pecan==1.2.1, removed pecan==1.0.3
+# Picked python-ldap==2.4.28, removed python-ldap==2.4.20
+# Picked PyYAML==3.12, removed PyYAML==3.11
+# Picked requests==2.12.1, removed requests==2.8.1
+# Picked SQLAlchemy==1.0.8, removed SQLAlchemy==0.9.10
+# Picked stevedore==1.18.0, removed stevedore==1.7.0
+# Picked WebOb==1.7.0rc1, removed WebOb==1.5.0a1
+
+# managesf+cauth
+alabaster==0.7.9
+basicauth==0.3
+docutils==0.12
+future==0.16.0
+MySQL-python==1.2.5
+Pygments==2.1.3
+python-ldap==2.4.28
+snowballstemmer==1.2.1
+sphinx-rtd-theme==0.1.9
+Sphinx==1.3.1
+
+# managesf+cauth+sfmanager
+cffi==1.9.1
+cryptography==1.6
+ecdsa==0.11
+enum34==1.1.6
+idna==2.1
+ipaddress==1.0.17
+ndg-httpsclient==0.4.2
+paramiko==1.16.0
+pyasn1==0.1.9
+pycparser==2.17
+pycrypto==2.6.1
+pygerrit==1.0.0
+pyOpenSSL==16.2.0
+python-redmine==1.5.0
+
+# managesf+sfmanager
+urllib3==1.11
+
+# managesf+storyboard
+debtcollector==1.9.0
+iso8601==0.1.11
+monotonic==1.2
+msgpack-python==0.4.8
+netaddr==0.7.18
+netifaces==0.10.5
+oslo.config==3.19.0
+oslo.i18n==3.10.0
+oslo.serialization==2.14.0
+oslo.utils==3.18.0
+pyparsing==2.1.10
+rfc3986==0.4.1
+wrapt==1.10.8
+
+# managesf+storyboard+cauth
+Babel==2.3.4
+beautifulsoup4==4.5.1
+funcsigs==1.0.2
+Jinja2==2.8
+logutils==0.3.3
+Mako==1.0.6
+MarkupSafe==0.23
+pecan==1.2.1
+pytz==2016.7
+singledispatch==3.4.0.3
+SQLAlchemy==1.0.8
+stevedore==1.18.0
+waitress==1.0.1
+WebOb==1.7.0rc1
+WebTest==2.0.23
+
+# managesf+storyboard+cauth+sfmanager
+pbr==1.10.0
+PyYAML==3.12
+requests==2.12.1
+
+# cauth
+-e git+https://github.com/rohe/pyoidc.git@85514e6400a62e812d7dea968eba3738983312da#egg=oic
+Beaker==1.8.1
+funcparserlib==0.3.6
+httmock==1.2.3
+M2Crypto==0.25.1
+mock==1.3.0
+mockldap==0.2.5
+nose==1.3.7
+pycryptodomex==3.4.3
+pyjwkest==1.3.2
+testfixtures==4.13.1
+typing==3.5.2.2
+
+# managesf
+deepdiff==2.1.2
+gerritlib==0.4.0
+gitdb==0.6.4
+GitPython==2.0.8
+htpasswd==2.3
+orderedmultidict==0.7.11
+oslo.policy==1.13.0
+passlib==1.6.5
+smmap==0.9.0
+
+# sfmanager
+prettytable==0.7.2
+
+# storyboard
+alembic==0.8.8
+APScheduler==3.0.6
+decorator==4.0.10
+email==4.0.2
+eventlet==0.19.0
+functools32==3.2.3.post2
+futures==3.0.5
+greenlet==0.4.10
+jsonschema==2.5.1
+oauthlib==2.0.1
+oslo.context==2.10.0
+oslo.db==4.7.1
+oslo.log==3.17.0
+pika==0.10.0
+positional==1.1.1
+pyinotify==0.9.6
+PyMySQL==0.7.6
+python-dateutil==2.6.0
+python-editor==1.0.1
+python-openid==2.2.5
+simplegeneric==0.8.1
+SQLAlchemy-FullText-Search==0.2.3
+sqlalchemy-migrate==0.10.0
+sqlparse==0.2.2
+Tempita==0.5.2
+tzlocal==1.3
+WSME==0.7.0
