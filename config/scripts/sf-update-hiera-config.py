@@ -180,7 +180,7 @@ def clean_arch(data):
 if len(argv) == 2:
     hiera_dir = argv[1]
 else:
-    hiera_dir = "/etc/puppet/hiera/sf"
+    hiera_dir = "/etc/software-factory"
 
 if not os.path.isdir(hiera_dir):
     print "usage: %s hiera_dir" % argv[0]
