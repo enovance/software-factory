@@ -1,0 +1,117 @@
+# Picked ecdsa==0.13 over ecdsa==0.11
+# Picked paramiko==1.17.2 over paramiko==1.16.0
+# Picked pbr==1.10.0 over pbr==0.11.1
+# Picked pecan==1.2.1 over pecan==1.0.3
+# Picked python-ldap==2.4.28 over python-ldap==2.4.20
+# Picked python-redmine==1.5.0 over python-redmine==1.2.0
+# Picked PyYAML==3.12 over PyYAML==3.11
+# Picked requests==2.12.3 over requests==2.7.0
+# Picked six==1.10.0 over six==1.9.0
+# Picked SQLAlchemy==1.0.8 over SQLAlchemy==0.9.10
+# Picked stevedore==1.19.0 over stevedore==1.7.0
+# Picked WebOb==1.7.0rc1 over WebOb==1.5.0a1
+-e git+https://github.com/rohe/pyoidc.git@85514e6400a62e812d7dea968eba3738983312da#egg=oic # cauth
+alabaster==0.7.9                 # cauth+managesf
+alembic==0.8.9                   # storyboard
+APScheduler==3.0.6               # storyboard
+Babel==2.3.4                     # cauth+managesf+python-storyboardclient+storyboard
+basicauth==0.3                   # cauth+managesf
+Beaker==1.8.1                    # cauth
+beautifulsoup4==4.5.1            # cauth+managesf+storyboard
+cffi==1.9.1                      # cauth
+cryptography==1.6                # cauth
+debtcollector==1.10.0            # managesf+python-storyboardclient+storyboard
+decorator==4.0.10                # storyboard
+deepdiff==2.1.2                  # managesf
+docutils==0.12                   # cauth+managesf
+ecdsa==0.13                      # cauth+managesf+pysflib+python-sfmanager
+email==4.0.2                     # storyboard
+enum34==1.1.6                    # cauth
+eventlet==0.19.0                 # storyboard
+funcparserlib==0.3.6             # cauth
+funcsigs==1.0.2                  # cauth+managesf+python-storyboardclient+storyboard
+functools32==3.2.3.post2         # storyboard
+future==0.16.0                   # cauth+managesf
+futures==3.0.5                   # storyboard
+gerritlib==0.4.0                 # managesf
+gitdb==0.6.4                     # managesf
+GitPython==2.0.8                 # managesf
+greenlet==0.4.10                 # storyboard
+htpasswd==2.3                    # managesf
+httmock==1.2.3                   # cauth
+idna==2.1                        # cauth
+ipaddress==1.0.17                # cauth
+iso8601==0.1.11                  # managesf+python-storyboardclient+storyboard
+Jinja2==2.8                      # cauth+managesf+storyboard
+jsonschema==2.5.1                # storyboard
+logutils==0.3.3                  # cauth+managesf+storyboard
+M2Crypto==0.25.1                 # cauth
+Mako==1.0.6                      # cauth+managesf+storyboard
+MarkupSafe==0.23                 # cauth+managesf+storyboard
+mock==1.3.0                      # cauth
+mockldap==0.2.5                  # cauth
+monotonic==1.2                   # managesf+python-storyboardclient+storyboard
+msgpack-python==0.4.8            # managesf+python-storyboardclient+storyboard
+MySQL-python==1.2.5              # cauth+managesf
+netaddr==0.7.18                  # managesf+python-storyboardclient+storyboard
+netifaces==0.10.5                # managesf+python-storyboardclient+storyboard
+nose==1.3.7                      # cauth
+oauthlib==2.0.1                  # storyboard
+orderedmultidict==0.7.11         # managesf
+oslo.config==3.20.0              # managesf+python-storyboardclient+storyboard
+oslo.context==2.11.0             # managesf+python-storyboardclient+storyboard
+oslo.db==4.7.1                   # storyboard
+oslo.i18n==3.11.0                # managesf+python-storyboardclient+storyboard
+oslo.log==3.18.0                 # managesf+python-storyboardclient+storyboard
+oslo.policy==1.13.0              # managesf
+oslo.serialization==2.15.0       # managesf+python-storyboardclient+storyboard
+oslo.utils==3.19.0               # managesf+python-storyboardclient+storyboard
+paramiko==1.17.2                 # cauth+managesf+pysflib+python-sfmanager
+passlib==1.6.5                   # managesf
+pbr==1.10.0                      # cauth+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
+pecan==1.2.1                     # cauth+managesf+storyboard
+pika==0.10.0                     # storyboard
+positional==1.1.1                # managesf+python-storyboardclient+storyboard
+prettytable==0.7.2               # python-sfmanager
+pyasn1==0.1.9                    # cauth
+pycparser==2.17                  # cauth
+pycrypto==2.6.1                  # cauth+managesf+pysflib+python-sfmanager
+pycryptodomex==3.4.3             # cauth
+pygerrit==1.0.0                  # cauth+managesf+pysflib+python-sfmanager
+Pygments==2.1.3                  # cauth+managesf
+pyinotify==0.9.6                 # managesf+python-storyboardclient+storyboard
+pyjwkest==1.3.2                  # cauth
+PyMySQL==0.7.6                   # storyboard
+pyOpenSSL==16.2.0                # cauth
+pyparsing==2.1.10                # managesf+python-storyboardclient+storyboard
+python-dateutil==2.6.0           # managesf+python-storyboardclient+storyboard
+python-editor==1.0.3             # storyboard
+python-ldap==2.4.28              # cauth+managesf
+python-openid==2.2.5             # storyboard
+python-redmine==1.5.0            # cauth+managesf+pysflib+python-sfmanager
+pytz==2016.7                     # cauth+managesf+python-storyboardclient+storyboard
+PyYAML==3.12                     # cauth+managesf+pysflib+python-sfmanager+storyboard
+requests==2.12.3                 # cauth+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
+rfc3986==0.4.1                   # managesf+python-storyboardclient+storyboard
+simplegeneric==0.8.1             # storyboard
+singledispatch==3.4.0.3          # cauth+managesf+storyboard
+six==1.10.0                      # cauth+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
+smmap==0.9.0                     # managesf
+snowballstemmer==1.2.1           # cauth+managesf
+sphinx-rtd-theme==0.1.9          # cauth+managesf
+Sphinx==1.3.1                    # cauth+managesf
+SQLAlchemy-FullText-Search==0.2.3 # storyboard
+sqlalchemy-migrate==0.10.0       # storyboard
+SQLAlchemy==1.0.8                # cauth+managesf+storyboard
+sqlparse==0.2.2                  # storyboard
+stevedore==1.19.0                # cauth+managesf+python-storyboardclient+storyboard
+Tempita==0.5.2                   # storyboard
+testfixtures==4.13.1             # cauth
+typing==3.5.2.2                  # cauth
+tzlocal==1.3                     # storyboard
+urllib3==1.11                    # managesf+python-sfmanager
+waitress==1.0.1                  # cauth+managesf+storyboard
+WebOb==1.7.0rc1                  # cauth+managesf+storyboard
+WebTest==2.0.23                  # cauth+managesf+storyboard
+wrapt==1.10.8                    # managesf+python-storyboardclient+storyboard
+WSME==0.7.0                      # storyboard

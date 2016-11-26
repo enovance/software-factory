@@ -16,20 +16,11 @@ echo
 echo "# RPM packages versions"
 sudo chroot ${dir} rpm -qa | sort | while read pkg; do echo "rpm: ${pkg}"; done
 echo
-echo "# PIP packages versions"
-sudo chroot ${dir} pip freeze | sort | while read pkg; do echo "pip: ${pkg}"; done
-echo
 echo "# Gem packages versions"
 sudo chroot ${dir} gem list | grep '^[a-z]' | sort | while read pkg; do echo "gem: ${pkg}"; done
 echo
-echo "# Zuul venv"
-sudo chroot ${dir} /srv/zuul/bin/pip freeze | sort | while read pkg; do echo "zuul_pip: ${pkg}"; done
-echo
-echo "# Nodepool venv"
-sudo chroot ${dir} /srv/nodepool/bin/pip freeze | sort | while read pkg; do echo "nodepool_pip: ${pkg}"; done
-echo
-echo "# Managesf venv"
-sudo chroot ${dir} /var/www/managesf/bin/pip freeze | sort | while read pkg; do echo "managesf_pip: ${pkg}"; done
+echo "# Pip venv"
+sudo chroot ${dir} /srv/venv/bin/pip freeze | sort | while read pkg; do echo "pip: ${pkg}"; done
 
 # Nodejs package listing disable because npm stuck when system is not running
 #echo
