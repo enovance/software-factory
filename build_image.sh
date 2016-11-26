@@ -64,10 +64,6 @@ function build_qcow {
 function build_cache {
     [ -z "${SKIP_BUILD}" ] || return
     CACHE_HASH="$(git log --simplify-merges --format=oneline -n 1 $CACHE_DEPS)"
-    CACHE_HASH+=" | managesf: $(cd $MANAGESF_CLONED_PATH; git log --simplify-merges --format=oneline -n 1 requirements.txt)"
-    CACHE_HASH+=" | cauth: $(cd $CAUTH_CLONED_PATH; git log --simplify-merges --format=oneline -n 1 requirements.txt)"
-    CACHE_HASH+=" | sfmanager: $(cd $SFMANAGER_CLONED_PATH; git log --simplify-merges --format=oneline -n 1 requirements.txt)"
-    CACHE_HASH+=" | pysflib: $(cd $PYSFLIB_CLONED_PATH; git log --simplify-merges --format=oneline -n 1 requirements.txt)"
     LOCAL_HASH="$(head -n 1 ${CACHE_PATH}.description 2> /dev/null)"
 
     echo "(STEP1) Cache: ${CACHE_HASH}"

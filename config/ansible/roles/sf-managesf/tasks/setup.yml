@@ -38,9 +38,6 @@
   template: src=config.py.j2 dest=/etc/managesf/config.py group=managesf mode=0440
   notify: [restart managesf]
 
-- name: "Install managesf program"
-  command: ln -sf /var/www/managesf/bin/managesf-api /usr/bin/managesf-api
-
 - name: Install service file
   copy:
       src: managesf.service
