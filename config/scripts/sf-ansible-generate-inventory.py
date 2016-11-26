@@ -16,7 +16,7 @@ def install():
     if not os.path.isdir("%s/group_vars" % ansible_root):
         os.mkdir("%s/group_vars" % ansible_root, 0700)
     if not os.path.islink("%s/group_vars/all.yaml" % ansible_root):
-        os.symlink("/etc/puppet/hiera/sf/sfconfig.yaml",
+        os.symlink("/etc/software-factory/sfconfig.yaml",
                    "%s/group_vars/all.yaml" % ansible_root)
 
 
@@ -80,9 +80,9 @@ def generate_inventory():
                            "%s/templates/serverspec.yml.j2" % ansible_root,
                            arch)
 
-    if args.arch == "/etc/puppet/hiera/sf/arch.yaml":
+    if args.arch == "/etc/software-factory/arch.yaml":
         # Write updated version of refarch to _arch.yaml
-        open("/etc/puppet/hiera/sf/_arch.yaml", "w").write(
+        open("/etc/software-factory/_arch.yaml", "w").write(
             yaml.dump(arch, default_flow_style=False))
 
         # Update /etc/hosts
