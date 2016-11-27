@@ -475,27 +475,6 @@ EOF
     fi
 }
 
-function install_paste {
-    # Paste (Lodgeit)
-    if [ ! -d "${dir}/srv/lodgeit" ]; then
-        do_chroot ${dir} mkdir -p /srv/lodgeit
-        retry do_chroot ${dir} git clone ${PASTE_URL} /srv/lodgeit/lodgeit
-        do_chroot ${dir} bash -c "cd /srv/lodgeit/lodgeit && git checkout ${PASTE_VERSION}"
-        do_chroot ${dir} chown -R apache:apache /srv/lodgeit
-
-        # Replace absolute URLs beginning with /static/
-        do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/layout.html
-        do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/advanced.html
-        do_chroot ${dir} sed -i -e 's#/static/#/static/lodgeit/#g' /srv/lodgeit/lodgeit/lodgeit/views/help/pasting.html
-        # Include topmenu in Paste
-        cat << EOF | patch ${dir}/srv/lodgeit/lodgeit/lodgeit/views/layout.html
-11a12
->     <script type="text/javascript" src="/static/js/topmenu.js"></script>
-EOF
-    fi
-    rm -Rf ${dir}/srv/lodgeit/lodgeit/.git
-}
-
 function install_gerritbot {
     # Checkout VERSION in /tmp
     rm -Rf ${dir}/tmp/gerritbot
@@ -592,10 +571,9 @@ if [ "$STEP" == 1 ]; then
     install_serverspec
     checkpoint "pygerrit, fonts, edeploy, serverspect installed"
     install_etherpad
-    install_paste
     install_bup
     install_mod_authpub_tkt
-    checkpoint "etherpad, paste, bup, mod_authpub_tkt installed"
+    checkpoint "etherpad, bup, mod_authpub_tkt installed"
     install_gitweb_theme
     checkpoint "gitweb theme installed"
     copy_sf_ansible_roles
@@ -605,6 +583,7 @@ if [ "$STEP" == 1 ]; then
     ansible_install sf-managesf "$MANAGESF_EXTRA_VARS"
     ansible_install sf-lecm "$LECM_EXTRA_VARS"
     ansible_install sf-zuul "$ZUUL_EXTRA_VARS"
+    ansible_install sf-lodgeit "$LODGEIT_EXTRA_VARS"
     ansible_install sf-nodepool "$NODEPOOL_EXTRA_VARS"
     ansible_install sf-storyboard "${STORYBOARD_EXTRA_VARS}"
     ansible_install sf-storyboard-webclient "${STORYBOARD_WEBCLIENT_EXTRA_VARS}"

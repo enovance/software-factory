@@ -1,2 +1,8 @@
 role_actions:
+  - install
   - setup
+
+lodgeit_url: https://git.openstack.org/openstack-infra/lodgeit
+lodgeit_commit: master
+
+lodgeit_module_path: /srv/lodgeit/lib/python2.7/site-packages/lodgeit
