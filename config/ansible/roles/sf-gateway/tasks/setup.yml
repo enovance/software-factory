@@ -119,5 +119,9 @@
 - name: "zuul: install index.html"
   copy: src=zuul.index.html dest=/var/www/zuul/index.html mode=0444
 
-- name: "apache: start service"
-  service: name=httpd enabled=yes state=started
+- name: Start service
+  systemd:
+      name: httpd
+      state: started
+      daemon_reload: yes
+      enabled: yes
