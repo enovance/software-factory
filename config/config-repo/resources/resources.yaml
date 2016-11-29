@@ -1,12 +1,12 @@
 resources:
   projects: {}
   repos:
-    config:
+    77ad454f-a534-4a3b-8ae6-78fde5030b6e:
       name: config
       description: Config repository (Do not delete it)
-      acl: config-acl
+      acl: 51bd5183-7e82-4737-8abd-54bbf1a6aea4
   acls:
-    config-acl:
+    51bd5183-7e82-4737-8abd-54bbf1a6aea4:
       file: |
         [access "refs/*"]
           read = group config-core
@@ -30,15 +30,15 @@ resources:
           mergeContent = false
           action = fast forward only
       groups:
-        - config-ptl
-        - config-core
+        - ec0fcbfb-09d7-4379-9e6d-6ad377720d77
+        - 3ef29c69-37fa-480f-bd4a-aabaf8256c3b
   groups:
-    config-ptl:
+    ec0fcbfb-09d7-4379-9e6d-6ad377720d77:
       name: config-ptl
       description: Team lead for the config repo
       members:
         - admin@sftests.com
-    config-core:
+    3ef29c69-37fa-480f-bd4a-aabaf8256c3b:
       name: config-core
       description: Team core for the config repo
       members: []
