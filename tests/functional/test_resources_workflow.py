@@ -18,6 +18,7 @@ import os
 import re
 import time
 import json
+import uuid
 import config
 import shutil
 import requests
@@ -162,11 +163,10 @@ class TestResourcesWorkflow(Base):
         name = create_random_str()
         resources = """resources:
   groups:
-    %s:
+    d490a8dd-5c35-4be5-9705-0d61d739eed0:
       description: test for functional test
 """
         # Add the resource file with review then check CI
-        resources = resources % name
         self.propose_resources_change_check_ci(fpath,
                                                resources=resources,
                                                mode='add',
@@ -179,14 +179,14 @@ class TestResourcesWorkflow(Base):
         name = create_random_str()
         resources = """resources:
   groups:
-    %s:
+    d490a8dd-5c35-4be5-9705-0d61d739eed0:
       name: %s
       description: test for functional test
       members:
         - user2@sftests.com
 """
         # Add the resource file with review then check CI
-        resources = resources % (name, name)
+        resources = resources % name
         self.propose_resources_change_check_ci(fpath,
                                                resources=resources,
                                                mode='add',
@@ -433,13 +433,14 @@ class TestResourcesWorkflow(Base):
         prev = "resources: {}"
         new = """resources:
   groups:
-    %(gname)s:
+    %(rid)s:
       name: %(gname)s
       description: A test group
       members: ['user2@sftests.com']
 """
+        rid = str(uuid.uuid4())
         group_name = create_random_str()
-        data = {'prev': prev, 'new': new % {'gname': group_name}}
+        data = {'prev': prev, 'new': new % {'gname': group_name, 'rid': rid}}
         # Direct PUT resources bypassing the config repo workflow
         requests.put("%s/manage/resources/" % config.GATEWAY_URL,
                      json=data,
@@ -450,7 +451,10 @@ class TestResourcesWorkflow(Base):
                            cookies={'auth_pubtkt': token})
         logs, resources = ret.json()
         self.assertListEqual(logs, [])
-        self.assertIn(group_name, resources['resources']['groups'])
+        self.assertListEqual(
+            [n['name'] for n in resources['resources']['groups'].values()
+             if n['name'] == group_name],
+            [group_name])
         # Call the resources.sh script on managesf node to propose
         # a review on the config repo to re-sync with the reality
         cmd = ['/usr/local/bin/resources.sh',
