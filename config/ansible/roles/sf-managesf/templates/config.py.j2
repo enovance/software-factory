@@ -32,8 +32,10 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['normal']},
     'loggers': {
-        'managesf': {'level': 'DEBUG', 'handlers': ['console'],
+        'managesf': {'level': 'DEBUG', 'handlers': ['console', 'normal'],
                      'propagate': False},
+        # Reduce requests debugging level
+        'requests': {'level': 'WARNING', 'handlers': ['normal']},
     },
     'handlers': {
         'console': {'level': 'INFO', 'class': 'logging.StreamHandler',
