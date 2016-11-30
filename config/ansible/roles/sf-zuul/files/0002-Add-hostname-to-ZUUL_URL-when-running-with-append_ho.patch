@@ -1,0 +1,38 @@
+From 3b6128e0fb8fe129bf1b9745c4119ed929ff1e44 Mon Sep 17 00:00:00 2001
+From: Tristan Cacqueray <tdecacqu@redhat.com>
+Date: Wed, 30 Nov 2016 04:41:08 +0000
+Subject: [PATCH 2/2] Add hostname to ZUUL_URL when running with
+ append_hostname
+
+Change-Id: Id89373f1e1818368062e57c4806cc1176a9f0172
+---
+ zuul/launcher/gearman.py | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/zuul/launcher/gearman.py b/zuul/launcher/gearman.py
+index 02f78fd..9f67822 100644
+--- a/zuul/launcher/gearman.py
++++ b/zuul/launcher/gearman.py
+@@ -287,6 +287,19 @@ class Gearman(object):
+         params['ZUUL_PIPELINE'] = pipeline.name
+         params['ZUUL_URL'] = item.current_build_set.zuul_url
+         params['ZUUL_VOTING'] = job.voting and '1' or '0'
++
++        if self.config.has_option('merger', 'append_hostname') and \
++                self.config.getboolean('merger', 'append_hostname'):
++            if params['ZUUL_URL'][-1] == '/':
++                params['ZUUL_URL'] = params['ZUUL_URL'][:-1]
++            connection_hostname = self.config.get('connection %s' % (
++                item.pipeline.source.connection.connection_name),
++                'server')
++            self.log.debug('Appending hostname %s to ZUUL_URL' % (
++                connection_hostname))
++            params['ZUUL_URL'] = "%s/%s" % (params['ZUUL_URL'],
++                                            connection_hostname)
++
+         if hasattr(item.change, 'refspec'):
+             changes_str = '^'.join(
+                 ['%s:%s:%s' % (i.change.project.name, i.change.branch,
+-- 
+2.7.3
+
