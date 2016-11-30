@@ -1,0 +1,95 @@
+From 16151307b21ce1641c43d6a0aebaf1ddda7449fb Mon Sep 17 00:00:00 2001
+From: Paul Belanger <pabelanger@redhat.com>
+Date: Fri, 7 Oct 2016 11:59:22 -0400
+Subject: [PATCH 1/2] Add hostname to merger path for git repos
+
+Since it is possible for zuul to be connected to 2 different gerrit
+servers, it is possible to have a namespace collision with git
+projects both using the same namespace.
+
+Fix this my adding the hostname of the remote url into the working
+directory path.
+
+Change-Id: Idc4c1e722c8e553041fc32ddbecdcab524bea64a
+Signed-off-by: Paul Belanger <pabelanger@redhat.com>
+---
+ doc/source/zuul.rst     |  6 ++++++
+ etc/zuul.conf-sample    |  1 +
+ tests/base.py           |  3 ++-
+ tests/test_scheduler.py | 33 +++++++++++++++++++++++++++++++++
+ zuul/merger/merger.py   | 17 +++++++++++++++--
+ zuul/merger/server.py   |  8 +++++++-
+ 6 files changed, 64 insertions(+), 4 deletions(-)
+
+diff --git a/zuul/merger/merger.py b/zuul/merger/merger.py
+index b3cfaca..c53b9a4 100644
+--- a/zuul/merger/merger.py
++++ b/zuul/merger/merger.py
+@@ -16,6 +16,7 @@
+ import git
+ import os
+ import logging
++import urlparse
+ 
+ import zuul.model
+ 
+@@ -199,7 +200,8 @@ class Repo(object):
+ class Merger(object):
+     log = logging.getLogger("zuul.Merger")
+ 
+-    def __init__(self, working_root, connections, email, username):
++    def __init__(self, working_root, connections, email, username,
++                 append_hostname):
+         self.repos = {}
+         self.working_root = working_root
+         if not os.path.exists(working_root):
+@@ -207,6 +209,7 @@ class Merger(object):
+         self._makeSSHWrappers(working_root, connections)
+         self.email = email
+         self.username = username
++        self.append_hostname = append_hostname
+ 
+     def _makeSSHWrappers(self, working_root, connections):
+         for connection_name, connection in connections.items():
+@@ -226,7 +229,17 @@ class Merger(object):
+     def addProject(self, project, url):
+         repo = None
+         try:
+-            path = os.path.join(self.working_root, project)
++            parsed = None
++            root = self.working_root
++
++            if self.append_hostname:
++                parsed = urlparse.urlparse(url)
++            if parsed:
++                root = os.path.join(self.working_root, parsed.hostname)
++            elif self.append_hostname:
++                self.log.warning("Unable to find hostname in url: %s" % url)
++
++            path = os.path.join(root, project)
+             repo = Repo(url, path, self.email, self.username)
+ 
+             self.repos[project] = repo
+diff --git a/zuul/merger/server.py b/zuul/merger/server.py
+index d56993c..f441003 100644
+--- a/zuul/merger/server.py
++++ b/zuul/merger/server.py
+@@ -44,8 +44,14 @@ class MergeServer(object):
+         else:
+             merge_name = None
+ 
++        if self.config.has_option('merger', 'append_hostname'):
++            append_hostname = self.config.getboolean(
++                'merger', 'append_hostname')
++        else:
++            append_hostname = False
++
+         self.merger = merger.Merger(merge_root, connections, merge_email,
+-                                    merge_name)
++                                    merge_name, append_hostname)
+ 
+     def start(self):
+         self._running = True
+-- 
+2.7.3
+

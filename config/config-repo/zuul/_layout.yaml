@@ -17,6 +17,7 @@ pipelines:
     require:
       open: True
       current-patchset: True
+    source: gerrit
     trigger:
       gerrit:
         - event: patchset-created
@@ -47,6 +48,7 @@ pipelines:
           username: jenkins
         - code-review: 2
         - workflow: 1
+    source: gerrit
     trigger:
       gerrit:
         - event: comment-added
@@ -76,6 +78,7 @@ pipelines:
     description: This pipeline runs jobs that operate after each change is merged.
     manager: IndependentPipelineManager
     precedence: low
+    source: gerrit
     trigger:
       gerrit:
         - event: ref-updated
@@ -85,6 +88,7 @@ pipelines:
     description: Jobs in this queue are triggered daily.
     manager: IndependentPipelineManager
     precedence: low
+    source: gerrit
     trigger:
       timer:
         - time: '0 0 * * *'
