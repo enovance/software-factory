@@ -1,8 +1,28 @@
 ---
 - include: /etc/ansible/tasks/create_user.yml user_name=grafana
 
-- name: "Setup grafana.ini"
-  template: src=grafana.ini.j2 dest=/etc/grafana/grafana.ini
+
+- name: Configure grafana.ini
+  ini_file:
+      dest: /etc/grafana/grafana.ini
+      section: "{{ item.section }}"
+      option: "{{ item.option }}"
+      value: "{{ item.value }}"
+  with_items:
+    - {section: server, option: http_port, value: "{{ grafana_server_http_port }}"}
+    - {section: server, option: root_url, value: "{{ grafana_server_root_url }}"}
+    - {section: database, option: type, value: "{{ grafana_database_type }}"}
+    - {section: database, option: host, value: "{{ grafana_database_host }}"}
+    - {section: database, option: name, value: "{{ grafana_database_name }}"}
+    - {section: database, option: user, value: "{{ grafana_database_user }}"}
+    - {section: database, option: password, value: "{{ grafana_database_password }}"}
+    - {section: users, option: allow_sign_up, value: "{{ grafana_users_allow_sign_up }}"}
+    - {section: auth.anonymous, option: enabled, value: "{{ grafana_auth_anonymous_enabled }}"}
+    - {section: auth.anonymous, option: org_role , value: "{{ grafana_auth_anonymous_org_role }}"}
+    - {section: auth.proxy, option: enabled, value: "{{ grafana_auth_proxy_enabled }}"}
+    - {section: auth.proxy, option: header_name, value: "{{ grafana_auth_proxy_header_name }}"}
+    - {section: auth.basic, option: enabled, value: "{{ grafana_auth_basic_enabled }}"}
+    - {section: , option: , value: "{{  }}"}
   notify: [restart grafana]
 
 - name: "Fix systemd file to wait for mysql"

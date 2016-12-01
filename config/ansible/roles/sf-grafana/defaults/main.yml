@@ -1,5 +1,23 @@
 role_actions:
   - setup
 
-grafana_http_port: 3000
 grafana_internal_url: http://grafana.{{ fqdn }}:{{ grafana_http_port }}/
+
+grafana_server_http_port: 3000
+grafana_server_root_url: {{ gateway_url }}/grafana/
+
+grafana_database_type: mysql
+grafana_database_host: mysql.{{ fqdn }}:3306
+grafana_database_name: grafana
+grafana_database_user: grafana
+grafana_database_password: {{ creds_grafana_sql_pwd }}
+
+grafana_users_allow_sign_up: false
+
+grafana_auth_anonymous_enabled: true
+grafana_auth_anonymous_org_role: Viewer
+
+grafana_auth_proxy_enabled: true
+grafana_auth_proxy_header_name: X-Forwarded-User
+
+grafana_auth_basic_enabled: false
