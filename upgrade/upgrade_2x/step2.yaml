@@ -38,7 +38,7 @@
 - hosts: install-server
   tasks:
   - name: Restart the configuration script
-    shell: sfconfig.sh &> /var/log/upgrade-bootstrap.log
+    shell: sfconfig.sh | tee -a /var/log/software-factory/upgrade.log
   # Managesf database migration
   - include: tasks/managesf_db.yml
   # Cauth database migration
