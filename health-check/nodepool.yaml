@@ -70,7 +70,7 @@
 - hosts: nodepool
   tasks:
     - name: Wait for image build start
-      wait_for: path=/var/log/nodepool/nodepool.log search_regex="Creating image.*{{ image_name }}"
+      wait_for: path=/var/log/nodepool/nodepool.log search_regex="nodepool.image.build.{{ provider_name }}.{{ image_name }}"
 
     - name: "Check image is building"
       command: nodepool image-list
