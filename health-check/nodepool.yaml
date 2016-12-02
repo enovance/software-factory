@@ -70,7 +70,7 @@
 - hosts: nodepool
   tasks:
     - name: Wait for image build start
-      wait_for: path=/var/log/nodepool/nodepool.log search_regex="Creating image.*{{ image_name }}"
+      wait_for: path=/var/log/nodepool/nodepool.log search_regex="nodepool.image.build.{{ provider_name }}.{{ image_name }}"
 
     - name: "Check image is building"
       command: nodepool image-list
@@ -78,7 +78,7 @@
       failed_when: imagelist.stdout.find("{{ image_name }}") == -1
 
     - name: "Wait for ssh connection to be okay for image build"
-      wait_for: path=/var/log/nodepool/image.log timeout=900 search_regex="{{ image_name }}.* access okay"
+      wait_for: path=/var/log/nodepool/image.log timeout=900 search_regex="nodepool.image.build.{{ provider_name }}.{{ image_name }}: \*\*\* SUCCESSFULLY test ssh access"
 
     - name: "Wait for image build to succeed: Base setup done."
       wait_for: path=/var/log/nodepool/image.log timeout=900 search_regex="nodepool.image.build.{{ provider_name }}.{{ image_name }}.*Base setup done."
