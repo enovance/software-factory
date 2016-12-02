@@ -1,0 +1,70 @@
+From 8bc789dc047f69298409cfb6b2fe3eafa29203fd Mon Sep 17 00:00:00 2001
+From: Tristan Cacqueray <tdecacqu@redhat.com>
+Date: Wed, 30 Nov 2016 06:35:30 +0000
+Subject: [PATCH] Don't getChange on source not triggering a change
+
+The current scheduler logic is to try to getChange
+from all pipelines source and then skip pipelines which
+source fail with ChangeNotFound. Moreover this logic
+may fail when the getChange raises another exception.
+
+Address this by adding the trigger_source to the
+TriggerEvent object and only process pipelines that
+use the same source.
+
+Change-Id: I0597146562be65b12a574e6edd46805b5451fc97
+---
+ zuul/connection/gerrit.py |  1 +
+ zuul/model.py             |  1 +
+ zuul/scheduler.py         | 10 +++-------
+ 3 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/zuul/connection/gerrit.py b/zuul/connection/gerrit.py
+index 62891cd..d1d5b4e 100644
+--- a/zuul/connection/gerrit.py
++++ b/zuul/connection/gerrit.py
+@@ -59,6 +59,7 @@ class GerritEventConnector(threading.Thread):
+         event = TriggerEvent()
+         event.type = data.get('type')
+         event.trigger_name = 'gerrit'
++        event.trigger_source = self.connection.connection_name
+         change = data.get('change')
+         if change:
+             event.project_name = change.get('project')
+diff --git a/zuul/model.py b/zuul/model.py
+index b24a06b..c107090 100644
+--- a/zuul/model.py
++++ b/zuul/model.py
+@@ -1040,6 +1040,7 @@ class TriggerEvent(object):
+         self.type = None
+         self.project_name = None
+         self.trigger_name = None
++        self.trigger_source = None
+         # Representation of the user account that performed the event.
+         self.account = None
+         # patchset-created, comment-added, etc.
+diff --git a/zuul/scheduler.py b/zuul/scheduler.py
+index 8c26541..bb3f62f 100644
+--- a/zuul/scheduler.py
++++ b/zuul/scheduler.py
+@@ -1022,14 +1022,10 @@ class Scheduler(threading.Thread):
+                 # Get the change even if the project is unknown to us for the
+                 # use of updating the cache if there is another change
+                 # depending on this foreign one.
+-                try:
+-                    change = pipeline.source.getChange(event, project)
+-                except exceptions.ChangeNotFound as e:
+-                    self.log.debug("Unable to get change %s from source %s. "
+-                                   "(most likely looking for a change from "
+-                                   "another connection trigger)",
+-                                   e.change, pipeline.source)
++                connection_name = pipeline.source.connection.connection_name
++                if event.trigger_source != connection_name:
+                     continue
++                change = pipeline.source.getChange(event, project)
+                 if not project or project.foreign:
+                     self.log.debug("Project %s not found" % event.project_name)
+                     continue
+-- 
+2.7.3
+
