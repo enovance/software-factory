@@ -1,4 +1,5 @@
 # Picked ecdsa==0.13 over ecdsa==0.11
+# Picked gerritlib==0.6.0 over gerritlib==0.4.0
 # Picked paramiko==1.17.2 over paramiko==1.16.0
 # Picked pbr==1.10.0 over pbr==0.11.1
 # Picked pecan==1.2.1 over pecan==1.0.3
@@ -15,6 +16,7 @@ alabaster==0.7.9                 # cauth+managesf
 alembic==0.8.9                   # storyboard
 APScheduler==3.0.6               # storyboard
 Babel==2.3.4                     # cauth+managesf+python-storyboardclient+storyboard
+backports.functools-lru-cache==1.3 # gerritbot
 basicauth==0.3                   # cauth+managesf
 Beaker==1.8.1                    # cauth
 beautifulsoup4==4.5.1            # cauth+managesf+storyboard
@@ -23,8 +25,8 @@ cryptography==1.6                # cauth
 debtcollector==1.10.0            # managesf+python-storyboardclient+storyboard
 decorator==4.0.10                # storyboard
 deepdiff==2.1.2                  # managesf
-docutils==0.12                   # cauth+managesf
-ecdsa==0.13                      # cauth+managesf+pysflib+python-sfmanager
+docutils==0.12                   # cauth+gerritbot+managesf
+ecdsa==0.13                      # cauth+gerritbot+managesf+pysflib+python-sfmanager
 email==4.0.2                     # storyboard
 enum34==1.1.6                    # cauth
 eventlet==0.19.0                 # storyboard
@@ -33,17 +35,27 @@ funcsigs==1.0.2                  # cauth+managesf+python-storyboardclient+storyb
 functools32==3.2.3.post2         # storyboard
 future==0.16.0                   # cauth+managesf
 futures==3.0.5                   # storyboard
-gerritlib==0.4.0                 # managesf
+gerritlib==0.6.0                 # gerritbot+managesf
 gitdb==0.6.4                     # managesf
 GitPython==2.0.8                 # managesf
 greenlet==0.4.10                 # storyboard
 htpasswd==2.3                    # managesf
 httmock==1.2.3                   # cauth
 idna==2.1                        # cauth
+inflect==0.2.5                   # gerritbot
 ipaddress==1.0.17                # cauth
+irc==15.0.5                      # gerritbot
 iso8601==0.1.11                  # managesf+python-storyboardclient+storyboard
+jaraco.classes==1.4              # gerritbot
+jaraco.collections==1.5          # gerritbot
+jaraco.functools==1.15.1         # gerritbot
+jaraco.itertools==2.0            # gerritbot
+jaraco.logging==1.5              # gerritbot
+jaraco.stream==1.1.1             # gerritbot
+jaraco.text==1.8                 # gerritbot
 Jinja2==2.8                      # cauth+managesf+storyboard
 jsonschema==2.5.1                # storyboard
+lockfile==0.12.2                 # gerritbot
 logutils==0.3.3                  # cauth+managesf+storyboard
 M2Crypto==0.25.1                 # cauth
 Mako==1.0.6                      # cauth+managesf+storyboard
@@ -51,6 +63,7 @@ MarkupSafe==0.23                 # cauth+managesf+storyboard
 mock==1.3.0                      # cauth
 mockldap==0.2.5                  # cauth
 monotonic==1.2                   # managesf+python-storyboardclient+storyboard
+more-itertools==2.4.1            # gerritbot
 msgpack-python==0.4.8            # managesf+python-storyboardclient+storyboard
 MySQL-python==1.2.5              # cauth+managesf
 netaddr==0.7.18                  # managesf+python-storyboardclient+storyboard
@@ -66,16 +79,16 @@ oslo.log==3.18.0                 # managesf+python-storyboardclient+storyboard
 oslo.policy==1.13.0              # managesf
 oslo.serialization==2.15.0       # managesf+python-storyboardclient+storyboard
 oslo.utils==3.19.0               # managesf+python-storyboardclient+storyboard
-paramiko==1.17.2                 # cauth+managesf+pysflib+python-sfmanager
+paramiko==1.17.2                 # cauth+gerritbot+managesf+pysflib+python-sfmanager
 passlib==1.6.5                   # managesf
-pbr==1.10.0                      # cauth+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
+pbr==1.10.0                      # cauth+gerritbot+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
 pecan==1.2.1                     # cauth+managesf+storyboard
 pika==0.10.0                     # storyboard
 positional==1.1.1                # managesf+python-storyboardclient+storyboard
 prettytable==0.7.2               # python-sfmanager
 pyasn1==0.1.9                    # cauth
 pycparser==2.17                  # cauth
-pycrypto==2.6.1                  # cauth+managesf+pysflib+python-sfmanager
+pycrypto==2.6.1                  # cauth+gerritbot+managesf+pysflib+python-sfmanager
 pycryptodomex==3.4.3             # cauth
 pygerrit==1.0.0                  # cauth+managesf+pysflib+python-sfmanager
 Pygments==2.1.3                  # cauth+managesf
@@ -84,18 +97,19 @@ pyjwkest==1.3.2                  # cauth
 PyMySQL==0.7.6                   # storyboard
 pyOpenSSL==16.2.0                # cauth
 pyparsing==2.1.10                # managesf+python-storyboardclient+storyboard
+python-daemon==2.1.2             # gerritbot
 python-dateutil==2.6.0           # managesf+python-storyboardclient+storyboard
 python-editor==1.0.3             # storyboard
 python-ldap==2.4.28              # cauth+managesf
 python-openid==2.2.5             # storyboard
 python-redmine==1.5.0            # cauth+managesf+pysflib+python-sfmanager
-pytz==2016.7                     # cauth+managesf+python-storyboardclient+storyboard
-PyYAML==3.12                     # cauth+managesf+pysflib+python-sfmanager+storyboard
+pytz==2016.7                     # cauth+gerritbot+managesf+python-storyboardclient+storyboard
+PyYAML==3.12                     # cauth+gerritbot+managesf+pysflib+python-sfmanager+storyboard
 requests==2.12.3                 # cauth+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
 rfc3986==0.4.1                   # managesf+python-storyboardclient+storyboard
 simplegeneric==0.8.1             # storyboard
 singledispatch==3.4.0.3          # cauth+managesf+storyboard
-six==1.10.0                      # cauth+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
+six==1.10.0                      # cauth+gerritbot+managesf+pysflib+python-sfmanager+python-storyboardclient+storyboard
 smmap==0.9.0                     # managesf
 snowballstemmer==1.2.1           # cauth+managesf
 sphinx-rtd-theme==0.1.9          # cauth+managesf
@@ -106,6 +120,7 @@ SQLAlchemy==1.0.8                # cauth+managesf+storyboard
 sqlparse==0.2.2                  # storyboard
 stevedore==1.19.0                # cauth+managesf+python-storyboardclient+storyboard
 Tempita==0.5.2                   # storyboard
+tempora==1.6.1                   # gerritbot
 testfixtures==4.13.1             # cauth
 typing==3.5.2.2                  # cauth
 tzlocal==1.3                     # storyboard
