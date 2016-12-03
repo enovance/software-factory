@@ -230,8 +230,9 @@ install_sf_packages() {
 
 install_venv_packages() {
     [ -d ${dir}/srv/venv ] || do_chroot ${dir} virtualenv /srv/venv
-    grep -v 'egg=oic ' ${ORIG}/../global-requirements.txt > ${dir}/root/global-requirements.txt
-    grep 'egg=oic ' ${ORIG}/../global-requirements.txt > ${dir}/root/global-requirements-without-install-options.txt
+    NO_INSTALL_OPTIONS='\(egg=oic \|^python-daemon\)'
+    grep -v "$NO_INSTALL_OPTIONS" ${ORIG}/../global-requirements.txt > ${dir}/root/global-requirements.txt
+    grep "$NO_INSTALL_OPTIONS" ${ORIG}/../global-requirements.txt > ${dir}/root/global-requirements-without-install-options.txt
     # Install install requierments first...
     do_chroot ${dir} /srv/venv/bin/pip install --upgrade pip
     do_chroot ${dir} /srv/venv/bin/pip install --upgrade pbr setuptools six Jinja2 Babel -c/root/global-requirements.txt
