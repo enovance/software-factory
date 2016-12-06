@@ -24,3 +24,5 @@
     - logstash
     - kibana
     - storyboard
+    - rabbitmq-server
+    - storyboard-worker
