@@ -13,6 +13,9 @@
     - projects.yaml
     - service_token.sql
 
+- name: "Install logging.conf"
+  copy: src=logging.conf dest=/etc/storyboard/logging.conf
+
 - name: "Setup database"
   command: storyboard-db-manage upgrade head
 
@@ -27,15 +30,41 @@
 
 - name: Install service file
   template:
-      src: storyboard.service.j2
-      dest: /lib/systemd/system/storyboard.service
+      src: "{{ item }}.service.j2"
+      dest: "/lib/systemd/system/{{ item }}.service"
       owner: root
       group: root
       mode: 0644
+  with_items:
+    - storyboard
+    - storyboard-worker
+
 
 - name: Start service
   systemd:
       name: storyboard
+      state: started
+      daemon_reload: yes
+      enabled: yes
+
+- block:
+  when: storyboard_email_notification
+  - name: "Create rabbitmq vhost"
+    rabbitmq_vhost: name=/storyboard state=present
+
+  - name: "Add rabbitmq user"
+    rabbitmq_user:
+      user: storyboard
+      vhost: /storyboard
+      password: "{{ storyboard_rabbitmq_password }}"
+      configure_priv: .*
+      write_priv: .*
+      read_priv: .*
+      state: present
+
+  - name: Start worker service
+    systemd:
+      name: storyboard-worker
       state: started
       daemon_reload: yes
       enabled: yes
