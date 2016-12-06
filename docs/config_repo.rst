@@ -36,3 +36,4 @@ To update the configuration repo:
    gerritlinks_user
    resources_user
    resources
+   koji_integration_user
