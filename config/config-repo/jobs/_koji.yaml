@@ -1,0 +1,86 @@
+# This file is managed by configuration management, do not edit directly
+# This is the definition of the default jobs
+
+# This is the base jobs for interacting with a koji
+# build system. To be able to run them be sure
+# your image is prepared with kojiclient-base.sh
+
+- builder:
+    name: prepare-kojiclient-workspace
+    builders:
+      - shell: |
+          # Set the koji client configuration if
+          # you use a koji server other than CBS
+          # cat > /tmp/koji.conf << EOF
+          # [koji]
+          # server = http://koji/kojihub
+          # weburl = http://koji/koji
+          # topurl = http://koji/kojifiles
+          # topdir = /mnt/koji
+          # cert = ~/.koji/client.crt
+          # ca = ~/.koji/clientca.crt
+          # serverca = ~/.koji/serverca.crt
+          # EOF
+          # sudo cp /tmp/koji.conf /etc/koji.conf
+          # cat /etc/koji.conf
+          # Set koji client identity
+          # Set koji client identity
+          echo "Set Koji client identity"
+          tar -xzf ${CLIENTSECRET} -C /home/jenkins/
+
+- builder:
+    name: 'base-pkg-validation'
+    defaults: global
+    builders:
+      - prepare-kojiclient-workspace
+      - shell: |
+          REPOS_CLONE_URL={reposcloneurl} /var/lib/koji-jobs/pkg-validate.sh {buildtarget} {kojicmd}
+
+- builder:
+    name: 'base-pkg-exportation'
+    defaults: global
+    builders:
+      - prepare-kojiclient-workspace
+      - shell: |
+          REPOS_CLONE_URL={reposcloneurl} /var/lib/koji-jobs/pkg-export.sh {buildtarget} {kojicmd}
+
+# Below are job definition example. Please use another file to declare
+# your jobs.
+
+#- job:
+#    name: 'package-validate'
+#    defaults: global
+#    builders:
+#      - base-pkg-validation:
+#          buildtarget: "dist-centos7"
+#          kojicmd: "koji"
+#          reposcloneurl: "http://sftests.com/r"
+#      - shell: |
+#          echo "Built RPM have been fetched. Additionnal tests can be done here."
+#    triggers:
+#      - zuul
+#    wrappers:
+#      - credentials-binding:
+#        - file:
+#           credential-id: ID_TO_THE_CERTS_ARCHIVE
+#           variable: CLIENTSECRET
+#    node: base-centos7
+#
+#- job:
+#    name: 'package-export'
+#    defaults: global
+#    builders:
+#      - base-pkg-exportation:
+#          buildtarget: "dist-centos7"
+#          kojicmd: "koji"
+#          reposcloneurl: "http://sftests.com/r"
+#      - shell: |
+#          echo "Exported !. Nothing more to do here."
+#    triggers:
+#      - zuul
+#    wrappers:
+#      - credentials-binding:
+#        - file:
+#           credential-id: ID_TO_THE_CERTS_ARCHIVE
+#           variable: CLIENTSECRET
+#    node: base-centos7
