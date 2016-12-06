@@ -1,0 +1,27 @@
+# This is the base jobs for interacting with a koji
+# build system. To be able to run them be sure
+# your image is prepared with kojiclient-base.sh
+
+- builder:
+    name: prepare-kojiclient-workspace
+    builders:
+      - shell: |
+          # Set koji client identity
+          echo "Set Koji client identity"
+          tar -xzf ${CLIENTSECRET} -C /home/jenkins/
+
+- builder:
+    name: 'base-pkg-validation'
+    defaults: global
+    builders:
+      - prepare-kojiclient-workspace
+      - shell: |
+          SF_HOST={sfhost} /var/lib/koji-jobs/pkg-validate.sh {buildtarget} {kojicmd}
+
+- builder:
+    name: 'base-pkg-exportation'
+    defaults: global
+    builders:
+      - prepare-kojiclient-workspace
+      - shell: |
+          SF_HOST={sfhost} /var/lib/koji-jobs/pkg-export.sh {buildtarget} {kojicmd}
