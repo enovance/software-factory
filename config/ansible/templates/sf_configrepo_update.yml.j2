@@ -12,6 +12,7 @@
 - hosts: jenkins:zuul:nodepool:managesf:gerrit{% if 'gerritbot' in roles %}:gerritbot{% endif %}{% if 'mirror' in roles %}:mirror{% endif %}{% if 'repoxplorer' in roles %}:repoxplorer{% endif %}
 
   tasks:
+    - include_vars: /etc/software-factory/sfcreds.yaml
     - include: tasks/update_configrepo.yaml
 
 - hosts: jenkins
