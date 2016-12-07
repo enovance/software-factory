@@ -19,6 +19,10 @@
 - hosts: all
   pre_tasks:
     - include: /etc/ansible/tasks/selinux_check.yml
+    - include_vars: /etc/software-factory/sfconfig.yaml
+    - include_vars: /etc/software-factory/sfcreds.yaml
+    - include_vars: /etc/software-factory/_arch.yaml
+    - include_vars: /etc/ansible/vars/common.yml
   roles:
     - {name: "sf-postfix", action: "setup"}
     - {name: "sf-base", action: "setup"}
