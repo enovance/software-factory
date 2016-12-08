@@ -75,7 +75,11 @@ def main():
             print execute("git review -y")
         else:
             print execute("git review -yi")
-        sha = open(".git/refs/heads/master").read()
+        # get current branch
+        current_ref = open(".git/HEAD").read()
+        if current_ref.startswith('ref: '):
+            current_ref = current_ref[len('ref: '):]
+        sha = open(".git/%s" % current_ref).read()
 
     # Give Jenkins some time to start test
     time.sleep(2)
