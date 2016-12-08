@@ -32,6 +32,10 @@
   include: playbooks/config_submit_change.yaml
   when: hostvars[groups["jenkins"][0]]["job_created"].stat.isdir is not defined or hostvars[groups["zuul"][0]]["zuul_created"].rc != 0
 
+# WIP Artificial pause to make sure the pipeline is set up correctly
+- pause:
+  minutes: 1
+
 # * Submit a bad change and verify Jenkins CI -1
 # * Fix bad change and verify Jenkins CI +1
 # * Check if change got merged
