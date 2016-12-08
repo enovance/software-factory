@@ -25,6 +25,13 @@
   with_items:
     - /var/www/sf
     - /var/www/dashboard
+    - /var/www/dash
+
+- name: "Install gerrit-dash-creator command"
+  copy: src=gerrit-dash-creator.sh dest=/usr/bin/gerrit-dash-creator mode=0555
+
+- name: "Install sf-update-dashboard command"
+  copy: src=sf-update-dashboard.py dest=/usr/local/bin/sf-update-dashboard mode=0555
 
 - name: Expose localCA.pem
   copy:
@@ -57,11 +64,18 @@
       - {name: ssl.conf, path: /etc/httpd/conf.d}
       - {name: user_settings.html, path: /var/www/sf}
       - {name: user_settings.js, path: /var/www/sf}
+      - {name: gerrit_dashboard.js, path: /var/www/static/js}
 
 - name: Install index.html for zuul
   copy:
     src: zuul.index.html
     dest: /var/www/zuul/index.html
+    mode: 0444
+
+- name: Install gerrit dashboard
+  copy:
+    src: dash.index.html
+    dest: /var/www/dash/index.html
     mode: 0444
 
 - name: Touch files

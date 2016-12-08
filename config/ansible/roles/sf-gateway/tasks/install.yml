@@ -1,0 +1,7 @@
+---
+- name: "Install gerrit-dash-creator venv"
+  command: "{{ item }}"
+  with_items:
+    - virtualenv /srv/gerrit-dash-creator
+    - /srv/gerrit-dash-creator/bin/pip install --upgrade 'pbr' 'pip'
+    - /srv/gerrit-dash-creator/bin/pip install gerrit-dash-creator

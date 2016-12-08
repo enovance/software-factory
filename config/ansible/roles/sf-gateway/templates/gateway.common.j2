@@ -178,6 +178,9 @@
     RewriteRule ^/$ /r/ [R]
     RewriteRule ^/redmine/redmine/(.*)$ /redmine/$1 [R=301,L]
 
+    RewriteRule "^/anchor/dash/(.*)$" "/dash/#$1" [R=301,NE,L]
+
+
     <LocationMatch "^/storyboard_api">
         # If api requests are authenticated, check cauth cookie
         <If "%{HTTP:Authorization} =~/Bearer .*/">
