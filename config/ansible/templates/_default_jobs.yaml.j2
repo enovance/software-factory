@@ -111,6 +111,9 @@
           echo "[+] Checking gerrit commentlinks"
           python -c "import yaml; 'commentlinks' in yaml.safe_load(open('gerrit/commentlinks.yaml'))"
 
+          echo "[+] Check dashboards"
+          gerrit-dash-creator --check-only dashboards/*.dash
+
           echo "[+] Checking syntax errors in policy file"
           python -c "import yaml; yaml.safe_load(open('policies/policy.yaml'))"
 

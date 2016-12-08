@@ -579,6 +579,7 @@ if [ "$STEP" == 1 ]; then
     ansible_install sf-cauth "$CAUTH_EXTRA_VARS"
     ansible_install sf-lecm "$LECM_EXTRA_VARS"
     ansible_install sf-zuul "$ZUUL_EXTRA_VARS"
+    ansible_install sf-gateway
     ansible_install sf-gerritbot "$GERRITBOT_EXTRA_VARS"
     ansible_install sf-nodepool "$NODEPOOL_EXTRA_VARS"
     ansible_install sf-storyboard "${STORYBOARD_EXTRA_VARS}"

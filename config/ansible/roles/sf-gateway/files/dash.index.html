@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Cache-control" content="no-cache, max-age=0">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/angular.min.js"></script>
+    <script src="/static/js/topmenu.js"></script>
+    <script src="/static/js/gerrit_dashboard.js"></script>
+    <style>
+tr:hover {background-color: #f5f5f5;}
+td {padding-left: 3px;}
+table {margin-left: 5px;}
+    </style>
+</head>
+
+<body ng-app="sfGerritDashboard" ng-controller="mainController">
+    <h1>{{ Title }}</h1>
+    <table width="90%" border=1>
+        <thead><tr>
+            <td>Project</td>
+            <td width="50%">Change</td>
+            <td>Owner</td>
+            <td>Size</td>
+            <td>Updated</td>
+            <td align="center" width=13px>CR</td>
+            <td align="center" width=13px>V</td>
+            <td align="center" width=13px>W</td>
+        </tr></thead>
+        <tbody ng-repeat="dashboard in Sections">
+            <tr><td colspan=8><b>{{ dashboard.title }}</b></td></tr>
+            <tr ng-repeat="change in dashboard.results">
+                <td><a href='/r/#/projects/{{ change.project }}'>{{ change.project }}</a></td>
+                <td><a href='/r/{{ change._number }}'>{{ change.subject }}</a></td>
+                <td>{{ change.owner.name }}</td>
+                <td>+{{ change.insertions}} -{{ change.deletions }}</td>
+                <td>{{ change.updated }}</td>
+                <td align="center">{{ change.labels['Code-Review'].value }}</td>
+                <td align="center">{{ change.labels['Verified'].value }}</td>
+                <td align="center">{{ change.labels['Workflow'].value }}</td>
+            </tr>
+       </tbody>
+    </table>
+    <br />
+    <br />
+    Click here for <a href="{{ GerritDashboardLink }}">Gerrit web-ui</a>
+</body>
+</html>
