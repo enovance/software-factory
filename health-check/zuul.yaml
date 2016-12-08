@@ -32,6 +32,16 @@
   include: playbooks/config_submit_change.yaml
   when: hostvars[groups["jenkins"][0]]["job_created"].stat.isdir is not defined or hostvars[groups["zuul"][0]]["zuul_created"].rc != 0
 
+# WIP Artificial pause to make sure the pipeline is set up correctly
+- name: "wait for job to be defined in jenkins"
+     uri:
+       url: "http://jenkins:8081/jenkins/job/{{ check[0] }}/api/json"
+       status_code: 200
+     register: result
+     until: result.status == 200
+     retries: 60
+     delay: 1
+
 # * Submit a bad change and verify Jenkins CI -1
 # * Fix bad change and verify Jenkins CI +1
 # * Check if change got merged
