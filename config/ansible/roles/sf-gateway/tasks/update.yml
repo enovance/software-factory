@@ -1,0 +1,32 @@
+---
+- name: "Check if dashboards directory already exists in the config repo"
+  stat: path=/root/config/dashboards
+  register: configrepo_dashboards
+
+- name: "Init dashboards config repo directory"
+  command: chdir=/root/config {{ item }}
+  with_items:
+    - mkdir dashboards
+    - cp /usr/local/share/sf-config-repo/dashboards/default.dash /root/config/dashboards/
+    - git add dashboards
+    - git commit -m "Initialize dashboards configuration"
+    - git push git+ssh://gerrit/config master
+  when: configrepo_dashboards.stat.exists == false
+
+- file: path=/var/lib/software-factory/dashboards_config state=touch
+
+- name: "Check local dashboards config"
+  command: cat /var/lib/software-factory/dashboards_config
+  register: localconfig
+
+- name: "Check upstream dashboards config"
+  command: chdir=/root/config git log --oneline dashboards/ resources/
+  register: upstreamconfig
+
+- block:
+  - name: "Update dashboards"
+    command: /usr/local/bin/sf-update-dashboard --input /root/config/dashboards/ --output /var/www/dashboards_data/ --managesf-url {{ managesf_internal_url }}
+
+  - name: "Write config repo sha1 matching current dashboards configuration"
+    copy: content="{{ upstreamconfig.stdout }}" dest=/var/lib/software-factory/dashboards_config
+  when: localconfig.stdout != upstreamconfig.stdout
