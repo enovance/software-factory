@@ -87,6 +87,10 @@ function clean_nodepool_tenant {
 
 function run_health_base {
     echo "[+] Starting the health base check"
+    echo "$(date) Running /etc/ansible/health-check/provision.yaml" | tee -a ${ARTIFACTS_DIR}/integration_tests.txt
+    ssh ${SF_HOST} ansible-playbook /etc/ansible/health-check/provision.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
+        && echo "Provision integration test SUCCESS"                        \
+        || fail "Provision integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
     echo "$(date) Running /etc/ansible/health-check/zuul.yaml" | tee -a ${ARTIFACTS_DIR}/integration_tests.txt
     ssh ${SF_HOST} ansible-playbook /etc/ansible/health-check/zuul.yaml >> ${ARTIFACTS_DIR}/integration_tests.txt \
         && echo "Zuul integration test SUCCESS"                        \

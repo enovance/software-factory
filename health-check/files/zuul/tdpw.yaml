@@ -1,0 +1,43 @@
+project-templates:
+  - name: tdpw-jobs
+    check:
+      - noop
+    gate:
+      - noop
+
+projects:
+  - name: tdpw/python-readerlib
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/python-readerlib-distgit
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/reader
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/reader-distgit
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/reader-ansible
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/reader-ansible-distgit
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/tdpw-installer
+    template:
+      - name: tdpw-jobs
+
+  - name: tdpw/tdpw-installer-distgit
+    template:
+      - name: tdpw-jobs
+
+#  - name: tdpw/tdpw-info
+#    template:
+#      - name: tdpw-jobs
