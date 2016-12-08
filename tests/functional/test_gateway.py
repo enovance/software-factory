@@ -122,6 +122,14 @@ class TestGateway(Base):
             self.assertTrue(('href="%s"' % subpath) in resp.text,
                             '%s not present as a link' % subpath)
 
+    def test_dashboard_data(self):
+        """ Test if dashboard data are created
+        """
+        data_url = "%s/dashboards_data/" % config.GATEWAY_URL
+        resp = requests.get("%s/data_project_tdpw-project.json" % data_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue("tdpw-info" in resp.text)
+
     def test_gerrit_accessible(self):
         """ Test if Gerrit is accessible on gateway hosts
         """
