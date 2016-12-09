@@ -164,6 +164,7 @@ class TestResourcesWorkflow(Base):
   groups:
     %s:
       description: test for functional test
+      members = {}
 """
         # Add the resource file with review then check CI
         resources = resources % name
@@ -448,6 +449,7 @@ class TestResourcesWorkflow(Base):
         ret = requests.get("%s/manage/resources/?get_missing_"
                            "resources=true" % config.GATEWAY_URL,
                            cookies={'auth_pubtkt': token})
+        self.assertEquals(ret.status_code, 200)
         logs, resources = ret.json()
         self.assertListEqual(logs, [])
         self.assertIn(group_name, resources['resources']['groups'])
