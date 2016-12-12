@@ -88,10 +88,13 @@ case $1 in
             rm -R $clone
             exit 0
         fi
+        if git log -1 --no-merges | grep "sf-resources: allow-delete" > /dev/null; then
+            ENDPOINT_PARAMS="?delete=yes"
+        fi
         cd -
         rm -R $clone
         http_code=$(curl -s -w "%{http_code}" -b $COOKIE_PATH \
-         -X PUT $ENDPOINT -o $APPLIED_OUTPUT)
+         -X PUT ${ENDPOINT}${ENDPOINT_PARAMS} -o $APPLIED_OUTPUT)
         cat $APPLIED_OUTPUT | python -m json.tool
         [ "$http_code" != "201" ] && {
             echo "Resource modifications apply failed (API return code: $http_code)."

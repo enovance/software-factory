@@ -86,16 +86,19 @@ class TestResourcesWorkflow(Base):
                                        resources=None, mode='add'):
         config_clone_dir = self.clone_as_admin("config")
         path = os.path.join(config_clone_dir, fpath)
+        commit_flag = ""
         if mode == 'add':
             file(path, 'w').write(resources)
         elif mode == 'del':
             os.unlink(path)
+            commit_flag = "\nsf-resources: allow-delete"
+
         last_success_build_num_cu = \
             self.ju.get_last_build_number("config-update",
                                           "lastSuccessfulBuild")
         self.commit_direct_push_as_admin(
             config_clone_dir,
-            "Add new resources for functional tests")
+            "Add new resources for functional tests %s" % commit_flag)
         self.ju.wait_till_job_completes("config-update",
                                         last_success_build_num_cu,
                                         "lastSuccessfulBuild",
