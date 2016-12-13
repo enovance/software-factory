@@ -551,7 +551,7 @@ function run_functional_tests {
 function pre_gui_tests {
     echo "$(date) ======= run_gui_tests"
     echo "Starting Selenium server in background ..."
-    ( sudo sh -c '/usr/bin/java -jar /usr/lib/selenium/selenium-server.jar -host 127.0.0.1 >/var/log/selenium/selenium.log 2>/var/log/selenium/error.log' ) &
+    ( sudo sh -c '/usr/bin/java -jar /usr/lib/selenium/selenium-server.jar -trustAllSSLCertificates -host 127.0.0.1 >/var/log/selenium/selenium.log 2>/var/log/selenium/error.log' ) &
     if [[ "$DISPLAY" == "localhost"* ]]; then
         echo "X Forwarding detected"
     else
@@ -571,6 +571,7 @@ function post_gui_tests {
 }
 
 function run_gui_test {
+    #read -rsp $'Disable SSL manually, then press any key to continue...\n' -n1 key
     export DISPLAY=:99
     # if ffmpeg is installed on the system, record a video
     command -v ffmpeg > /dev/null && tmux new-session -d -s guiTestRecording_$(tr -cd 0-9 </dev/urandom | head -c 3) 'export FFREPORT=file=/tmp/gui/ffmpeg-$(date +%Y%m%s).log && ffmpeg -f x11grab -video_size 1920x1080 -i 127.0.0.1'$DISPLAY' -codec:v mpeg4 -r 16 -vtag xvid -q:v 8 /tmp/gui/'$1'.avi && sleep 5'

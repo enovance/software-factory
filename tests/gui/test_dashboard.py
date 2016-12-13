@@ -20,6 +20,8 @@ from tests.gui.base import BaseGuiTest, snapshot_if_failure
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class TestSoftwareFactoryDashboard(BaseGuiTest):
@@ -39,6 +41,14 @@ class TestSoftwareFactoryDashboard(BaseGuiTest):
         p = driver.find_element_by_id("password")
         p.send_keys(password)
         p.submit()
+        WebDriverWait(driver, 10)
+
+        #buttons = driver.find_elements_by_xpath("//*[contains(text(), 'Log in')]")
+        # get last button in the page
+        #btn = buttons[-1]
+        #driver.execute_script("return arguments[0].scrollIntoView();", btn)
+        #btn.click()
+        #p.submit()
 
     @snapshot_if_failure
     def test_login_page(self):
@@ -49,8 +59,9 @@ class TestSoftwareFactoryDashboard(BaseGuiTest):
 
     @snapshot_if_failure
     def test_admin_login(self):
+        self.driver.get("%s/r/login" % config.GATEWAY_URL)
+        #self.login_as(config.USER_1, config.USER_1_PASSWORD)
         driver = self.driver
-        driver.get("%s/r/login" % config.GATEWAY_URL)
         self.assertIn("SF", driver.title)
         self._internal_login(driver, config.USER_1, config.USER_1_PASSWORD)
         self.assertTrue("Project" in driver.page_source)
@@ -75,9 +86,10 @@ class TestSoftwareFactoryDashboard(BaseGuiTest):
         # switch to top menu iframe
         driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
         # The logout link is not shown if not logged in
-        self.assertRaises(NoSuchElementException,
-                          driver.find_element_by_link_text, "Logout")
-        driver.find_element_by_link_text("Login")
+        logout = driver.find_element_by_link_text("Logout")
+        self.assertTrue("display: none" in logout.get_attribute('style'))
+        login = driver.find_element_by_link_text("Login")
+        self.assertTrue("display: block" in login.get_attribute('style'))
         driver.find_element_by_link_text("Get started")
         driver.find_element_by_link_text("Paste")
         driver.find_element_by_link_text("Etherpad")
