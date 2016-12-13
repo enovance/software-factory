@@ -72,7 +72,9 @@ def loading_please_wait(driver):
 
 class BaseGuiTest(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        profile = webdriver.FirefoxProfile()
+        profile.accept_untrusted_certs = True
+        self.driver = webdriver.Firefox(profile)
         self.driver.maximize_window()
         self.driver.implicitly_wait(20)
 
