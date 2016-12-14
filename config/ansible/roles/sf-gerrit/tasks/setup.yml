@@ -57,11 +57,10 @@
   register: initialize_done
   when: gerrit_war.stat.exists == False
 
-- name: "Reindex gerrit after the first initialization"
+- name: "Reindex Gerrit"
   shell: '/usr/bin/java -jar /home/gerrit/gerrit.war reindex -d /home/gerrit/site_path'
   become: true
   become_user: gerrit
-  when: initialize_done|changed
 
 - name: "Install gerrit service file"
   template:

@@ -1,0 +1,31 @@
+description: All in one instance architecture
+inventory:
+- cpu: 4
+  disk: 20
+  ip: 192.168.135.101
+  mem: 8
+  name: managesf
+  roles:
+  - install-server
+  - mysql
+  - gateway
+  - cauth
+  - managesf
+  - etherpad
+  - lodgeit
+  - gerrit
+  - gerritbot
+  - zuul
+  - nodepool
+  - jenkins
+  - redmine
+  - murmur
+  - elasticsearch
+  - job-logs-gearman-client
+  - job-logs-gearman-worker
+  - logstash
+  - kibana
+  - mirror
+  - storyboard
+  - storyboard-webclient
+  - repoxplorer
