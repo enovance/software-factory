@@ -192,6 +192,11 @@ class TestResourcesWorkflow(Base):
                                                mode='add',
                                                expected='success')
 
+    def test_validate_resources_deletion(self):
+        """ Check resources - deletions are detected """
+        # TODO(fbo)
+        pass
+
     def test_CUD_group(self):
         """ Check resources - ops on group work as expected """
         fpath = "resources/%s.yaml" % create_random_str()
