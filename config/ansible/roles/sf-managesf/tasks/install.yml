@@ -14,6 +14,7 @@
   command: chdir=/usr/src/pysflib {{ item }}
   with_items:
     - /var/www/managesf/bin/pip install -rrequirements.txt
+    - sed -i 's/^.*storyboardclient.*//' requirements.txt
     - /var/www/managesf/bin/python setup.py install
 
 - name: "Fetch storyboardclient"
