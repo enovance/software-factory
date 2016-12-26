@@ -73,6 +73,9 @@ services = [
 {% if 'jenkins' in roles %}
     'SFJenkins',
 {% endif %}
+{% if 'nodepool' in roles %}
+    'SFNodepoolSSH',
+{% endif %}
 ]
 
 mysql = {
@@ -123,6 +126,12 @@ jenkins = {
     'api_url': 'http://jenkins.{{ fqdn }}:8080/jenkins/',
     'user': 'jenkins',
     'password': '{{ creds_jenkins_user_password }}'
+}
+
+nodepool = {
+    'host': 'nodepool.{{ fqdn }}',
+    'user': 'root',
+    'key': '/root/ssh/id_rsa',
 }
 
 redmine = {
