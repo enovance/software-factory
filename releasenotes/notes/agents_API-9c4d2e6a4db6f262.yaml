@@ -1,0 +1,17 @@
+---
+features:
+  - "agents" REST API
+    The endpoint at manage/agents/ allows users with adequate
+    clearance to manage dynamic agents; typically nodes spawned
+    by Nodepool. The endpoint supports listing agents, holding
+    an agent up after a job, deleting such an agent, and allowing
+    an ssh key to connect to an agent. The endpoint at
+    /manage/agents/image/ can be used to list current images,
+    and update them.
+issues:
+  - Calling PUT manage/agents/image/<provider>/<image>/ for an
+    image update might be blocking on the manageSF server.
+    Use with caution.
+upgrade:
+  - The policies file is upgraded to include the default
+    access policies for the API.
