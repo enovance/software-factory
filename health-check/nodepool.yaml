@@ -94,3 +94,23 @@
 
     - name: "Wait for the first slave to appears online in Jenkins"
       shell: for i in {1..100}; do sleep ${i}; curl -Ls https://{{ fqdn }}/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('base_centos-default' in s['displayName'])]; any(s['offline'] == False for s in slaves) and sys.exit(0) or sys.exit(1)" && exit 0; done; exit 1
+
+    - name: "Query the agents REST API to get last node info"
+      shell: curl -Ls -H "X-Remote-User: admin" https://managesf:20001/agents// | python -c "import sys, json; d = json.loads(sys.stdin.read()); node = d['nodepool'][-1]; print node"
+      register: node
+
+    - name: "Hold the node with the REST API"
+      shell: curl -X POST -H "X-Remote-User: admin" http://managesf:20001/agents/{{ (node.stdout | from_json).node_id }}/
+
+    - name: "Create a test ssh key"
+      command: ssh-keygen -N '' -f /tmp/{{ (node.stdout | from_json).node_name }}_id_rsa
+
+    - name: "Add the test ssh key to node's authorized keys with the REST API"
+      shell: curl -Ls -X POST -H "X-Remote-User: admin" --data "node_id={{ (node.stdout | from_json).node_name }}.node_id" --data-urlencode "public_key=$(cat /tmp/{{ (node.stdout | from_json).node_name }}_id_rsa.pub)" http://managesf:20001/manage/agents/authorize_key/
+      register: ak_output
+      failed_when: ak_output.stdout.find("OK") == -1
+
+    - name: "SSH into node with the test key"
+      command: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q -i /tmp/{{ (node.stdout | from_json).node_name }}_id_rsa jenkins@{{ (node.stdout | from_json).ip }} -c whoami
+      register: ssh_whoami
+      failed_when: ssh_whoami.stdout.find("jenkins") == -1
