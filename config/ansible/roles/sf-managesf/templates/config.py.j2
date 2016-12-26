@@ -79,15 +79,13 @@ services = [
 {% if 'jenkins' in roles %}
     'SFJenkins',
 {% endif %}
+{% if 'nodepool' in roles %}
+    'SFNodepool',
+{% endif %}
 ]
 
 mysql = {
     'host': '{{ managesf_mysql_host }}',
-}
-
-# fake host, does not matter
-nodepool = {
-    'host': 'nodepool.{{ fqdn }}',
 }
 
 managesf = {
@@ -134,6 +132,13 @@ jenkins = {
     'password': '{{ jenkins_password }}'
 }
 {% endif %}
+
+{% if 'nodepool' in roles %}
+nodepool = {
+    'host': 'nodepool.{{ fqdn }}',
+    'user': 'root',
+    'key': '/var/lib/managesf/.ssh/id_rsa',
+}
 
 {% if 'redmine' in roles %}
 redmine = {
