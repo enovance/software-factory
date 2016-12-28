@@ -9,3 +9,5 @@ nodepool_commit: master
 
 jenkins_host: "jenkins.{{fqdn}}"
 jenkins_api_url: "http://{{ jenkins_host }}:8080/jenkins/"
+
+nodepool_debug: False
