@@ -30,8 +30,14 @@ app = {
 }
 
 logging = {
-    'root': {'level': 'DEBUG', 'handlers': ['normal', 'console']},
-    'loggers': {},
+    'root': {'level': '{% if managesf_debug %}INFO{% else %}WARNING{% endif %}', 'handlers': ['normal', 'console']},
+    'loggers': {
+        'managesf': {
+            'level': '{% if managesf_debug %}DEBUG{% else %}INFO{% endif %}',
+            'handlers': ['normal', 'console'],
+            'propagate': False
+        },
+    },
     'handlers': {
         'console': {'level': 'INFO', 'class': 'logging.StreamHandler',
                     'formatter': 'console'},
