@@ -1,0 +1,4 @@
+---
+features:
+  - A new 'debug' option in sfconfig.yaml enable to
+    switch all service debug mode.

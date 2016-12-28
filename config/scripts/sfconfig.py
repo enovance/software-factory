@@ -38,6 +38,10 @@ def generate_role_vars(allvars_file, args):
     # Fix url used in services
     glue["gateway_url"] = "https://%s" % sfconfig["fqdn"]
 
+    if sfconfig["debug"]:
+        for service in ("managesf", "zuul", "nodepool"):
+            glue["%s_debug" % service] = True
+
     yaml.dump(glue, allvars_file, default_flow_style=False)
 
 
