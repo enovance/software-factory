@@ -6,6 +6,8 @@
 
 - hosts: install-server
   tasks:
+  # Fix modebit of /var/lib/software-factory
+  - file: path=/var/lib/software-factory/ state=directory mode=0700 owner=root group=root
   # storyboard
   - include: tasks/new_creds.yml sf_secret_name=storyboard_sql_pwd
   - include: tasks/new_creds.yml sf_secret_name=storyboard_rabbitmq_password
