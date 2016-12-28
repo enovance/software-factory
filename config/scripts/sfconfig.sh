@@ -240,6 +240,8 @@ for host in $HOSTS; do
 done
 
 echo "[sfconfig] Starting configuration"
+/usr/local/bin/sfconfig.py
+
 [ -f /etc/software-factory/custom-vars.yaml ] && EXTRA_VARS="--extra-vars=@/etc/software-factory/custom-vars.yaml"
 time ansible-playbook ${EXTRA_VARS} /etc/ansible/sf_setup.yml || {
     echo "[sfconfig] sf_setup playbook failed"
