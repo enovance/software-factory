@@ -4,11 +4,11 @@
     gitHttpUrl =
 [database]
     type = MYSQL
-    hostname = {{ mysql_host }}
-    database = {{ mysql_db }}
-    username = {{ mysql_user }}
-    port = {{ mysql_port }}
-    url = jdbc:mysql://{{ mysql_host }}/{{ mysql_db }}?useUnicode=yes&characterEncoding=UTF-8
+    hostname = {{ gerrit_mysql_host }}
+    database = {{ gerrit_mysql_db }}
+    username = {{ gerrit_mysql_user }}
+    port = {{ gerrit_mysql_port }}
+    url = jdbc:mysql://{{ gerrit_mysql_host }}/{{ gerrit_mysql_db }}?useUnicode=yes&characterEncoding=UTF-8
 [auth]
     type = HTTP
     gitBasicAuth = true
@@ -48,6 +48,6 @@
 [cache]
     directory = cache
 [user]
-    email = gerrit@{{ fqdn }}
+    email = {{ gerrit_email }}
 [plugins]
     allowRemoteAdmin = true
