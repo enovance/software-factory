@@ -6,6 +6,7 @@
 import argparse
 import os
 import yaml
+import uuid
 
 
 def append_legacy(allvars_file, args):
@@ -28,17 +29,49 @@ def yaml_load(filename):
 def generate_role_vars(allvars_file, args):
     """ This function 'glue' all roles and convert sfconfig.yaml """
     secrets = yaml_load("%s/secrets.yaml" % args.lib)
+    arch = yaml_load(args.arch)
     sfconfig = yaml_load(args.sfconfig)
 
+    # Generate all variable when the value is CHANGE_ME
+    for role in arch["roles"]:
+        role_vars = yaml_load("%s/roles/sf-%s/defaults/main.yml" % (
+                              args.ansible_root, role))
+        for key, value in role_vars.items():
+            if str(value).strip().replace('"', '') == 'CHANGE_ME':
+                if key not in secrets:
+                    secrets[key] = str(uuid.uuid4())
+
+    # Save secrets to new secrets file
     yaml.dump(secrets, open("%s/secrets.yaml" % args.lib, "w"))
-    if secrets:
-        yaml.dump(secrets, allvars_file)
+    # And add them to the all.yaml file
+    yaml.dump(secrets, allvars_file)
 
-    # Set absolute urls and hostnames
-    glue = {}
+    # Generate dynamic role variable in the glue dictionary
+    glue = {'mysql_databases': {}}
 
-    # Fix url used in services
+    def get_hostname(role):
+        if len(arch["roles"][role]) != 1:
+            raise RuntimeError("Role %s is defined on multi-host" % role)
+        return arch["roles"][role][0]["hostname"]
+
     glue["gateway_url"] = "https://%s" % sfconfig["fqdn"]
+
+    if "mysql" in arch["roles"]:
+        glue["mysql_host"] = get_hostname("mysql")
+
+    if "gerrit" in arch["roles"]:
+        glue["gerrit_pub_url"] = "%s/r/" % glue["gateway_url"]
+        glue["gerrit_internal_url"] = "http://%s:8000/r/" % (
+                get_hostname("gerrit"))
+        glue["gerrit_email"] = "gerrit@%s" % sfconfig["fqdn"]
+        glue["gerrit_mysql_host"] = glue["mysql_host"]
+        glue["mysql_databases"]["gerrit"] = {
+            'hosts': list(set(('localhost',
+                               get_hostname("gerrit"),
+                               get_hostname("managesf")))),
+            'user': 'gerrit',
+            'password': secrets['gerrit_mysql_password'],
+        }
 
     yaml.dump(glue, allvars_file, default_flow_style=False)
 
