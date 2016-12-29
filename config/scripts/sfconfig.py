@@ -78,6 +78,12 @@ def generate_role_vars(allvars_file, args):
             get_hostname("jenkins")
         glue["jenkins_pub_url"] = "%s/jenkins/" % glue["gateway_url"]
 
+    if "redmine" in arch["roles"]:
+        glue["redmine_internal_url"] = "http://%s:8083/" % \
+            get_hostname("redmine")
+        glue["redmine_pub_url"] = "https://%s/redmine/" % glue["gateway_url"]
+        glue["redmine_api_url"] = "http://%s:8083/" % get_hostname("redmine")
+
     yaml.dump(glue, allvars_file, default_flow_style=False)
 
 
