@@ -70,6 +70,14 @@ def generate_role_vars(allvars_file, args):
         glue["zuul_pub_url"] = "%s/zuul/" % glue["gateway_url"]
         glue["zuul_internal_url"] = "http://%s:8084/" % get_hostname("zuul")
 
+    if "jenkins" in arch["roles"]:
+        glue["jenkins_host"] = get_hostname("jenkins")
+        glue["jenkins_internal_url"] = "http://%s:8081/jenkins/" % \
+            get_hostname("jenkins")
+        glue["jenkins_api_url"] = "http://%s:8080/jenkins/" % \
+            get_hostname("jenkins")
+        glue["jenkins_pub_url"] = "%s/jenkins/" % glue["gateway_url"]
+
     yaml.dump(glue, allvars_file, default_flow_style=False)
 
 
