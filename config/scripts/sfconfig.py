@@ -55,13 +55,20 @@ def generate_role_vars(allvars_file, args):
     glue = {}
 
     # Fix url used in services
+    def get_hostname(role):
+        return arch["roles"][role][0]["hostname"]
+
     glue["gateway_url"] = "https://%s" % sfconfig["fqdn"]
-    glue["mysql_host"] = arch["roles"]["mysql"][0]["hostname"]
+    glue["mysql_host"] = get_hostname("mysql")
 
     if "gerrit" in arch["roles"]:
         glue["gerrit_pub_url"] = "%s/r/" % glue["gateway_url"]
         glue["gerrit_email"] = "gerrit@%s" % sfconfig["fqdn"]
         glue["gerrit_mysql_host"] = glue["mysql_host"]
+
+    if "zuul" in arch["roles"]:
+        glue["zuul_pub_url"] = "%s/zuul/" % glue["gateway_url"]
+        glue["zuul_internal_url"] = "http://%s:8084/" % get_hostname("zuul")
 
     yaml.dump(glue, allvars_file, default_flow_style=False)
 
