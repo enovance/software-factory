@@ -9,4 +9,6 @@ storyboardclient_commit: master
 redmine_api_url: "http://api-redmine.{{ fqdn }}:8083/"
 roles: []
 
+jenkins_password: "CHANGE_ME"
+
 managesf_port: 20001
