@@ -55,6 +55,9 @@ sudo pip install glob2
 sudo yum install -y python-requests gcc python-devel python-crypto
 install_with_pip zuul
 
+# Package building tool
+sudo yum install -y rpmdevtools createrepo mock
+
 # Copy slave tools
 sudo cp -v /opt/nodepool-scripts/*.py /usr/local/bin/
 
