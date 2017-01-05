@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Cache-control" content="no-cache, max-age=0">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/angular.min.js"></script>
+    <script src="/static/js/topmenu.js"></script>
+    <script src="welcome.js"></script>
+</head>
+
+<body ng-app="sfWelcome" ng-controller="mainController">
+    <div class="container-fluid">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3>Hosted project</h3>
+            </div>
+            <div class="panel-body">
+            <p>Welcome, below is the list of projects hosted on this plateform. To add, update or delete a project or repository, you need
+               to submit a change on the <a href="/r/gitweb?p=config.git;a=summary">config repository</a> as explained in this <a href="/docs/resources_user.html">documentation</a>.</p>
+            <hr />
+        <div class="row-fluid"><div class="col-md-4" ng-repeat="project in Projects"><div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ project.name }} - {{ project.description }}</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><span class="glyphicon glyphicon-home"> Website: <a href="{{ project.website }}">{{ project.website }}</a></span></li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-info-sign"> Documentation: <a href="{{ project.documentation }}">{{ project.documentation }}</a></span></li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-barcode"> Issue-tracker: <a href="{{ project['issue-tracker'] }}">{{ project['issue-tracker'] }}</a></span></li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-envelope"> Contact:
+                        <ul><li ng-repeat="(id, contact) in project.contacts"><a href="mailto:{{ contact }}">{{ contact }}</a></li></ul>
+                    </span></li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-envelope"> Mailing-list:
+                        <ul><li ng-repeat="(id, contact) in project['mailing-lists']"><a href="mailto:{{ contact }}">{{ contact }}</a></li></ul>
+                    </span></li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-hdd"> Repositories:
+                        <ul><li ng-repeat="(id, repo) in project['source-repositories']"><a href="/r/gitweb?p={{ repo }}.git;a=summary">{{ repo }}</a></li></ul>
+                    </span></li>
+                </ul>
+            </div>
+
+            </div>
+        </div>
+
+        </div></div></div>
+    </div>
+</body>
+</html>
