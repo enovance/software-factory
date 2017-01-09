@@ -68,7 +68,7 @@ function clean {
 }
 
 add_main_repository() {
-    local base=http://mirror.centos.org/centos/7/os/x86_64/Packages/
+    local base=http://vault.centos.org/centos/7.2.1511/os/x86_64/Packages/
     local releaserpm=$(wget -O- -q $base/|fgrep centos-release|sed -n -e 's@.*>\(centos-release-.*\.rpm\)<.*@\1@p')
     echo "$base/$releaserpm"
 }

@@ -18,7 +18,7 @@
 
 set -e
 
-INSTALL_OPTIONS="--disablerepo=base,epel,extras,updates,jenkins,passenger --enablerepo=sfbase,sfextras,sfupdates,sfepel,sfrdo,sfjenkins,sfpassenger"
+INSTALL_OPTIONS="--disablerepo=jenkins,passenger --enablerepo=sfrdo,sfjenkins,sfpassenger" --enablerepo=sfbase,sfextras,sfupdates,sfepel,sfrdo,sfjenkins,sfpassenger"
 
 [ -z "$DEBUG" ] || set -x
 # Target dir where the centos images will be built
