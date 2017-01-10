@@ -2,6 +2,42 @@
 Release Notes
 =============
 
+2.3.0
+=====
+
+New Features
+------------
+
+- A new jobs API is available to manage (start, stop) jobs.
+- A new /etc/software-factory/custom-vars.yaml is created to manage custom Ansible variables such as gerrit heap limit.
+- A new 'debug' option in sfconfig.yaml enable to switch all service debug mode. Debug logs are now written to service.log (was debug.log), and regular logs are available through journald.
+- Use gerrit connections pool to improve performance.
+- The Jobs API allows authorized users to start and stop jobs on the platform, and also list details about them. "Jobs" refers to a "build" in Jenkins terminology; jobs definition is still managed through the config repository. sfmanager includes the new "job" subcommand allowing users to interact with this API from the CLI.
+- Support OpenID Connect identity provider.
+
+
+Known Issues
+------------
+
+- query filtering is currently limited to job id, change number and patchset (ie fetch jobs that were run for a given gerrit change). Furthermore the job name must be specified.
+- possible performances issues due to the jenkins API handling filtering poorly (there's actually no job filtering). Looking up jobs might take substantial time on a deployment with some history.
+
+
+Bug Fixes
+---------
+
+- ensure grafana is disabled in the dashboard if role not included
+- Fix captcha display in lodgeit (paste) service incorrectly displayed.
+- Let's encrypt configuration doesn't reload the httpd service when it's not started.
+- Gerrit service reindex pretask is removed because it caused timeout. Reindex is now performed in the component setup tasks.
+
+
+Other Notes
+-----------
+
+- Migration to Ansible is now completed, Puppet is no longer used.
+
+
 2.2.6
 =====
 
