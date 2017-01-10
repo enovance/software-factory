@@ -1,0 +1,4 @@
+---
+features:
+  - A new jobs API is available to manage (start, stop)
+    jobs.
