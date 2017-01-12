@@ -76,6 +76,9 @@ def prepare_role(base_path, name, ip, gateway, netmask="255.255.255.0"):
                 "--exclude", "/root/sf-bootstrap-data/certs/localCA.pem",
                 "--exclude", "/root/sf-bootstrap-data/certs/localCAkey.pem",
                 "--exclude", "/root/sf-bootstrap-data/certs/localCA.srl",
+                "--exclude", "/var/lib/software-factory/bootstrap-data/certs/localCA.pem",
+                "--exclude", "/var/lib/software-factory/bootstrap-data/certs/localCAkey.pem",
+                "--exclude", "/var/lib/software-factory/bootstrap-data/certs/localCA.srl",
                 "%s/softwarefactory/" % base_path,
                 "%s/" % root]):
         print "Could not prepare %s with %s" % (name, base_path)
