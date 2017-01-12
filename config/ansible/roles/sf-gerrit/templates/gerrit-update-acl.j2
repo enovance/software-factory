@@ -53,7 +53,7 @@ function upgrade_project_acl {
     popd
 }
 
-projects=`/root/gerrit_data_source/ssh_wrapper.sh -p 29418 -l admin gerrit "gerrit ls-projects" --all`
+projects=$(ssh gerrit "gerrit ls-projects" --all)
 for project in ${projects}; do
     upgrade_project_acl ${project}
 done
