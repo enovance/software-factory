@@ -35,9 +35,10 @@
 - hosts: install-server
   tasks:
     - name: "wait for new jobs to appear in jenkins"
-      command: curl --head --silent "http://jenkins:8081/jenkins/job/{{ check[0] }}/api/json"
+      uri:
+          url: http://jenkins:8081/jenkins/job/{{ check[0] }}/api/json
+          return_content: yes
       register: newjob
-      until: newjob.stdout.find("200 OK") != -1
       retries: 36
       delay: 5
       changed_when: false
@@ -77,12 +78,14 @@
   tasks:
     - name: "Get artifact url from console.log"
       when: test_log_export == 'yes'
-      command: "grep '^http' /var/lib/jenkins/jobs/{{ check[0] }}/lastSuccessful/log"
+      command: "awk '/Creating repo/ {print $6}' /var/lib/jenkins/jobs/{{ check[0] }}/lastSuccessful/log"
       register: logsurl
 
     - name: "Check artifact is published"
       when: test_log_export == 'yes'
-      command: "curl {{ logsurl.stdout }}artifacts/test_log.txt"
+      uri:
+          url: "{{ logsurl.stdout }}artifacts/test_log.txt"
+          return_content: yes
       register: test_log
       failed_when: test_log.stdout.find('TEST EXPORT') == -1
 
