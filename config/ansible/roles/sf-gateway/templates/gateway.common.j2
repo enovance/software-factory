@@ -206,7 +206,7 @@
         TKTAuthLoginURL /auth/login
         TKTAuthFakeBasicAuth on
         TKTAuthDebug 1
-        require valid-user
+        Satisfy Any
         RequestHeader set X-Remote-User %{REMOTE_USER}s
     </Location>
 
