@@ -332,7 +332,6 @@ function fetch_bootstraps_data {
     rm -Rf sf-bootstrap-data
     scp -r ${SF_HOST}:sf-bootstrap-data .
     # could be remove after 2.2.7 release
-    rsync -a -L ${SF_HOST}:/etc/puppet/hiera/sf/ sf-bootstrap-data/
     rsync -a -L ${SF_HOST}:/etc/software-factory/ sf-bootstrap-data/
     rsync -a -L ${SF_HOST}:/var/lib/software-factory/bootstrap-data/ sf-bootstrap-data/
     ADMIN_PASSWORD=$(awk '/admin_password:/ {print $2}' sf-bootstrap-data/sfconfig.yaml)

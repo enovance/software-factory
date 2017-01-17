@@ -104,7 +104,7 @@ case "${TEST_TYPE}" in
         run_bootstraps
         run_provisioner
         # Copy new arch
-        scp config/refarch/allinone.yaml ${SF_HOST}:/etc/puppet/hiera/sf/arch.yaml
+        scp config/refarch/allinone.yaml ${SF_HOST}:/etc/software-factory/arch.yaml
         run_upgrade
         run_checker "checksum_warn_only"
         run_serverspec_tests
