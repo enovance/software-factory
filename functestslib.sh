@@ -486,7 +486,7 @@ if 'internal' not in d['resources']['projects']:
         'issue-tracker': 'SFStoryboard',
         'source-repositories': ['config'],
     }
-    yaml.dump(d, file(f, 'w'))
+    yaml.dump(d, file(f, 'w'), default_flow_style=False)
     commit = True
 if commit:
     for cmd in [
@@ -496,6 +496,9 @@ if commit:
         ]:
         subprocess.Popen(cmd).wait()
 SCRIPT
+    # Force the resources engine to detect changes and call callbacks for the
+    # commit pushed just above.
+    ssh ${SF_HOST} "/usr/local/bin/resources.sh apply" || fail "Fail to run resources apply"
 
     echo "[+] Running upgrade"
     ssh ${SF_HOST} "cd software-factory; ./upgrade.sh" | tee ${ARTIFACTS_DIR}/upgrade.sh.log || fail "Upgrade failed" "/var/lib/lxc/${INSTALL_SERVER}/rootfs/var/log/software-factory/upgrade.log"
