@@ -8,6 +8,7 @@
   gather_facts: no
   tasks:
     - include: tasks/update_fqdn_step1.yaml
+    - include: tasks/ssh_populate_known_hosts.yml
 
 # Setup install-server ssh keys
 - hosts: localhost
