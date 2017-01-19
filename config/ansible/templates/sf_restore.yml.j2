@@ -14,14 +14,6 @@
     - name: "Extract backup file"
       command: chdir=/var/lib/software-factory/backup/ tar xzpf {{'{{'}} backup_file|default('/var/www/managesf/sf_backup.tar.gz') {{'}}'}}
 
-# Call stop task
-{% for host in inventory %}
-- hosts: {{ host['hostname'] }}
-  roles:
-{% for role in host['roles'] %}    - {role: "sf-{{ role }}", action: "stop"}
-{% endfor %}
-{% endfor %}
-
 # Call restore task
 {% for host in inventory %}
 - hosts: {{ host['hostname'] }}

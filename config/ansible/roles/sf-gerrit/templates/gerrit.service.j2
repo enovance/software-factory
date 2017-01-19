@@ -12,9 +12,9 @@ ExecStartPost=/usr/libexec/wait4gerrit
 LimitCPU=infinity
 LimitFSIZE=infinity
 LimitDATA=infinity
-LimitCORE=0
 LimitAS=infinity
 LimitLOCKS=infinity
+SuccessExitStatus=143
 
 [Install]
 WantedBy=multi-user.target
