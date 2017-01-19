@@ -1,6 +1,10 @@
 ---
-# Remove old git repositories
-- name: "Remove previous state repositories"
+- name: "Stop service"
+  systemd:
+      name: gerrit
+      state: stopped
+
+- name: "Remove previous state and git repositories"
   file:
     path: "/home/gerrit/site_path/{{ item }}"
     state: absent
@@ -8,7 +12,13 @@
     - git
     - cache
     - index
+
 - name: "Restore data"
   synchronize:
     src: "{{ backup_src }}/"
     dest: /
+
+- name: "Reindex gerrit"
+  command: /usr/bin/java -jar /home/gerrit/gerrit.war reindex -d /home/gerrit/site_path
+  become: true
+  become_user: gerrit
