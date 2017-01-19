@@ -15,40 +15,16 @@
 # license for the specific language governing permissions and limitations
 # under the license.
 
-# -----------------
-# Functions
-# -----------------
-[ -z "${DEBUG}" ] || set -x
 set -e
 
 logger "sfconfig.sh: started"
 echo "[$(date)] Running sfconfig.sh"
 
-# Defaults
-DOMAIN=$(awk '/^fqdn/ {print $2}' /etc/software-factory/sfconfig.yaml)
-HOME=/root
-
-export PATH=/bin:/sbin:/usr/local/bin:/usr/local/sbin
-
 /usr/local/bin/sfconfig.py                                              \
-    --domain ${DOMAIN}                                                  \
     --install_server_ip $(ip route get 8.8.8.8 | awk '{ print $7 }')    \
     --arch /etc/software-factory/arch.yaml
 
-time ansible-playbook /etc/ansible/sf_setup.yml || {
-    echo "[sfconfig] sf_setup playbook failed"
-    exit 1
-}
-
-time ansible-playbook /etc/ansible/sf_initialize.yml || {
-    echo "[sfconfig] sf_initialize playbook failed"
-    exit 1
-}
-
-time ansible-playbook /etc/ansible/sf_postconf.yml || {
-    echo "[sfconfig] sf_postconf playbook failed"
-    exit 1
-}
+time ansible-playbook /etc/ansible/sf_initialize.yml
 
 logger "sfconfig.sh: ended"
 cat << EOF
