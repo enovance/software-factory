@@ -1,3 +1,7 @@
 role_actions:
   - setup
   - get_logs
+
+gateway_topmenu_logo_data: ""
+gateway_favicon_data: ""
+gateway_splash_image_data: ""
