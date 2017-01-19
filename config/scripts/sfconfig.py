@@ -648,7 +648,6 @@ def generate_inventory_and_playbooks(arch, ansible_root):
 
 def usage():
     p = argparse.ArgumentParser()
-    p.add_argument("--domain", default="sftests.com")
     p.add_argument("--install_server_ip")
     p.add_argument("--ansible_root", default="/etc/ansible")
     p.add_argument("--sfconfig", default="/etc/software-factory/sfconfig.yaml")
@@ -679,7 +678,7 @@ def main():
     if clean_arch(sfarch):
         save_file(sfarch, args.arch)
 
-    arch = load_refarch(args.arch, args.domain, args.install_server_ip)
+    arch = load_refarch(args.arch, sfconfig['fqdn'], args.install_server_ip)
     generate_inventory_and_playbooks(arch, args.ansible_root)
 
     with open(allyaml, "w") as allvars_file:
