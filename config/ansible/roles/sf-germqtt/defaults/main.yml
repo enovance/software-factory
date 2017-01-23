@@ -1,0 +1,6 @@
+role_actions:
+  - install
+  - setup
+
+germqtt_url: https://git.openstack.org/openstack-infra/germqtt
+zuul_commit: master
