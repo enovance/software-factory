@@ -1,0 +1,27 @@
+---
+- include: /etc/ansible/tasks/create_user.yml user_name=germqtt ssh_key=jenkins_rsa
+
+- name: "Create /etc/germqtt directory"
+  file: path=/etc/germqtt state=directory
+
+- name: "Setup configuration"
+  template: src=germqtt.conf.j2 dest=/etc/germqtt/germqtt.conf mode=0440 group=germqtt
+
+- name: Install service file
+  copy:
+      src: "{{ item }}.service"
+      dest: "/lib/systemd/system/{{ item }}.service"
+      owner: root
+      group: root
+      mode: 0644
+  with_items:
+    - germqtt
+
+- name: Start service
+  systemd:
+      name: "{{ item }}"
+      state: started
+      daemon_reload: yes
+      enabled: yes
+  with_items:
+    - germqtt
