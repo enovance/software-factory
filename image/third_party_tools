@@ -305,6 +305,8 @@ if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
     PASTE_URL="${SWIFT_CACHE}/lodgeit.git"
     REPOXPLORER_EXTRA_VARS="repoxplorer_url: \"${REPOXPLORER_URL}\""
     REPOXPLORER_EXTRA_VARS+=", repoxplorer_commit: \"${REPOXPLORER_VERSION}\""
+    # TODO add to swift cache
+    GERMQTT_EXTRA_VARS=""
 fi
 
 LECM_URL="https://github.com/Spredzy/lecm"
