@@ -1,0 +1,3 @@
+---
+- name: restart repoxplorer
+  service: name=repoxplorer state=restarted
