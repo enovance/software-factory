@@ -42,6 +42,7 @@
   with_items:
     - projects.yaml
     - idents.yaml
+  notify: restart repoxplorer
 
 - name: "Write config repo sha1 matching current repoxplorer configuration"
   copy: content="{{ upstreamconfig.stdout }}" dest=/var/lib/software-factory/repoxplorer_config
