@@ -70,6 +70,7 @@
       owner: root
       group: root
       mode: 0644
+  notify: restart gerrit
 
 - name: "Start service"
   systemd:
