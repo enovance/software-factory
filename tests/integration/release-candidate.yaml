@@ -1,0 +1,117 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    rc_number: 1
+  tasks:
+    - block:
+      - name: "Download the image"
+        get_url:
+          url: "{{ image_url }}"
+          checksum:  "{{ image_hash }}"
+          dest: "{{ home_path }}/sf-{{ sf_ver }}.qcow2"
+
+      - name: "Upload the image to glance"
+        os_image:
+          name: "sf-{{ sf_ver }}-rc{{ rc_number }}"
+          container_format: bare
+          disk_format: qcow2
+          state: present
+          filename: "{{ home_path }}/sf-{{ sf_ver }}.qcow2"
+        register: image
+
+      - name: "Destroy stacks"
+        os_stack:
+          name: "sf-{{ sf_ver }}-rc{{ rc_number }}"
+          state: "absent"
+        when: reset_stack|default(None) == "yes"
+
+      - name: "Deploy stacks"
+        os_stack:
+          name: "sf-{{ sf_ver }}-rc{{ rc_number }}"
+          rollback: yes
+          template: "{{ stack_url }}"
+          parameters:
+            key_name: id_rsa
+            image_id: "{{ image['image']['id'] }}"
+            domain: "{{ sf_ver|replace('.', '') }}rc{{ rc_number }}.com"
+            bootstrap: false
+        ignore_errors: yes
+        register: stack
+
+      - name: "Get stack outputs"
+        set_fact:
+          os_slave_network: "{{ stack['stack']['outputs'][1]['output_value'].split()[-1] }}"
+          rc_ip: "{{ stack['stack']['outputs'][0]['output_value'].split()[-1] }}"
+
+
+      when: rc_ip is not defined
+
+    - debug: msg="Reuse the deployment by running this playbook with -e 'rc_ip={{ rc_ip }} os_slave_network={{ os_slave_network }}'"
+
+    - name: "Wait for ssh"
+      wait_for:
+        host: "{{ rc_ip }}"
+        port: 22
+        search_regex: OpenSSH
+        delay: 10
+
+    - name: Wait for SSH on the Instance
+      command: ssh -oBatchMode=yes -oStrictHostKeyChecking=no root@{{ rc_ip }} true
+      register: result
+      until: result|success
+      retries: 30
+      delay: 10
+
+    - add_host:
+        name: "{{ rc_ip }}"
+        group: rc
+        os_slave_network: "{{ os_slave_network }}"
+
+
+- hosts: rc
+  gather_facts: no
+  remote_user: root
+  tasks:
+    - name: "Fetch SF_dev authorized keys"
+      get_url: "url=https://softwarefactory-project.io/r/gitweb?p=SF_devs_public_keys.git;a=blob_plain;f=authorized_keys;hb=refs/heads/master dest=/root/sf-dev-authorized-keys"
+
+    - name: "Install authorized keys"
+      shell: "[ -f /root/authorized-keys ] || cp /root/.ssh/authorized_keys /root/authorized-keys; cat /root/authorized-keys /root/sf-dev-authorized-keys > /root/.ssh/authorized_keys"
+
+    - name: "Setup nodepool"
+      command: |
+        python -c "import yaml
+        data = yaml.load(open('/etc/software-factory/sfconfig.yaml'))
+        data['nodepool'] = {'disabled': False,
+          'providers': [{
+            'auth_url': '{{ lookup('env', 'OS_AUTH_URL') }}',
+            'boot_timeout': 120,
+            'max_servers': 3,
+            'name': 'default',
+            'network': '{{ os_slave_network }}',
+            'password': '{{ lookup('env', 'OS_PASSWORD') }}',
+            'pool': 'external_network',
+            'project_id': 'SF-Preprod',
+            'rate': 5.0,
+            'username': '{{ lookup('env', 'OS_USERNAME') }}',
+          }]
+        }
+        yaml.dump(data, open('/etc/software-factory/sfconfig.yaml', 'w'), default_flow_style=False)"
+
+    - name: "Setup OpenID Connect"
+      command: |
+        python -c "import yaml
+        data = yaml.load(open('/etc/software-factory/sfconfig.yaml'))
+        data['authentication']['openid_connect'] = {
+            'client_id': '93008367378-euhhq0huolte6b6ue28fm57q6cfj7c4k.apps.googleusercontent.com',
+            'client_secret': 'Q4ekASXcn2uydU1oz3A_ZH-g',
+            'disabled': False,
+            'issuer_url': 'https://accounts.google.com/',
+            'login_button_text': 'Log in with Google (OpenID Connect)',
+            'mapping': {'email': 'email', 'login': 'email', 'name': 'name', 'uid': 'sub', 'ssh_keys': None},
+        }
+        yaml.dump(data, open('/etc/software-factory/sfconfig.yaml', 'w'), default_flow_style=False)"
+
+    - name: "Run sfconfig"
+      command: sfconfig.py
