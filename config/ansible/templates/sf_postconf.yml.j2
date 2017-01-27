@@ -15,3 +15,8 @@
 {% for role in host['rolesname'] %}    - {role: "{{ role }}", action: "postconf"}
 {% endfor %}
 {% endfor %}
+
+- hosts: localhost
+  tasks:
+    - name: "After postconf tasks triggers the playbook configrepo_update.yml"
+      command: ansible-playbook /etc/ansible/sf_configrepo_update.yml
