@@ -1,5 +1,8 @@
 role_actions:
+  - install
   - setup
+
+kibana_repo_url: https://packages.elastic.co/kibana/4.5/centos
 
 kibana_topmenu_patch: |
   function load_menu() { loadTopmenu(); }
