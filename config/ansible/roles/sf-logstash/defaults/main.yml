@@ -1,2 +1,5 @@
 role_actions:
+  - install
   - setup
+
+logstash_repo_url: https://packages.elastic.co/logstash/2.3/centos
