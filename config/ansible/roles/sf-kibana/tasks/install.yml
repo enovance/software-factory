@@ -1,0 +1,5 @@
+---
+- name: "Install kibana package"
+  yum:
+    name: kibana
+    state: latest
