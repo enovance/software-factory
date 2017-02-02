@@ -31,8 +31,8 @@ resources:
         [receive]
           requireChangeId = true
         [submit]
-          mergeContent = false
-          action = fast forward only
+          mergeContent = true
+          action = rebase if necessary
       groups:
         - {{ project }}-ptl
         - {{ project }}-core
