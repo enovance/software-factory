@@ -435,6 +435,12 @@ function run_provisioner {
     echo "$(date) ======= run_provisioner"
     ./tests/functional/provisioner/provisioner.py 2>> ${ARTIFACTS_DIR}/provisioner.debug || fail "Provisioner failed" ${ARTIFACTS_DIR}/provisioner.debug
     checkpoint "run_provisioner"
+    echo "$(date) Running /etc/ansible/health-check/provision.yaml" | tee -a ${ARTIFACTS_DIR}/integration_tests.txt
+    # TODO(2.4.0): remove negative condition bellow when 2.3.0 is no longer supported
+    ssh ${SF_HOST} "[ ! -f /etc/ansible/health-check/provision.yaml ] || ansible-playbook /etc/ansible/health-check/provision.yaml" >> ${ARTIFACTS_DIR}/integration_tests.txt \
+        && echo "Provision integration test SUCCESS"                        \
+        || fail "Provision integration test failed" ${ARTIFACTS_DIR}/integration_tests.txt
+    export PROVISIONED_VERSION=$(ssh ${SF_HOST} grep sf_version /etc/software-factory/sf_version.yaml /etc/ansible/group_vars/all.yaml 2> /dev/null | awk '{ print $2 }')
 }
 
 function run_backup_start {
