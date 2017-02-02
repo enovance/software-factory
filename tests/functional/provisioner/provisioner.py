@@ -31,6 +31,7 @@ from utils import JenkinsUtils
 from utils import get_cookie
 from utils import is_present
 from utils import ssh_run_cmd
+from utils import cmp_version
 
 from pysflib.sfstoryboard import SFStoryboard
 
@@ -60,6 +61,15 @@ class SFProvisioner(object):
         self.stb_client = SFStoryboard(
             config.GATEWAY_URL + "/storyboard_api",
             config.USERS[config.ADMIN_USER]['auth_cookie'])
+
+    def create_resources(self):
+        print " Creating resources ..."
+        if cmp_version(os.environ.get("PROVISIONED_VERSION", "0.0"), "2.4.0"):
+            # Remove review-dashboard
+            for p in self.resources['resources']['projects'].values():
+                del p['review-dashboard']
+        self.ru.create_resources("provisioner",
+            {'resources': self.resources['resources']})
 
     def create_project(self, name):
         print " Creating project %s ..." % name
@@ -109,9 +119,9 @@ class SFProvisioner(object):
         pass
 
 
-    def simple_login(self, user):
+    def simple_login(self, user, password):
         """log as user to make the user listable"""
-        get_cookie(user, config.USERS[user]['password'])
+        get_cookie(user, password)
 
 
     def create_review(self, project, issue):
@@ -158,9 +168,10 @@ class SFProvisioner(object):
             self.create_local_user(user['username'],
                                    user['password'],
                                    user['email'])
+            self.simple_login(user['username'], user['password'])
         for u in self.resources['users']:
             print "log in as %s" % u['name']
-            self.simple_login(u['name'])
+            self.simple_login(u['name'], config.USERS[u['name']]['password'])
         for project in self.resources['projects']:
             print "Create user datas for %s" % project['name']
             self.create_project(project['name'])
@@ -174,6 +185,7 @@ class SFProvisioner(object):
                     self.create_review(project['name'], i)
             self.create_jenkins_jobs(project['name'],
                                      [j['name'] for j in project['jobnames']])
+        self.create_resources()
         self.create_pads(2)
         self.create_pasties(2)
 
