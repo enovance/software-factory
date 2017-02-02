@@ -57,3 +57,13 @@
       when: config_done.stat.exists != True
 
 - include: sf_configrepo_update.yml
+
+# This is needed because repoxplorer update task actually trigger a config-update when it "git push"
+# TODO: refactor repoxplorer update task to avoid triggering a config-update during config-update... and remove bellow wait
+- hosts: jenkins
+  tasks:
+    - name: Wait for first config-update
+      wait_for:
+        path: /var/lib/jenkins/jobs/config-update/builds/lastStableBuild/log
+        search_regex: "^Finished. SUCCESS$"
+        timeout: 120
