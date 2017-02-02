@@ -1,0 +1,49 @@
+---
+# * Setup test projects
+- include: playbooks/config_reset.yaml
+
+- hosts: install-server
+  tasks:
+    - name: "Check for sf_version file (remove this task once 2.3.0 is no longer supported)"
+      stat: path=/etc/software-factory/sf_version.yaml
+      register: sf_version_file
+
+    - include_vars: /etc/software-factory/sf_version.yaml
+      when: sf_version_file.stat.exists
+
+    - name: "Makes user connect once"
+      command: sfmanager --auth "{{ item }}:userpass" sf_user list
+      with_items: [user2, user3, user4]
+
+    - name: "Add config repo files"
+      template: src={{ item }}.j2 dest=/root/config/{{ item }}
+      with_items:
+        - resources/tdpw.yaml
+        - zuul/tdpw.yaml
+
+    - name: "Commit change"
+      command: chdir=/root/config bash -c "git add */*.yaml; exec git commit -a -m 'Add tdpw to config repo'"
+
+
+- name: "Submit config repos"
+  include: playbooks/config_submit_change.yaml
+
+# * Add a couple of reviews
+- hosts: install-server
+  tasks:
+    - name: "Create provision directory"
+      file: path=/var/lib/software-factory/provision state=directory
+
+    - name: "Create tdpw-info review"
+      command: chdir=/var/lib/software-factory/provision {{ item }}
+      with_items:
+        - git clone git+ssh://gerrit/tdpw/tdpw-info
+        - touch tdpw-info/test-file
+        - bash -c "cd tdpw-info; git add test-file; git commit -m 'Add test-file'; git review"
+
+    - name: "Create reader review"
+      command: chdir=/var/lib/software-factory/provision {{ item }}
+      with_items:
+        - git clone git+ssh://gerrit/tdpw/reader
+        - touch reader/test-file
+        - bash -c "cd reader; git add test-file; git commit -m 'Add another test-file'; git review"
