@@ -31,6 +31,7 @@ import yaml
 import logging
 import pkg_resources
 
+from distutils.version import StrictVersion
 from subprocess import Popen, PIPE
 from pysflib.sfredmine import RedmineUtils
 
@@ -74,6 +75,10 @@ def is_present(service):
 def has_issue_tracker():
     return set(config.ISSUE_TRACKERS) & set(services)
 
+
+def skipIfProvisionVersionLesserThan(wanted_version):
+    return skipIf(StrictVersion(wanted_version) <
+                  StrictVersion(os.environ.get("PROVISIONED_VERSION", "0.0")))
 
 def skipIfServiceMissing(service):
     return skipIf(service not in services,
