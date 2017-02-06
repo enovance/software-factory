@@ -33,7 +33,6 @@ The build_image.sh script does the following:
   * Install yum.repos and already packaged requirements
   * Install gerrit (which is build using image/packages/gerrit/build.sh)
   * Install zuul/nodepool
-  * Install redmine
   * Everything that is not developped by/for SF
 
 * The third step adds the SF secret sauce to the image cache (see image/sf.install)
@@ -46,7 +45,7 @@ The build_image.sh script does the following:
 
 Why use an image ?
 
-* Easy install of non packaged services such as gerrit or redmine
+* Easy install of non packaged services such as gerrit or nodepool
 * Reproducible deployment (no network access required)
 * Reproducible upgrade
 

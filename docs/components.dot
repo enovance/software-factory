@@ -46,13 +46,6 @@ digraph {
         "Nodepool";
     }
 
-    subgraph cluster_redmine {
-        style = dashed;
-        label="Redmine";
-        "Redmine";
-        "RedmineApache" [label="Apache"];
-    }
-
     subgraph cluster_mysql {
         style = dashed;
         label="Mysql";
