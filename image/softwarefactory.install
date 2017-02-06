@@ -96,12 +96,6 @@ name=Passenger
 baseurl=http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror/passenger/
 gpgcheck=0
 enabled=0
-
-[sf]
-name=SF repository for various packages
-baseurl=http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/rpms
-gpgcheck=0
-enabled=1
 EOF
     mkdir -p ${dir}/etc/pki/rpm-gpg/
     rsync -a --delete ${ORIG}/keys/ ${dir}/etc/pki/rpm-gpg/
@@ -192,7 +186,7 @@ enable_selinux() {
 
 install_sf_packages() {
     do_chroot ${dir} bash -c 'for key in /etc/pki/rpm-gpg/*.key; do rpm --import $key; done'
-    install_packages ${dir} $CENTOS_PKGS $BUILD_PKGS $SF_PKGS
+    install_packages ${dir} $CENTOS_PKGS $BUILD_PKGS
 
     # Make sure auditd is enabled by default
     do_chroot ${dir} systemctl enable auditd
@@ -558,8 +552,6 @@ if [ "$STEP" == 1 ]; then
     checkpoint "sf dep packages installed"
     enable_selinux
     checkpoint "selinux configured"
-    install_jenkins
-    checkpoint "jenkins installed"
     install_redmine
     checkpoint "redmine installed"
     install_gerrit
@@ -586,6 +578,9 @@ if [ "$STEP" == 1 ]; then
     ansible_install sf-managesf "$MANAGESF_EXTRA_VARS"
     ansible_install sf-cauth "$CAUTH_EXTRA_VARS"
     ansible_install sf-lecm "$LECM_EXTRA_VARS"
+    ansible_install sf-jenkins
+    # TODO migrate the rest of jenkins install in sf-jenkins role
+    install_jenkins
     ansible_install sf-zuul "$ZUUL_EXTRA_VARS"
     ansible_install sf-gerritbot "$GERRITBOT_EXTRA_VARS"
     ansible_install sf-nodepool "$NODEPOOL_EXTRA_VARS"

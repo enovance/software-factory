@@ -1,5 +1,6 @@
 role_actions:
   - stop
+  - install
   - setup
   - update
   - get_logs
