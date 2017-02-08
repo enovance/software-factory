@@ -46,8 +46,8 @@ cat /opt/nodepool-scripts/authorized_keys | sudo tee -a /home/$cloud_user/.ssh/a
 # Install java (required by Jenkins)
 sudo yum install -y java
 
-# Install glob2 and python-magic for zuul_swift_upload
-sudo yum install -y python-magic
+# Install glob2, python-magic and pytz for zuul_swift_upload
+sudo yum install -y python-magic pytz
 sudo pip install glob2
 
 # Install zuul-cloner
