@@ -250,6 +250,15 @@
         RewriteRule .* - [E=B64:${base64helper:admin},NE]
         RequestHeader set Authorization "Basic %{B64}e"
     </LocationMatch>
+ 
+    # Gerrit API fake auth requires password to set at 'password'
+    # Don't give a chance to a user to change it
+    <LocationMatch "^/r/accounts/.*/password.http">
+      <limit PUT DELETE>
+        Order Allow,Deny
+        Allow from {{ fqdn }}
+      </limit>
+    </LocationMatch>
 
     RewriteMap path2content "txt:/etc/httpd/pages.txt"
     <LocationMatch "^/pages/((?!404.*).)+">
