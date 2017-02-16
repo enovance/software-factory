@@ -3,6 +3,8 @@
   yum:
     name: "{{ item }}"
     state: latest
+    disablerepo: "{{ yum_disable_repo|default(omit) }}"
+    enablerepo: "{{ yum_enable_repo|default(omit) }}"
   with_items:
     - gzip
     - git
