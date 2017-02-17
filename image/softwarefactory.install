@@ -18,7 +18,14 @@
 
 set -e
 
-INSTALL_OPTIONS="--disablerepo=base,epel,extras,updates,jenkins,passenger --enablerepo=sfbase,sfextras,sfupdates,sfepel,sfrdo,sfjenkins,sfpassenger"
+. ${ORIG}/third_party_tools
+
+if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
+    ENABLED_REPOS="sfbase,sfextras,sfupdates,sfepel,sfrdo,sfjenkins,sfpassenger"
+    DISABLED_REPOS="*"
+    INSTALL_OPTIONS="--disablerepo=${DISABLED_REPOS} --enablerepo=${ENABLED_REPOS}"
+    ANSIBLE_EXTRA_VARS="yum_disable_repo=* yum_enable_repo=${ENABLED_REPO}"
+fi
 
 [ -z "$DEBUG" ] || set -x
 # Target dir where the centos images will be built
@@ -45,7 +52,6 @@ if [ -z "$dir" ]; then
     exit 1
 fi
 
-. ${ORIG}/third_party_tools
 . ${ORIG}/functions
 
 bootstrap() {
