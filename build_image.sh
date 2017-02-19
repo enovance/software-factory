@@ -42,7 +42,7 @@ function description_diff {
     # Can't find current version description, tries previous_ver
     grep -q "Not Found" ${IMAGE_PATH}.old_description && sudo curl -o ${IMAGE_PATH}.old_description ${SWIFT_SF_URL}/softwarefactory-${SF_PREVIOUS_VER}.description
     grep -q "Not Found" ${IMAGE_PATH}.old_description && echo "(E) Couldn't find previous description"
-    diff ${IMAGE_PATH}.old_description ${IMAGE_PATH}-${SF_VER}.description | sudo tee ${IMAGE_PATH}.description_diff
+    diff ${IMAGE_PATH}.old_description ${IMAGE_PATH}.description | sudo tee ${IMAGE_PATH}.description_diff
 }
 
 function build_qcow {
