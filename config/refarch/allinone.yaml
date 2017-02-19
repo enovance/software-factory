@@ -13,6 +13,7 @@ inventory:
       - lodgeit
       - gerrit
       - gerritbot
+      - zookeeper
       - zuul
       - nodepool
       - jenkins
