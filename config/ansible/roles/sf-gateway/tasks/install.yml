@@ -1,0 +1,19 @@
+---
+- name: "Install requirements"
+  yum:
+    name: "fontawesome-fonts-web,js-jquery1"
+    state: present
+    disablerepo: "{{ yum_disable_repo|default(omit) }}"
+    enablerepo: "{{ yum_enable_repo|default(omit) }}"
+
+- name: "Symlink awesome font"
+  file:
+    src: /usr/share/font-awesome-web
+    dest: /var/www/static/font-awesome
+    state: link
+
+- name: "Symlink jquery"
+  file:
+    src: /usr/share/javascript/jquery/1/jquery.min.js
+    dest: /var/www/static/js/jquery.min.js
+    state: link
