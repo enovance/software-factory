@@ -88,6 +88,11 @@
     ignore_errors: yes
     when: "'storyboard' in mysql_databases"
 
+- hosts: elasticsearch
+  tasks:
+  # repoXplorer does not manage DB version so wipe it
+  - include: tasks/remove_repoxplorer_index.yml
+
 - hosts: auth
   tasks:
   - include: tasks/remove_old_service_user.yml

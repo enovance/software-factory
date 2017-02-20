@@ -1,0 +1,3 @@
+---
+- name: Remove repoxplorer EL index
+  command: curl -XDELETE "http://localhost:9200/repoxplorer/"
