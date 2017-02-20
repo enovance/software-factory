@@ -143,16 +143,6 @@ if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
 fi
 
 
-# bootstrap
-BOOTSTRAP_VERSION=3.2.0
-BOOTSTRAP_URL="https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAP_VERSION}/bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
-
-URL_LIST="$URL_LIST $BOOTSTRAP_URL"
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    BOOTSTRAP_URL="${SWIFT_CACHE}/javascripts/bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
-fi
-
-
 # jenkins plugins
 JENKINS_PLUGINS_URL="https://updates.jenkins-ci.org/download/plugins"
 JENKINS_SWARM_VERSION=2.1
@@ -237,35 +227,6 @@ if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
     ETHERPAD_EXTRA_VARS+=", etherpad_version: \"${ETHERPAD_LITE_VERSION}\""
 fi
 
-
-# font awesome
-FONTAWESOME_VERSION=4.2.0
-FONTAWESOME_URL="https://codeload.github.com/FortAwesome/Font-Awesome/zip/v${FONTAWESOME_VERSION}"
-
-URL_LIST="$URL_LIST $FONTAWESOME_URL"
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    FONTAWESOME_URL="${SWIFT_CACHE}/fontawesome/v${FONTAWESOME_VERSION}"
-fi
-
-
-# JQuery
-JQUERY_VERSION=1.7.2
-JQUERY_URL="https://code.jquery.com/jquery-${JQUERY_VERSION}.min.js"
-
-URL_LIST="$URL_LIST $JQUERY_URL"
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    JQUERY_URL="${SWIFT_CACHE}/javascripts/jquery-${JQUERY_VERSION}.min.js"
-fi
-
-
-# AngularJS
-ANGULARJS_VERSION=1.2.27
-ANGULARJS_URL="https://ajax.googleapis.com/ajax/libs/angularjs/${ANGULARJS_VERSION}/angular.min.js"
-
-URL_LIST="$URL_LIST $ANGULARJS_URL"
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    ANGULARJS_URL="${SWIFT_CACHE}/javascripts/angular.min.js"
-fi
 
 # repoXplorer
 REPOXPLORER_URL="https://softwarefactory-project.io/r/repoxplorer"
