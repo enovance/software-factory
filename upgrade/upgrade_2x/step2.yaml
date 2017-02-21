@@ -49,6 +49,45 @@
   - file: path=/etc/software-factory/_arch.yaml state=absent
   - file: path=/root/sf-bootstrap-data state=absent
 
+- hosts: gerrit
+  tasks:
+  - name: "Check for previous install"
+    stat: path=/home/gerrit/site_path
+    register: gerrit_home
+
+  - block:
+    # 2.4.0: switch to packaged version
+    - name: "Move config file to /etc"
+      command: rsync -a /home/gerrit/site_path/etc/ /etc/gerrit/
+
+    - name: "Move git to /var/lib"
+      command: rsync -a /home/gerrit/site_path/git/ /var/lib/gerrit/git/
+
+    - name: "Move .ssh to new home directory"
+      command: rsync -a /home/gerrit/.ssh /var/lib/gerrit/.ssh/
+
+    - name: "Archive previous gerrit tree"
+      command: mv /home/gerrit /home/gerrit.old
+
+    - name: "Update gerrit group"
+      group: name=gerrit
+
+    - name: "Update gerrit user"
+      user: name=gerrit group=gerrit shell=/bin/bash home=/var/lib/gerrit
+
+    when: gerrit_home.stat.exists == True
+
+  - name: "Upgrade Gerrit schema"
+    command: /usr/bin/java -jar /usr/lib64/gerrit/release.war init -d /var/lib/gerrit/ --batch --no-auto-start --skip-plugins
+    become: true
+    become_user: gerrit
+
+  - name: "Create secondary Gerrit index"
+    command: /usr/bin/java -jar /usr/lib64/gerrit/release.war reindex -d /var/lib/gerrit/
+    become: true
+    become_user: gerrit
+
+
 - hosts: managesf
   tasks:
   # 2.2.7: managesf is running with its own user
