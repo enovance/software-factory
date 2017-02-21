@@ -4,9 +4,6 @@ requests[security]
 # Pin Balel to 2.0 especially for the version of lodgeit we use
 Babel==2.0
 
-# Zuul_swift_upload req
-glob2
-
 # Graphite req
 django<1.8
 django-tagging
