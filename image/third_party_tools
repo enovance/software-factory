@@ -26,11 +26,6 @@ URL_LIST="$URL_LIST $PASSENGER_REPO $RDO_REPO"
 
 SF_PKGS="$(grep '^[a-zA-Z]' ${ORIG}/packages/rpm_sf.txt)"
 
-# pip
-PIP_PKGS="$(grep '^[a-zA-Z\-]' ${ORIG}/packages/pip_pkgs.txt)"
-export PIP_USE_MIRRORS=True
-
-
 # Serverspec gem versions
 SERVERSPEC_VERSION=2.25.0
 

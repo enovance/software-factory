@@ -228,10 +228,6 @@ install_sf_packages() {
         checkpoint "passenger installed"
     fi
 
-    retry do_chroot ${dir} pip install --upgrade 'pip<8'
-    retry do_chroot ${dir} pip install ${PIP_PKGS}
-    checkpoint "pip packages installed"
-
     # install zuul_swift_upload.py
     http_fetch $ZUUL_SWIFT_UPLOAD_URL ${dir}/usr/local/bin/zuul_swift_upload.py
     chmod +x ${dir}/usr/local/bin/zuul_swift_upload.py
@@ -432,15 +428,6 @@ function install_sf {
     test -n "${SFMANAGER_CLONED_PATH}"
 
     mkdir -p ${dir}/usr/src
-
-    cp -f /etc/resolv.conf "${dir}/etc/"
-
-    if [ ! -z "${STAGING_PKGS}" ]; then
-        install_packages ${dir} ${STAGING_PKGS}
-    fi
-    if [ ! -z "${STAGING_PIP}" ]; then
-        retry do_chroot ${dir} pip install 'pip<8' ${STAGING_PIP}
-    fi
 
     # Make sure subproject are available
     if [ ! -d "${CAUTH_CLONED_PATH}" ] || [ ! -d "${MANAGESF_CLONED_PATH}" ] || \
