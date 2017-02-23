@@ -232,10 +232,6 @@ install_sf_packages() {
     retry do_chroot ${dir} pip install ${PIP_PKGS}
     checkpoint "pip packages installed"
 
-    # install zuul_swift_upload.py
-    http_fetch $ZUUL_SWIFT_UPLOAD_URL ${dir}/usr/local/bin/zuul_swift_upload.py
-    chmod +x ${dir}/usr/local/bin/zuul_swift_upload.py
-
     [ -d ${dir}/var/lib/grafana ] || install_packages ${dir} ${GRAFANA_URL}
 }
 
@@ -357,6 +353,7 @@ remove_obsolete() {
     rm -Rf ${dir}/usr/src/git*
     rm -Rf ${dir}/srv/lodgeit
     rm -Rf ${dir}/root/gerrit_data_source
+    rm -Rf ${dir}/usr/local/bin/zuul_swift_upload.py
 
     # Gemfile is a sign /var/www/static was setup manually. It's now replaced by sf-web-assets package
     if [ -f ${dir}/var/www/static/font-awesome/Gemfile ]; then

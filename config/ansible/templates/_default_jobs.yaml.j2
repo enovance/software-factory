@@ -34,7 +34,7 @@
     builders:
       - shell: |
           # Publish artifacts on a Swift server
-          /usr/local/bin/zuul_swift_upload.py --name artifacts --delete-after 0 artifacts
+          /usr/bin/zuul-swift-upload --name artifacts --delete-after 0 artifacts
 
 - publisher:
     name: zuul-swift-upload
