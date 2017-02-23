@@ -202,14 +202,6 @@ EOF
     chmod 0644 ${dir}/etc/sysconfig/network
 }
 
-enable_selinux() {
-    # Force SELinux relabel
-    touch ${dir}/.autorelabel
-
-    # TODO: replace "permissive" by "enforcing" once there are no more avc message
-    sed -i "s/^SELINUX=.*/SELINUX=permissive/" "${dir}/etc/selinux/config"
-}
-
 install_sf_packages() {
     do_chroot ${dir} bash -c 'for key in /etc/pki/rpm-gpg/*.key; do rpm --import $key; done'
     install_packages ${dir} $CENTOS_PKGS $BUILD_PKGS
@@ -479,8 +471,6 @@ build_all() {
     install_sf_packages
     fix_ansible_issue5504
     checkpoint "sf dep packages installed"
-    enable_selinux
-    checkpoint "selinux configured"
     install_redmine
     checkpoint "redmine installed"
     install_edeploy

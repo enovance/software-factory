@@ -2,9 +2,13 @@
 - name: "Create libexec directory"
   file: path=/usr/local/libexec/software-factory state=directory mode=0755
 
-- name: "Install sfmanager"
-  yum:
-    name: "python2-sfmanager"
-    state: latest
-    disablerepo: "{{ yum_disable_repo|default(omit) }}"
-    enablerepo: "{{ yum_enable_repo|default(omit) }}"
+- name: "Set permissive selinux"
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=permissive'
+
+- name: "Enable selinux autorelabel"
+  file:
+    path: /.autorelabel
+    state: touch
