@@ -1,4 +1,11 @@
 ---
+- name: "Install package"
+  yum:
+    name: "zuul-swift-upload"
+    state: latest
+    disablerepo: "{{ yum_disable_repo|default(omit) }}"
+    enablerepo: "{{ yum_enable_repo|default(omit) }}"
+
 - name: "Fetch code"
   git:
     repo: "{{ zuul_url }}"

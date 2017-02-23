@@ -124,13 +124,6 @@ if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
     BCPKIXJAVA_URL="${SWIFT_CACHE}/gerrit/bcpkix-${BCPKIXJDK_VERSION}-${BCPKIX_VERSION}.jar"
 fi
 
-# zuul_swift_upload
-ZUUL_SWIFT_UPLOAD_URL="https://raw.githubusercontent.com/openstack-infra/project-config/master/jenkins/scripts/zuul_swift_upload.py"
-URL_LIST="${URL_LIST} ${ZUUL_SWIFT_UPLOAD_URL}"
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    ZUUL_SWIFT_UPLOAD_URL="${SWIFT_CACHE}/zuul/zuul_swift_upload.py"
-fi
-
 # jenkins
 if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
     JENKINS_EXTRA_VARS="jenkins_cache_url: \"${SWIFT_CACHE}/jenkins_plugins\""
