@@ -2,6 +2,17 @@
 - name: "Create libexec directory"
   file: path=/usr/local/libexec/software-factory state=directory mode=0755
 
+- name: "Set permissive selinux"
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=permissive'
+
+- name: "Enable selinux autorelabel"
+  file:
+    path: /.autorelabel
+    state: touch
+
 - name: "Install sfmanager venv"
   command: chdir=/usr/src/python-sfmanager {{ item }}
   with_items:
