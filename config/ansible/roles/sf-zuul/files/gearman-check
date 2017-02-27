@@ -13,10 +13,17 @@ f. close()
 # Get a list of configured projects
 configured_jobs = []
 projects = layout_yaml.get('projects')
+templates = layout_yaml.get('project-templates')
 for project in projects:
     configured_jobs.extend(project.get('check', []))
     configured_jobs.extend(project.get('gate', []))
     configured_jobs.extend(project.get('post', []))
+    configured_jobs.extend(project.get('tag', []))
+for template in templates:
+    configured_jobs.extend(template.get('check', []))
+    configured_jobs.extend(template.get('gate', []))
+    configured_jobs.extend(template.get('post', []))
+    configured_jobs.extend(template.get('tag', []))
 
 # Connect to gearman, and get list of active jobs
 active_jobs = []
@@ -38,6 +45,22 @@ for line in response.splitlines():
 
         if entry not in active_jobs:
             active_jobs.append(entry)
+
+
+def flatten_nested(configured_jobs):
+    ret = []
+    for job in configured_jobs:
+        if isinstance(job, dict):
+            for key in job.keys():
+                ret.extend(flatten_nested(job[key]))
+                ret.append(key)
+        else:
+            ret.append(job)
+    return ret
+
+# Flatten configured jobs If jobs are chained such as
+# "{'sf-rpm-build': ['sf-functional-allinone', 'sf-upgrade-allinone']}"
+configured_jobs = flatten_nested(configured_jobs)
 
 # Compute difference between these two lists
 surplus = set(active_jobs) - set(configured_jobs)
