@@ -1,0 +1,26 @@
+---
+- name: Check if policy config is already in config-repo
+  stat: path=/root/config/policies
+  register: configrepo_policies
+
+- name: Check if policy config has agent api entries
+  when: configrepo_policies.stat.exists == true
+  shell: grep -q managesf.node:get /root/config/policies/policy.yaml
+  register: grep
+  ignore_errors: yes
+
+- name: Init policy configuration
+  when: configrepo_policies.stat.exists == true and grep.rc == 1
+  command: chdir=/root/config {{ item }}
+  with_items:
+    - git fetch --all
+    - git reset --hard origin/master --
+    - git clean -f -x -d
+    # Remove obsolete rule
+    - sed -i '/managesf.node:image-update/d' /root/config/policies/policy.yaml
+    # Create default rules
+    - /usr/local/bin/hieraedit.py --yaml /root/config/policies/policy.yaml managesf.node:image-start-update rule:admin_or_service
+    - /usr/local/bin/hieraedit.py --yaml /root/config/policies/policy.yaml managesf.node:image-update-status rule:admin_or_service
+    - git add policies
+    - git commit -m "Add node API image update related policies"
+    - git push git+ssh://{{ fqdn }}/config master
