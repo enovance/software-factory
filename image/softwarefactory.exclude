@@ -76,6 +76,7 @@
 /srv/cauth_keys/
 /var/lib/elasticsearch/
 /var/lib/repoxplorer/
+/var/lib/managesf/
 
 # Sf configuration
 /etc/puppet/hiera/sf/
@@ -83,3 +84,4 @@
 /etc/httpd/htpasswd
 /etc/httpd/managesf_htpasswd
 /etc/httpd/pages.txt
+/etc/managesf/
