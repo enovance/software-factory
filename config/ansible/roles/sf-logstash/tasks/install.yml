@@ -13,3 +13,4 @@
     state: latest
     disablerepo: "*"
     enablerepo: "{{ logstash_repo_name }}"
+    update_cache: yes
