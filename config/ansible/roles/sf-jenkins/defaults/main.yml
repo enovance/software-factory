@@ -74,3 +74,6 @@ jenkins_plugins:
   - name: zmq-event-publisher
     version: "0.0.5"
     checksum: "sha256:104c3c264c39d0c253572b41951e7c0d181a68c11535972c846f295c67c403ef"
+  - name: mqtt-notification-plugin
+    version: "1.6"
+    checksum: "sha256:11c1ea3cd96c6c8fa39c42e29625c40be9417de38db36caee272399a357f7a97"
