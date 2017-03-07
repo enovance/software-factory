@@ -11,6 +11,8 @@
       - ansicolor:
           colormap: gnome-terminal
       - timestamps
+    publishers:
+      - firehose-zuul
     concurrent: true
 
 - builder:
@@ -28,6 +30,18 @@
           rm -Rf ./*
           echo "Clone $ZUUL_PROJECT"
           zuul-cloner http://{{ fqdn }}/r $ZUUL_PROJECT
+
+- publisher:
+    name: firehose-zuul
+    publishers:
+      - mqtt:
+          broker-url: tcp://{{ mosquitto_host }}:1883
+          topic: zuul_jobs
+          credentials-id: 900936e8-a4e0-483e-8ab8-07bca5f80699
+          message: |
+            {"build": "${BUILD_NUMBER}", "job": "${JOB_NAME}", "status": "${BUILD_RESULT}", "node": "${NODE_NAME}", "ZUUL_UUID": "${ZUUL_UUID}", "ZUUL_PIPELINE": "${ZUUL_PIPELINE}", "ZUUL_URL": "${ZUUL_URL}", "ZUUL_PROJECT": "${ZUUL_PROJECT}", "ZUUL_BRANCH": "${ZUUL_BRANCH}", "ZUUL_CHANGES": "${ZUUL_CHANGES}", "ZUUL_REF": "${ZUUL_REF}", "ZUUL_COMMIT": "${ZUUL_COMMIT}", "ZUUL_CHANGE_IDS": "${ZUUL_CHANGE_IDS}", "ZUUL_CHANGE": "${ZUUL_CHANGE}", "ZUUL_PATCHSET": "${ZUUL_PATCHSET}"}
+          qos: AT_MOST_ONCE
+          retain-message: false
 
 - builder:
     name: zuul-swift-upload
