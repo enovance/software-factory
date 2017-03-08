@@ -267,6 +267,14 @@
         Deny from all
     </Directory>
 
+{% if 'mosquitto' in roles %}
+    <Location "/mqtt">
+        ProxyPreserveHost On
+        ProxyPass ws://localhost:1884
+        ProxyPassReverse ws://localhost:1884
+    </Location>
+{% endif %}
+
     {% if authentication["authenticated_only"] %}
     # Make sure static files, docs, git and the topmenu are accessible even if
     # anonymous access is disabled. Git itself is protected by Gerrit
