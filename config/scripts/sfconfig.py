@@ -551,6 +551,9 @@ DNS.1 = %s
         glue["jenkins_pub_url"] = "%s/jenkins/" % glue["gateway_url"]
         get_or_generate_ssh_key("jenkins_rsa")
 
+    if "mosquitto" in arch["roles"]:
+        glue["mosquitto_host"] = get_hostname("mosquitto")
+
     if "redmine" in arch["roles"]:
         glue["redmine_internal_url"] = "http://%s:%s/" % (
             get_hostname("redmine"), defaults["redmine_port"])
