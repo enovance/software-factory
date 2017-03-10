@@ -58,7 +58,7 @@
 /var/lib/umurmurd/
 /var/lib/managesf/users.db
 /var/lib/murmur/murmur.sqlite
-/var/lib/cauth/state_mapping.db
+/var/lib/cauth/
 /var/www/managesf/users.db
 /var/www/cauth/keys/
 
@@ -72,7 +72,6 @@
 /var/lib/gerrit/
 /etc/gerrit/
 /usr/share/config.init.done
-/srv/cauth_keys/
 /var/lib/elasticsearch/
 /var/lib/repoxplorer/
 /var/lib/managesf/
