@@ -1,28 +1,4 @@
 ---
-- name: Create /var/www/cauth
-  file:
-      path: /var/www/cauth
-      state: directory
-      owner: apache
-      group: apache
-      mode: 0750
-      setype: httpd_sys_content_t
-
-- name: "Copy app.wsgi"
-  copy: src=app.wsgi dest=/var/www/cauth/app.wsgi
-
-- name: Create /var/lib/cauth directory
-  file: path=/var/lib/cauth state=directory owner=apache group=apache mode=0750
-
-- name: Create /var/lib/cauth/templates directory
-  file: path=/var/lib/cauth/templates state=directory owner=apache group=apache mode=0750
-
-- name: Create /var/lib/cauth/keys directory
-  file: path=/var/lib/cauth/keys state=directory owner=root group=root mode=0755
-
-- name: Create /var/log/cauth
-  file: path=/var/log/cauth state=directory owner=apache group=apache mode=0750
-
 - name: Hash admin password
   shell: python <<<"{{hash_code}}'{{authentication.admin_password}}'{{hash_code_end}}"
   register: admin_password_hashed
@@ -32,14 +8,17 @@
   register: service_user_password_hashed
 
 - name: Install cauth config.py
-  template: src=templates/config.py.j2 dest=/var/www/cauth/config.py
+  template: src=templates/config.py.j2 dest=/var/lib/cauth/config.py
   notify: apache reload
 
-- name: Create /var/www/cauth/templates
-  file: path=/var/www/cauth/templates state=directory
-
 - name: Install login.html
-  template: src=login.html.j2 dest=/var/www/cauth/templates/login.html
+  template: src=login.html.j2 dest=/var/lib/cauth/templates/login.html
+
+- name: Create httpd content
+  file:
+    src: /var/lib/cauth/templates
+    dest: /var/www/cauth/templates
+    state: link
 
 - name: Install auth site
   copy:
@@ -49,7 +28,7 @@
 - name: Install cauth private key
   copy:
     content: "{{ cauth_privkey }}"
-    dest: /srv/cauth_keys/privkey.pem
+    dest: /var/lib/cauth/keys/privkey.pem
     owner: root
     group: apache
     mode: 0440

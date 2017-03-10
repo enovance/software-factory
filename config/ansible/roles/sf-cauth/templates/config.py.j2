@@ -19,7 +19,7 @@ app = {
     'modules': ['cauth'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/templates',
-    'priv_key_path': '/srv/cauth_keys/privkey.pem',
+    'priv_key_path': '/var/lib/cauth/keys/privkey.pem',
     'cookie_domain': '{{ fqdn }}',
     'debug': False,
     'cookie_period': {{ authentication['sso_cookie_timeout'] }}
