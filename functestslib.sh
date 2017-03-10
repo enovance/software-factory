@@ -101,7 +101,7 @@ function run_health_base {
 function run_health_openstack {
     echo "[+] Starting the health openstack check"
     export OS_AUTH_URL=${OS_AUTH_URL:-"http://192.168.42.1:5000/v2.0"}
-    EXTRA_VARS="node=base_centos base_image_name=sf-latest os_slave_network=${HEAT_SLAVE_NETWORK}"
+    EXTRA_VARS="node=base_centos base_image_name='CentOS 7 (1603) x86_64' os_slave_network=${HEAT_SLAVE_NETWORK}"
     EXTRA_VARS+=" os_auth_url=${OS_AUTH_URL} os_username=${OS_USERNAME} os_password=${OS_PASSWORD} os_tenant_name=${OS_TENANT_NAME}"
     EXTRA_VARS+=" os_tempurl_key=${RANDOM}${RANDOM}${RANDOM}"
     echo "$(date) Running /etc/ansible/health-check/nodepool.yaml" | tee -a ${ARTIFACTS_DIR}/integration_tests.txt
