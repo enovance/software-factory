@@ -107,7 +107,7 @@ enabled=0
 
 [sfrelease]
 name=SF released packages
-baseurl=http://46.231.133.231/kojifiles/repos/sf-master-centos7-build/latest/x86_64/
+baseurl=http://46.231.133.231/kojifiles/repos/sf-2.4-centos7-build/latest/x86_64/
 gpgcheck=0
 enabled=1
 EOF
