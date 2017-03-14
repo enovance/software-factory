@@ -4,3 +4,4 @@ nose
 nose-timer
 selenium
 paho-mqtt
+beautifulsoup4
