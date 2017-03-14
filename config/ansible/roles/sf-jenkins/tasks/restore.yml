@@ -1,5 +1,8 @@
 ---
 - name: "Restore data"
-  synchronize:
+  # Discard files created between backup and restore
+  copy:
     src: "{{ backup_src }}/"
     dest: /
+    rsync_opts:
+      - "--ignore-times"
