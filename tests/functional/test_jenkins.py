@@ -82,6 +82,16 @@ class TestJenkinsBasic(Base):
         resp = self.ju.get(url)
         self.assertEquals(resp.status_code, 200)
 
+    def test_sf_service_user_credentials(self):
+        """Test if SF_SERVICE_USER's credentials are correctly added
+        to the credentials store"""
+        creds_uid = '900936e8-a4e0-483e-8ab8-07bca5f80699'
+        url = '%s/credential-store/domain/_/credential/%s/api/json'
+        url = url % (self.ju.jenkins_url, creds_uid)
+        resp = self.ju.get(url)
+        self.assertEquals(200, resp.status_code, url)
+        self.assertTrue("SF_SERVICE_USER" in resp.text, url)
+
 
 class TestJobsAPI(Base):
 
