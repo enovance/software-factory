@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+      - name: Ensure instance is down
+        os_server:
+            cloud: "{{ pre_upgrade_cloud }}"
+            state: absent
+            name: sf_instance_name
+
+      - name: Ensure volume is not present
+        os_volume:
+            cloud: "{{ pre_upgrade_cloud }}"
+            state: absent
+            display_name: "{{ sf_current_volume }}"
+
+      - name: Create volume from snapshot
+        os_volume:
+            cloud: "{{ pre_upgrade_cloud }}"
+            state: present
+            size: "{{ sf_volume_size }}"
+            display_name: "{{ sf_current_volume }}"
+            sf_snapshot_id: "{{ sf_snapshot_id }}"
+#
+#      - name: Create instance
+#      - name: Add floating ip
