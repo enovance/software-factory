@@ -1,0 +1,72 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: create private network
+      os_network:
+          cloud: "{{ pre_upgrade_cloud }}"
+          state: present
+          name: private
+
+    - name: create private subnet
+      os_subnet:
+          cloud: "{{ pre_upgrade_cloud }}"
+          state: present
+          network_name: private
+          name: private
+          cidr: 192.168.0.0/24
+          dns_nameservers:
+             - 8.8.8.8
+             - 8.8.8.4
+
+    - name: create router
+      os_router:
+          cloud: "{{ pre_upgrade_cloud }}"
+          state: present
+          name: router
+          network: public
+          interfaces:
+            - private
+
+    - name: create security group
+      os_security_group:
+          cloud: "{{ pre_upgrade_cloud }}"
+          state: present
+          name: "{{ project }}"
+          # TODO: prepare a patch from  review
+          # https://github.com/ansible/ansible/pull/22628
+          #egress_default_rules: absent
+          description: security group for "{{ project }}" instances
+
+    - name: security group allow icmp
+      os_security_group_rule:
+          cloud: "{{ pre_upgrade_cloud }}"
+          security_group: "{{ project }}"
+          direction: "{{ item }}"
+          protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+      with_items:
+          - egress
+          - ingress
+
+    - name: create ingress security group rules
+      os_security_group_rule:
+          cloud: "{{ pre_upgrade_cloud }}"
+          security_group: "{{ project }}"
+          direction: ingress
+          protocol: "{{ item.protocol | default('tcp')}}"
+          port_range_min: "{{ item.port }}"
+          port_range_max: "{{ item.port }}"
+          remote_ip_prefix: 0.0.0.0/0
+      with_items: "{{ ingress_ports }}"
+
+    - name: create egress security group rules
+      os_security_group_rule:
+          cloud: "{{ pre_upgrade_cloud }}"
+          security_group: "{{ project }}"
+          direction: egress
+          protocol: "{{ item.protocol | default('tcp')}}"
+          port_range_min: "{{ item.port }}"
+          port_range_max: "{{ item.port }}"
+          remote_ip_prefix: 0.0.0.0/0
+      with_items: "{{ egress_ports }}"

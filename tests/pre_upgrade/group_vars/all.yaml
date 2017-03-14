@@ -1,0 +1,15 @@
+---
+# setup_pre_upgrade_tenant
+project: sf-pre-upgrade
+production_cloud: rcip-dev-sf-prod
+pre_upgrade_cloud: rcip-dev-sf-pre-upgrade
+egress_ports: [{port: 53, protocol: udp}]
+ingress_ports: [{port: 22},
+                {port: 80},
+                {port: 443}]
+
+sf_instance_name: managesf.preprod.softwarefactory-project.io
+sf_original_volume: "{{ sf_instance_name }}"
+sf_current_volume: "current-{{ sf_original_volume }}"
+sf_volume_size: 20
+sf_snapshot_id: be42d4c4-e202-42fb-84ef-4e1705aeb8ee
