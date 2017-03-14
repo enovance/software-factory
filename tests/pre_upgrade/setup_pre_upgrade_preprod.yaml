@@ -1,0 +1,61 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+
+    - name: create private network
+      os_network:
+          cloud: rcip-dev-sf-pre-upgrade
+          state: present
+          name: private
+
+    - name: create private subnet
+      os_subnet:
+          cloud: rcip-dev-sf-pre-upgrade
+          state: present
+          network_name: private
+          name: private
+          cidr: 192.168.0.0/24
+          dns_nameservers:
+             - 8.8.8.8
+             - 8.8.8.4
+
+    - name: create router
+      os_router:
+          cloud: rcip-dev-sf-pre-upgrade
+          state: present
+          name: router
+          network: public
+          interfaces:
+            - private
+
+    - name: create security group
+      os_security_group:
+          cloud: rcip-dev-sf-pre-upgrade
+          state: present
+          name: sf-pre-upgrade
+          description: security group for sf-pre-upgrade instances
+
+    # TODO: need to patch os_security_group_rule.py
+    # module in _find_matching_rule function. The matching
+    # doesn't match default rules
+    - name: remove default egress rules
+      os_security_group_rule:
+          cloud: rcip-dev-sf-pre-upgrade
+          security_group: sf-pre-upgrade
+          state: absent
+          ethertype: "{{ item.protocol }}"
+          direction: egress
+          remote_ip_prefix: "{{ item.network }}"
+      with_items:
+          - {protocol: "IPv4", network: "0.0.0.0/0"}
+          - {protocol: "IPv6", network: "::/0"}
+
+#    - name: get deployment image image:
+#        cloud: rcip-dev-sf-pre-upgrade
+#        name: sf-snapshot
+#        state: present
+#        disk_format: qcow2
+#        container_format: bare
+#        filename: sf-snapshot.qcow2
+
