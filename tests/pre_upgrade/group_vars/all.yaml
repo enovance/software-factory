@@ -1,0 +1,7 @@
+---
+sf_version: 2.0.4
+snapshot_name: "sf-{{ sf_version }}"
+image_name: "{{ snapshot_name }}.qcow2"
+project: sf-pre-upgrade
+production_cloud: rcip-dev-sf-prod
+pre_upgrade_cloud: rcip-dev-sf-pre-upgrade
