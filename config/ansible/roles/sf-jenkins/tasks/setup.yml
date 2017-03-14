@@ -74,6 +74,16 @@
       - {name: org.jenkinsci.main.modules.sshd.SSHD.xml}
       - {name: org.jenkinsci.plugins.ZMQEventPublisher.HudsonNotificationProperty.xml}
 
+- copy:
+      src: "{{ item.name }}.j2"
+      dest: "/var/lib/jenkins/{{ item.name }}"
+      owner: jenkins
+      group: jenkins
+      mode: "{{ item.mode | default(0444) }}"
+      force: "{{ item.force | default('yes') }}"
+  with_items:
+      - {name: service_user_credentials.groovy}
+
 - name: Manage jenkins user password for apache
   htpasswd:
       path: /etc/httpd/htpasswd
@@ -104,3 +114,6 @@
       state: started
       daemon_reload: yes
       enabled: yes
+
+- name: Create or update service user credentials in jenkins
+  command: curl -s --user "jenkins:{{ jenkins_password }}" --data-urlencode "script=$(</var/lib/jenkins/remove-offline-node.groovy)" {{ jenkins_api_url }}/scriptText 
