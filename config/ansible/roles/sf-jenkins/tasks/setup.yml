@@ -15,6 +15,7 @@
     - {name: /var/lib/jenkins}
     - {name: /var/lib/jenkins/defconf, mode: '0500'}
     - {name: /var/lib/jenkins/plugins}
+    - {name: /var/lib/jenkins/init.groovy.d}
 
 - name: Install templates for root user
   template:
@@ -73,6 +74,15 @@
       - {name: org.codefirst.SimpleThemeDecorator.xml}
       - {name: org.jenkinsci.main.modules.sshd.SSHD.xml}
       - {name: org.jenkinsci.plugins.ZMQEventPublisher.HudsonNotificationProperty.xml}
+
+- name: Install init script that sets SF service credentials in Jenkins secrets store
+  template:
+      src: service_user_credentials.groovy.j2
+      dest: /var/lib/jenkins/init.groovy.d/service_user_credentials.groovy
+      owner: jenkins
+      group: jenkins
+      mode: 0444
+      force: yes
 
 - name: Manage jenkins user password for apache
   htpasswd:
