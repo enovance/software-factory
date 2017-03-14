@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+      - name: Destroy old instance
+        os_server:
+            cloud: '{{ pre_upgrade_cloud }}'
+            state: absent
+            name: '{{ item.hostname }}'
+        with_items: '{{ instances }}'
+
+      - name: Cleanup old ports
+        os_port:
+            cloud: '{{ pre_upgrade_cloud }}'
+            name: '{{ item.hostname }}'
+            network: '{{ private_network }}'
+            state: absent
+        with_items: '{{ instances }}'
+
+      - name: Create volume from snapshot
+        os_volume:
+            cloud: '{{ pre_upgrade_cloud }}'
+            state: present
+            size: '{{ item.volume_size }}'
+            display_name: 'current-{{ item.hostname }}'
+            snapshot_id: '{{ item.snapshot_id }}'
+        with_items: '{{ instances }}'
+
+      - name: Create fixed ip addr
+        os_port:
+            cloud: '{{ pre_upgrade_cloud }}'
+            name: '{{ item.hostname }}'
+            network: '{{ private_network }}'
+            security_groups: '{{ project }}'
+            fixed_ips:
+                - ip_address: '{{ item.fixed_private_ip }}'
+        with_items: '{{ instances }}'
+
+      - name: Create instance
+        os_server:
+            cloud: '{{ pre_upgrade_cloud }}'
+            name: '{{ item.hostname }}'
+            boot_volume: 'current-{{ item.hostname }}'
+            flavor: '{{ item.flavor }}'
+            floating_ips: '{{ item.floating_ips }}'
+            terminate_volume: yes
+            security_groups: '{{ project }}'
+            nics: "port-name={{ item.hostname }}"
+        with_items: '{{ instances }}'

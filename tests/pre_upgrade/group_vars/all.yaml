@@ -1,0 +1,26 @@
+---
+project: sf-pre-upgrade
+production_cloud: rcip-dev-sf-prod
+pre_upgrade_cloud: rcip-dev-sf-pre-upgrade
+public_network: public
+private_network: private
+cidr: '192.168.240.0/24'
+
+egress_ports: [{min_port: 1, max_port: 65535, remote_ip_prefix: '{{ cidr }}'},
+               {min_port: 53, protocol: udp}]
+ingress_ports: [{min_port: 22},
+                {min_port: 80},
+                {min_port: 443}]
+
+instances: [{hostname: managesf.preprod.softwarefactory-project.io,
+             volume_size: 160,
+             flavor: 2,
+             snapshot_id: '{{ managesf_snapshot_id }}',
+             fixed_private_ip: 192.168.240.5,
+             floating_ips: 46.231.133.203},
+             {hostname: elk.softwarefactory-project.io,
+             flavor: 2,
+             volume_size: 160,
+             snapshot_id: '{{ elk_snapshot_id }}',
+             fixed_private_ip: 192.168.240.6,
+             floating_ips: 46.231.133.254}]
