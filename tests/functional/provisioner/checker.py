@@ -19,6 +19,7 @@ import shlex
 import requests
 import sys
 import yaml
+from bs4 import BeautifulSoup
 
 pwd = os.path.dirname(os.path.abspath(__file__))  # flake8: noqa
 sys.path.append(os.path.dirname(pwd))             # flake8: noqa
@@ -147,12 +148,34 @@ class SFchecker:
             exit(1)
         print "OK"
 
+    def check_credentials(self, new_creds, old_creds):
+        new = BeautifulSoup(new_creds, 'lxml')
+        old = BeautifulSoup(old_creds, 'lxml')
+        return set(n.string for n in new.find_all('id')) !=\
+               set(o.string for o in old.find_all('id'))
+
     def check_checksums(self):
         print "Check that expected file are there"
         checksum_list = yaml.load(file('pc_checksums.yaml'))
         mismatch = False
         for f, checksum in checksum_list.items():
             if f.startswith("content_"):
+                continue
+            # SF service user password is regenerated after sfconfig.py
+            # so the checksums will not match. Instead, make sure ids are
+            # still there.
+            if f.endswith("credentials.xml"):
+                old_file = checksum_list['content_' + f]
+                mismatch = self.check_credentials(self.read_file(f),
+                                                  old_file)
+                if not mismatch:
+                    print "Jenkins credentials file is OK."
+                else:
+                    print "Jenkins credentials mismatch:\n"
+                    print "New file is:"
+                    print "    %s" % self.read_file(f).replace("\n", "\n    ")
+                    print "Old file was:"
+                    print "    %s" % old_file.replace("\n", "\n    ")
                 continue
             c = self.compute_checksum(f)
             if c == checksum:

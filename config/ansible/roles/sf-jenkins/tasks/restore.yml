@@ -1,5 +1,6 @@
 ---
 - name: "Restore data"
+  # Discard files created between backup and restore
   synchronize:
     src: "{{ backup_src }}/"
     dest: /
