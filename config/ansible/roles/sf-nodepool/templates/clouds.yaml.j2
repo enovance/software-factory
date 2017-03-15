@@ -1,0 +1,18 @@
+clouds:
+{% for provider in nodepool.providers %}
+  {{ provider['name'] }}:
+    auth:
+      username: {{ provider['username'] }}
+      password: {{ provider['password'] }}
+      auth_url: {{ provider['auth_url'] }}
+      project_name: {{ provider['project_name'] }}
+  {% if provider.get("region_name") %}
+    region_name: {{ provider["region_name"] }}
+  {% endif %}
+  {% if provider.get("regions") %}
+    regions:
+    {% for region in provider["regions"] %}
+      - {{ region }}
+    {% endfor%}
+  {% endif %}
+{% endfor %}
