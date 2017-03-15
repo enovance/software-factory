@@ -1,0 +1,12 @@
+---
+features:
+  - Nodepool service support for diskimage builder based
+    slave image.
+upgrade:
+  - The nodepool configuration now uses os-client-config
+    and provides the full 'providers', 'labels' and
+    'diskimages' configuration through the config-repo.
+    The images.yaml and labels.yaml are merged into a single
+    nodepool.yaml that better reflect openstack-infra project-config.
+  - Nodepool provider tuning such as max-server are now exposed
+    through the config repo.

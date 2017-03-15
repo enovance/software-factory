@@ -4,27 +4,24 @@ import os
 import sys
 import yaml
 
-workdir = os.environ.get('WORKDIR', '/tmp/nodepool')
-main = 'nodepool.yaml'
-images = 'images.yaml'
-labels = 'labels.yaml'
 
+def merge(_nodepool):
+    conf = yaml.safe_load(open(_nodepool))
+    user = yaml.safe_load(open("nodepool/nodepool.yaml"))
 
-def merge():
-    conf = yaml.safe_load(file(os.path.join(workdir, main), 'r'))
-    images_conf = yaml.safe_load(file(os.path.join(workdir, images), 'r'))
-    labels_conf = yaml.safe_load(file(os.path.join(workdir, labels), 'r'))
+    for provider in user['providers']:
+        for image in provider['images']:
+            image['private-key'] = '/var/lib/nodepool/.ssh/id_rsa'
 
-    for defined_provider in conf['providers']:
-        # This makes sure all defined providers have an 'images' section
-        defined_provider['images'] = []
+    for dib in user['diskimages']:
+        dib['env-vars']['TMPDIR'] = '/var/cache/nodepool/dib_tmp'
+        dib['env-vars']['DIB_IMAGE_CACHE'] = '/var/cache/nodepool/dib_cache'
 
-    for provider in images_conf:
-        for defined_provider in conf['providers']:
-            if provider['provider'] == defined_provider['name']:
-                defined_provider['images'] = provider['images']
-
-    conf['labels'] = labels_conf['labels']
+    if 'cron' in user:
+        conf['cron'] = user['cron']
+    conf['labels'] = user['labels']
+    conf['providers'] = user['providers']
+    conf['diskimages'] = user['diskimages']
     return yaml.dump(conf, default_flow_style=False)
 
 
@@ -32,11 +29,11 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print "Please provide the target filename"
         sys.exit(1)
-    else:
-        try:
-            out = merge()
-        except Exception as err:
-            print err
+    out = sys.argv[1]
+    _nodepool = "%s/_nodepool.yaml" % os.path.dirname(out)
+    for reqfile in (_nodepool, "nodepool/nodepool.yaml"):
+        if not os.path.isfile(_nodepool):
+            print "%s: missing file" % _nodepool
             sys.exit(1)
-
-        file(os.path.join(workdir, sys.argv[1]), 'w').write(out)
+    merged = merge(_nodepool)
+    open(out, 'w').write(merged)

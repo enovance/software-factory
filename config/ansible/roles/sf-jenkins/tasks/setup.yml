@@ -55,7 +55,7 @@
       - {name: jenkins, dest: /etc/sudoers.d, mode: '0440'}
       - {name: jenkins.conf, dest: /etc/httpd/conf.d}
       - {name: ports.conf, dest: /etc/httpd/conf.d}
-      - {name: remove-offline-node.groovy, dest: /usr/local/share/sf-jenkins-slave-tools}
+      - {name: remove-offline-node.groovy, dest: /var/lib/jenkins/}
       - {name: wait4jenkins, dest: /usr/libexec, mode: '0555'}
 
 - name: Install files for jenkins user
