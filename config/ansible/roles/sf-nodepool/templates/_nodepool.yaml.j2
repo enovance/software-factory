@@ -1,5 +1,6 @@
 script-dir: /etc/nodepool/scripts
-images-dir: /opt/nodepool
+elements-dir: /etc/nodepool/elements
+images-dir: /var/lib/nodepool/dib
 
 zmq-publishers:
   - tcp://{{ jenkins_host }}:8888
@@ -15,36 +16,6 @@ cron:
 targets:
   - name: default
 
-providers:
-{% for provider in nodepool.providers %}
-  - name: {{ provider.name }}
-    clean-floating-ips: true
-{% if provider.auth_url %}
-    auth-url: {{ provider.auth_url }}
-{% endif %}
-{% if provider.project_id %}
-    project-name: {{ provider.project_id }}
-{% endif %}
-{% if provider.username %}
-    username: {{ provider.username }}
-{% endif %}
-{% if provider.network|default(None) %}
-    networks:
-      - name: {{ provider.network }}
-{% endif %}
-{% if provider.password %}
-    password: {{ provider.password }}
-{% endif %}
-{% if provider.pool %}
-    pool: {{ provider.pool }}
-{% endif %}
-{% if provider.max_servers %}
-    max-servers: {{ provider.max_servers }}
-{% endif %}
-{% if provider.rate %}
-    rate: {{ provider.rate }}
-{% endif %}
-{% if provider.boot_timeout %}
-    boot-timeout: {{ provider.boot_timeout }}
-{% endif %}
-{% endfor %}
+labels: []
+providers: []
+diskimages: []

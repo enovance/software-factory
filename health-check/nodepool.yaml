@@ -24,11 +24,18 @@
       register: sfconfiged
       failed_when: False
 
-    - name: "Adds nodepool image"
+    - name: Adds nodepool providers
       when: sfconfiged.rc
       command: >
-        hieraedit.py --yaml /root/config/nodepool/images.yaml --eval 0 "{
-            'provider': '{{ provider_name }}',
+        hieraedit.py --yaml /root/config/nodepool/nodepool.yaml --eval providers "[{
+            'name: '{{ provider_name }}',
+            'boot-timeout': 120,
+            'clean-floating-ips': true,
+            'cloud': '{{ provider_name }}',
+            'pool': '{{ os_pool }}',
+            'boot-timeout': 120,
+            'max-servers': 3,
+            'rate': 3.0,
             'images': [{
                 'name': '{{ image_name }}',
                 'base-image': '{{ base_image_name }}',
@@ -37,12 +44,12 @@
                 'setup': 'nodepool_demo.sh',
                 'min-ram': 2048,
             }]
-        }"
+        }]"
 
     - name: Adds nodepool label
       when: sfconfiged.rc
       command: >
-        hieraedit.py --yaml /root/config/nodepool/labels.yaml --eval labels "[{
+        hieraedit.py --yaml /root/config/nodepool/nodepool.yaml --eval labels "[{
             'name': '{{ node }}',
             'image': '{{ image_name }}',
             'min-ready': 2,

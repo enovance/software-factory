@@ -13,7 +13,10 @@
   command: chdir=/root/config {{ item }}
   when: localconfig.stdout != upstreamconfig.stdout
   with_items:
-    - /usr/local/bin/sf-nodepool-conf-update.sh apply
+    - /usr/local/bin/sf-nodepool-conf-merger.py /etc/nodepool/nodepool.yaml
+    - rsync -avi --delete --exclude authorized_keys --exclude localCA.pem nodepool/scripts/ /etc/nodepool/scripts/
+    - rsync -avi /usr/local/share/sf-jenkins-slave-tools/ /etc/nodepool/scripts/
+    - rsync -avi --delete nodepool/elements/ /etc/nodepool/elements/
 
 - name: Write config repo checksum matching current configuration
   copy: content="{{ upstreamconfig.stdout }}" dest=/var/lib/software-factory/nodepool_config

@@ -301,6 +301,23 @@ def update_sfconfig(data):
         data['debug'] = False
         dirty = True
 
+    if "disabled" in data['nodepool']:
+        # Disable provider if disable
+        if data["nodepool"]["disabled"] and data['nodepool'].get('providers'):
+            data['nodepool']['providers'][0]['auth_url'] = ""
+        del data['nodepool']['disabled']
+        dirty = True
+
+    for provider in data['nodepool'].get('providers', []):
+        for key in ('boot_timeout', 'max_servers', 'network', 'pool', 'rate'):
+            if key in provider:
+                del provider[key]
+                dirty = True
+        if 'project_id' in provider:
+            provider['project_name'] = provider['project_id']
+            del provider['project_id']
+            dirty = True
+
     return dirty
 
 
@@ -528,11 +545,17 @@ DNS.1 = %s
         get_or_generate_ssh_key("gerrit_admin_rsa")
 
     if "zuul" in arch["roles"]:
+        if ("nodepool" not in arch["roles"] or
+            len(sfconfig["nodepool"].get("providers", [])) == 0 or (
+                len(sfconfig["nodepool"]["providers"]) == 1 and
+                not sfconfig["nodepool"]["providers"][0]["auth_url"])):
+            glue["zuul_offline_node_when_complete"] = False
         glue["zuul_pub_url"] = "%s/zuul/" % glue["gateway_url"]
         glue["zuul_internal_url"] = "http://%s:%s/" % (
             get_hostname("zuul"), defaults["zuul_port"])
 
     if "nodepool" in arch["roles"]:
+        glue["nodepool_providers"] = sfconfig["nodepool"].get("providers", [])
         glue["nodepool_mysql_host"] = glue["mysql_host"]
         glue["mysql_databases"]["nodepool"] = {
             'hosts': ["localhost", get_hostname("nodepool")],

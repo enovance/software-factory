@@ -16,6 +16,36 @@
   - include: tasks/gerrit_default_jenkins_user.yml
   - include: tasks/nodes_image_update.yml
 
+- hosts: zuul
+  tasks:
+  - service: name=zuul state=stopped
+
+- hosts: nodepool
+  tasks:
+  # Ignore errors when the service is not started...
+  - service: name=nodepool state=stopped
+    ignore_errors: yes
+
+- hosts: install-server
+  tasks:
+  - include: tasks/update_configrepo.yaml
+  - name: "Check for new nodepool config repo"
+    stat: path=/root/config/nodepool/elements
+    register: nodepool_elements
+  - block:
+    - copy: src=sf-nodepool-conf-migrator.py dest=/root
+    - name: "Migrate nodepool configuration"
+      command: chdir=/root/config {{ item }}
+      with_items:
+        - rsync -a {{install_path}}/softwarefactory/usr/local/share/sf-config-repo/nodepool/elements/ nodepool/elements/
+        - python /root/sf-nodepool-conf-migrator.py
+        - git add nodepool/nodepool.yaml nodepool/elements nodepool/scripts
+        - git commit -a -m "Update nodepool configuration"
+        - git push git+ssh://gerrit/config master
+    - file: path=/root/sf-nodepool-conf-migrator.py state=absent
+
+    when: nodepool_elements.stat.exists == false
+
 - hosts: all
   tasks:
   - include: tasks/clean_root_crontab.yml

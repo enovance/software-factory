@@ -3,6 +3,7 @@ role_actions:
   - setup
   - backup
   - restore
+  - get_logs
 
 fqdn: "{{ fqdn }}"
 backup: "{{ backup }}"
