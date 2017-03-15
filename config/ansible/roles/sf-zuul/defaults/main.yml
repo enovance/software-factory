@@ -11,6 +11,8 @@ gerrit_pub_url: "https://example.com/r/"
 zuul_pub_url: "https://example.com/zuul/"
 zuul_internal_url: "http://localhost:{{ zuul_port }}/"
 
+zuul_offline_node_when_complete: True
+
 zuul_loglevel: INFO
 zuul_gear_loglevel: WARNING
 zuul_root_loglevel: WARNING
