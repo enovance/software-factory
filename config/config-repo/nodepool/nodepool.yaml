@@ -1,0 +1,26 @@
+providers: []
+#providers:
+#  - name: default
+#    cloud: cloud-name-from-sfconfig.yaml
+#    images:
+#      - name: centos7
+#        base-image: centos7-cloud
+#        username: centos
+#        setup: base.sh
+#        min-ram: 4096
+
+labels: []
+#labels:
+#  - name: myproject-centos7-slave
+#    image: centos7
+#    min-ready: 5
+#    providers:
+#      - name: default
+
+diskimages: []
+#diskimages:
+#  - name: centos-7
+#    elements:
+#      - centos-minimal
+#    env-vars:
+#      DIB_CHECKSUM: '1'
