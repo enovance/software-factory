@@ -124,23 +124,14 @@ mirrors:
     swift_mirror_ttl: 15811200 # 6 months ttl
 
 nodepool:
-    disabled: True
     providers:
       - name: default
-        auth_url: http://localhost:35357/v2.0
-        project_id: tenantname
+        auth_url:
+        project_name: tenantname
         username: username
         password: secret
-        # Optional nodepool network uuid (required by heat based tenant when multiple network are available)
-        network:
-        # Compute availability zone
-        pool: nova
-        # Max amount of Slaves that can be started
-        max_servers: 10
-        # Delay in seconds between two tasks within nodepool
-        rate: 10.0
-        # Timeout in seconds for SSH login to node
-        boot_timeout: 120
+        region_name: regionOne
+        regions: []
 
 logs:
     disabled: True

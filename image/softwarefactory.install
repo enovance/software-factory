@@ -290,10 +290,7 @@ function install_sf {
     rsync --delete -a --no-owner ./../health-check/ ${dir}/etc/ansible/health-check/
 
     rsync -a --delete ./../config/config-repo/ ${dir}/usr/local/share/sf-config-repo/
-    cp -Rv ./../tools/slaves/ ${dir}/usr/local/share/sf-jenkins-slave-tools
-    # Also copy tool in image PATH so that sf image could
-    # be used as slave base image
-    cp -Rv ./../tools/slaves/* ${dir}/usr/local/bin/
+    rsync -a --delete ./../tools/slaves/ ${dir}/usr/local/share/sf-jenkins-slave-tools/
 
     do_chroot ${dir} find /root /var/www /srv/ -name "*.pyc" -exec rm {} \;
 
