@@ -1,17 +1,35 @@
 ---
 - include: /etc/ansible/tasks/create_user.yml user_name=nodepool ssh_key=jenkins_rsa
 
-- name: Install templates
+- name: Install config
   template:
-      src: "{{ item.name }}.j2"
-      dest: "{{item.dest }}/{{ item.name }}"
-      owner: "{{ item.owner | default('root') }}"
-      group: "{{ item.group | default('root') }}"
-      mode: "{{ item.mode | default(0444) }}"
+    src: "{{ item }}.j2"
+    dest: "/etc/nodepool/{{ item }}"
+    owner: "root"
+    group: "nodepool"
+    mode: "0440"
   with_items:
-      - {name: _nodepool.yaml, dest: /etc/nodepool, owner: nodepool}
-      - {name: secure.conf, dest: /etc/nodepool, group: nodepool, mode: '0440'}
-      - {name: sf-nodepool-conf-update.sh, dest: /usr/local/bin, mode: '0555'}
+    - _nodepool.yaml
+    - secure.conf
+    - logging.conf
+  notify: nodepool restart
+
+- name: Install os-client-config
+  template:
+    src: clouds.yaml.j2
+    dest: /var/lib/nodepool/.config/openstack/clouds.yaml
+    owner: nodepool
+    group: nodepool
+    mode: 0400
+
+- name: Ensure /root/.config/openstack exists
+  file: path=/root/.config/openstack state=directory
+
+- name: Install os-client-config for root user
+  template:
+    src: clouds.yaml.j2
+    dest: /root/.config/openstack/clouds.yaml
+    mode: 0400
 
 - name: Install sf-nodepool-conf-merger.py
   copy:
@@ -21,26 +39,19 @@
 
 - name: Setup sysconfig
   template:
-      src: sysconfig.j2
-      dest: /etc/sysconfig/nodepool
+    src: sysconfig.j2
+    dest: /etc/sysconfig/nodepool
   notify: nodepool restart
-  when: nodepool.disabled == False
-
-- name: Install logging.conf
-  template:
-      src: logging.conf.j2
-      dest: /etc/nodepool/logging.conf
 
 - name: Setup authorized keys
   copy:
-      content: "{{ jenkins_rsa_pub }}"
-      dest: /etc/nodepool/scripts/authorized_keys
+    content: "{{ jenkins_rsa_pub }}"
+    dest: /etc/nodepool/scripts/authorized_keys
 
 - name: Setup localCA
   copy:
-      content: "{{ localCA_pem }}"
-      dest: /etc/nodepool/scripts/localCA.pem
+    content: "{{ localCA_pem }}"
+    dest: /etc/nodepool/scripts/localCA.pem
 
 - name: Start service
   service: name=nodepool state=started enabled=yes
-  when: nodepool.disabled == False

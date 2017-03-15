@@ -89,7 +89,7 @@
           # Prepare a default configuration for zuul and nodepool
           mkdir -p build/nodepool build/zuul
           cp ~jenkins/defconf/zuul.conf build/zuul/
-          cp ~jenkins/defconf/nodepool.yaml build/nodepool/
+          cp ~jenkins/defconf/nodepool.yaml build/nodepool/_nodepool.yaml
 
           cd config
           echo "[+] Checking jobs"
@@ -101,9 +101,8 @@
           zuul-server -c ../build/zuul/zuul.conf -l ../build/zuul/layout.yaml -t
 
           echo "[+] Checking nodepool"
-          cp nodepool/*.yaml ../build/nodepool/
-          WORKDIR=../build/nodepool/ /usr/local/bin/sf-nodepool-conf-merger.py merged.yaml
-          nodepool -c ../build/nodepool/merged.yaml config-validate
+          /usr/local/bin/sf-nodepool-conf-merger.py ../build/nodepool/nodepool.yaml
+          nodepool -c ../build/nodepool/nodepool.yaml config-validate
 
           echo "[+] Checking gerrit replication"
           git config -f gerrit/replication.config -l > /dev/null
