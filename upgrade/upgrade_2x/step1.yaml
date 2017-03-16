@@ -15,6 +15,7 @@
   - include: tasks/resources_configrepo.yml
   - include: tasks/gerrit_default_jenkins_user.yml
   - include: tasks/nodes_image_update.yml
+  - include: tasks/repoxplorer_configrepo.yml
 
 - hosts: all
   tasks:
