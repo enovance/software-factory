@@ -5,9 +5,6 @@
     regexp: "^elasticsearch_host =.*$"
     replace: "elasticsearch_host = 'elasticsearch'"
 
-- name: "Add topmenu"
-  patch: src=layout.html-topmenu.patch basedir=/usr/share/repoxplorer/templates/
-
 - name: Start service
   systemd:
     name: "{{ item }}"
