@@ -1,0 +1,58 @@
+---
+- name: "Check if repoxplorer directory already exists in the config repo"
+  stat: path=/root/config/repoxplorer
+  register: configrepo_repoxplorer
+
+- block:
+
+  - name: "Init repoxplorer config repo directory (1)"
+    command: chdir=/root/config {{ item }}
+    with_items:
+      - mkdir repoxplorer
+      - cp {{install_path}}/softwarefactory/usr/local/share/sf-config-repo/repoxplorer/projects.yaml repoxplorer/
+      - cp {{install_path}}/softwarefactory/usr/local/share/sf-config-repo/repoxplorer/idents.yaml repoxplorer/
+
+  - name: Change default fqdn in default repoxplorer projects.yaml file
+    replace:
+      dest: /root/config/repoxplorer/projects.yaml
+      regexp: 'sftests.com'
+      replace: '{{ fqdn }}'
+
+  - name: "Push repoxplorer directory in the config repo"
+    command: chdir=/root/config {{ item }}
+    with_items:
+      - git add repoxplorer
+      - git commit -m "Initialize repoxplorer configuration"
+      - git push git+ssh://{{ fqdn }}/config master
+
+  when: configrepo_repoxplorer.stat.exists == false
+
+- name: Check repoxplorer version
+  command: rpm -q --queryformat '%{VERSION}' repoxplorer
+  register: version
+
+- block:
+
+  - name: "Copy config file updater"
+    copy:
+      src: update-repoxplorer-config.py
+      dest: /tmp/update-repoxplorer-config.py
+
+  - name: "Update projects yaml file"
+    command: chdir=/root/config {{ item }}
+    with_items:
+      - python /tmp/update-repoxplorer-config.py repoxplorer/projects.yaml
+      - git add repoxplorer/projects.yaml
+
+  - name: "Check file has changes"
+    command: chdir=/root/config git --no-pager diff --name-only --staged
+    register: result
+
+  - name: "Push repoxplorer directory in the config repo"
+    command: chdir=/root/config {{ item }}
+    with_items:
+      - git commit -m "Update repoxplorer configuration"
+      - git push git+ssh://{{ fqdn }}/config master
+    when: "'projects.yaml' in result.stdout"
+
+  when: configrepo_repoxplorer.stat.exists == true and version.stdout == '0.7.2'
