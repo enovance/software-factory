@@ -1,0 +1,6 @@
+---
+upgrade:
+  - repoXplorer DB will be wiped and rebuilt
+  - repoXplorer config/repoxplorer/projects.yaml will be updated to new format
+other:
+  - repoXplorer component has been upgraded to 0.7.2
