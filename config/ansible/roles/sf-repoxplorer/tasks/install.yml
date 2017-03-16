@@ -6,6 +6,12 @@
     disablerepo: "{{ yum_disable_repo|default(omit) }}"
     enablerepo: "{{ yum_enable_repo|default(omit) }}"
 
+- name: "Install top menu"
+  lineinfile:
+    dest: /usr/share/repoxplorer/templates/layout.html
+    insertafter: '<%def name="javascript()">'
+    line: '    <script src="/static/js/topmenu.js"></script>'
+
 - name: "Remove old install method tree"
   file:
     path: /srv/repoxplorer

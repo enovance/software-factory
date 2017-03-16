@@ -1,0 +1,28 @@
+---
+- name: "Check if repoxplorer directory already exists in the config repo"
+  stat: path=/root/config/repoxplorer
+  register: configrepo_repoxplorer
+
+- block:
+
+  - name: "Init repoxplorer config repo directory (1)"
+    command: chdir=/root/config {{ item }}
+    with_items:
+      - mkdir repoxplorer
+      - cp {{install_path}}/softwarefactory/usr/local/share/sf-config-repo/repoxplorer/projects.yaml repoxplorer/
+      - cp {{install_path}}/softwarefactory/usr/local/share/sf-config-repo/repoxplorer/idents.yaml repoxplorer/
+
+  - name: Change default fqdn in default repoxplorer projects.yaml file
+    replace:
+      dest: /root/config/repoxplorer/projects.yaml
+      regexp: 'sftests.com'
+      replace: '{{ fqdn }}'
+
+  - name: "Push repoxplorer directory in the config repo"
+    command: chdir=/root/config {{ item }}
+    with_items:
+      - git add repoxplorer
+      - git commit -m "Initialize repoxplorer configuration"
+      - git push git+ssh://{{ fqdn }}/config master
+
+  when: configrepo_repoxplorer.stat.exists == false
