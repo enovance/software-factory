@@ -48,6 +48,21 @@
       command: rsync -av /usr/local/share/sf-config-repo/ {{ conf_tmp.stdout }}/
       when: config_done.stat.exists != True
 
+    # Temporary workaround until https://softwarefactory-project.io/r/#/c/7000/ is merged
+    - name: Check repoxplorer version installed
+      command: rpm -q repoxplorer
+      ignore_errors: True
+      register: found
+    - name: Check repoxplorer version
+      command: rpm -q --queryformat '%{VERSION}' repoxplorer
+      register: version
+      when: found|succeeded
+    - copy:
+         src: "{{ conf_tmp.stdout }}/repoxplorer/projects-0.7.2.yaml"
+         dest: "{{ conf_tmp.stdout }}/repoxplorer/projects.yaml"
+         remote_src: True
+      when: found|succeeded and version.stdout == '0.7.2'
+
     - name: Change default fqdn in default repoxplorer projects.yaml file
       replace:
           dest: "{{ conf_tmp.stdout }}/repoxplorer/projects.yaml"

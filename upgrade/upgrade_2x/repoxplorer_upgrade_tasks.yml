@@ -36,5 +36,11 @@
 
 - hosts: repoxplorer
   tasks:
+  - name: "Copy config file updater"
+    copy:
+      src: update-repoxplorer-config.py
+      dest: /tmp/update-repoxplorer-config.py
+  - name: "Update projects yaml file"
+    command: python /tmp/update-repoxplorer-config.py /etc/repoxplorer/projects.yaml
   - name: "Restart repoxplorer indexer"
     service: name=repoxplorer state=restarted
