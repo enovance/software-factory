@@ -1,18 +1,7 @@
 ---
-- name: "Install requirements"
+- name: "Install package"
   yum:
-    name: "{{ item }}"
+    name: "mirror2swift"
     state: present
     disablerepo: "{{ yum_disable_repo|default(omit) }}"
     enablerepo: "{{ yum_enable_repo|default(omit) }}"
-  with_items: [python-lxml, PyYAML, python-requests]
-
-- name: "Fetch mirror2swift code"
-  git:
-    repo: "{{ mirror2swift_url }}"
-    dest: /usr/src/mirror2swift
-    recursive: no
-    force: yes
-
-- name: "Install mirror2swift"
-  command: chdir=/usr/src/mirror2swift python setup.py install

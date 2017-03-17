@@ -4,5 +4,3 @@ role_actions:
   - postconf
   - setup
   - update
-
-mirror2swift_url: https://github.com/cschwede/mirror2swift

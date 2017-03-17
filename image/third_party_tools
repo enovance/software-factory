@@ -96,11 +96,6 @@ if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
     ETHERPAD_EXTRA_VARS+=", etherpad_version: \"${ETHERPAD_LITE_VERSION}\""
 fi
 
-# mirror2swift
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    MIRROR2SWIFT_EXTRA_VARS="mirror2swift_url: \"${SWIFT_CACHE}/mirror2swift.git\""
-fi
-
 #---- URL health check -------
 function test_url {
   local e=0

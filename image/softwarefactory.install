@@ -260,6 +260,7 @@ remove_obsolete() {
     rm -Rf ${dir}/srv/nodepool ${dir}/usr/src/nodepool
     rm -Rf ${dir}/srv/gerritbot ${dir}/usr/src/gerritbot
     rm -Rf ${dir}/srv/lecm ${dir}/usr/src/lecm
+    rm -Rf ${dir}/usr/src/mirror2swift
 }
 
 fix_ansible_issue5504() {
@@ -365,7 +366,7 @@ build_all() {
     ansible_install sf-nodepool
     ansible_install sf-storyboard
     ansible_install sf-storyboard-webclient "${STORYBOARD_WEBCLIENT_EXTRA_VARS}"
-    ansible_install sf-mirror "${MIRROR2SWIFT_EXTRA_VARS}"
+    ansible_install sf-mirror
     ansible_install sf-elasticsearch "${ELASTICSEARCH_EXTRA_VARS}"
     ansible_install sf-logstash "${LOGSTASH_EXTRA_VARS}"
     ansible_install sf-kibana "${KIBANA_EXTRA_VARS}"
