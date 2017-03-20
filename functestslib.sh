@@ -197,7 +197,6 @@ function build_image {
         [ -f "${IMAGE_PATH}.description_diff" ] && grep "^[><]" ${IMAGE_PATH}.description_diff | grep -v '[><] SF:'
         cp ${IMAGE_PATH}-${SF_VER}.description ${ARTIFACTS_DIR}/
         checkpoint "build_image"
-        prepare_functional_tests_utils
     else
         echo "SKIP_BUILD: Reusing previously built image, just update source code without re-installing"
         echo "            To update requirements and do a full installation, do not use SKIP_BUILD"
@@ -209,9 +208,6 @@ function build_image {
         sudo rsync -a --delete --no-owner config/config-repo/ ${IMAGE_PATH}/usr/local/share/sf-config-repo/
         sudo rsync -a --delete --no-owner serverspec/ ${IMAGE_PATH}/etc/serverspec/
         sudo rsync -a config/scripts/ ${IMAGE_PATH}/usr/local/bin/
-        sudo rsync -a --delete ${MANAGESF_CLONED_PATH}/managesf/ ${IMAGE_PATH}/usr/lib/python2.7/site-packages/managesf/
-        sudo rsync -a --delete ${CAUTH_CLONED_PATH}/cauth/ ${IMAGE_PATH}/usr/lib/python2.7/site-packages/cauth/
-        sudo rsync -a --delete ${PYSFLIB_CLONED_PATH}/pysflib/ ${IMAGE_PATH}/usr/lib/python2.7/site-packages/pysflib/
         sudo cp image/edeploy/edeploy ${IMAGE_PATH}/usr/sbin/edeploy
         set +e
     fi
@@ -391,22 +387,6 @@ function run_heat_bootstraps {
     echo "ok."
     checkpoint "run_heat_bootstraps"
     fetch_bootstraps_data
-}
-
-function prepare_functional_tests_utils {
-    # TODO: replace this prepare_functional_tests_utils by a python-sfmanager package
-    cat ${PYSFLIB_CLONED_PATH}/requirements.txt ${SFMANAGER_CLONED_PATH}/requirements.txt tests/requirements.txt | sort | uniq | grep -v '\(requests\|pysflib\)' > ${ARTIFACTS_DIR}/test-requirements.txt
-    (
-        set -e
-        pip install --user --upgrade pip pbr
-        cd ${PYSFLIB_CLONED_PATH}; pip install --user -r ${ARTIFACTS_DIR}/test-requirements.txt || {
-            echo "Can't install test-requirements.txt $(cat ${ARTIFACTS_DIR}/test-requirements.txt)"
-            exit 1
-        }
-        cd ${PYSFLIB_CLONED_PATH};   python setup.py install --user
-        cd ${SFMANAGER_CLONED_PATH}; python setup.py install --user
-    ) &> ${ARTIFACTS_DIR}/test-requirements.install.log || fail "Can't install test-requirements" ${ARTIFACTS_DIR}/test-requirements.install.log
-    checkpoint "prepare_utils"
 }
 
 function reset_etc_hosts_dns {

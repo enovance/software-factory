@@ -74,8 +74,6 @@ function build_image {
     (
         set -e
         cd image
-        DOCDIR=$DOCDIR MANAGESF_CLONED_PATH=$MANAGESF_CLONED_PATH PYSFLIB_CLONED_PATH=$PYSFLIB_CLONED_PATH \
-        CAUTH_CLONED_PATH=$CAUTH_CLONED_PATH SFMANAGER_CLONED_PATH=$SFMANAGER_CLONED_PATH \
         SF_REPO=${SF_REPO} sudo -E ./softwarefactory.install ${IMAGE_PATH} ${SF_VER}
         ./get_image_versions_information.sh ${IMAGE_PATH} | sudo tee ${IMAGE_PATH}-${SF_VER}.description > /dev/null
     )
@@ -88,9 +86,6 @@ function build_image {
 }
 
 prepare_buildenv
-# Make sure subproject are available
-echo "(STEP0) Fetch subprojects..."
-./image/fetch_subprojects.sh || exit 1
 build_image
 if [ -n "$BUILD_QCOW" ]; then
     echo "(STEP2) Building qcow, please wait..."

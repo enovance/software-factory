@@ -40,7 +40,7 @@ The minimal architecture includes following components:
 * mysql
 * gateway
 * cauth
-* managesf
+* `Managesf </docs/managesf/>`_
 * gerrit
 * zuul
 * jenkins

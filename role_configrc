@@ -40,12 +40,6 @@ else
     IN_ZUUL=0
 fi
 
-PYSFLIB_CLONED_PATH="${PYSFLIB_CLONED_PATH:-${DEPS}/pysflib}"
-CAUTH_CLONED_PATH="${CAUTH_CLONED_PATH:-${DEPS}/cauth}"
-MANAGESF_CLONED_PATH="${MANAGESF_CLONED_PATH:-${DEPS}/managesf}"
-SFMANAGER_CLONED_PATH="${SFMANAGER_CLONED_PATH:-${DEPS}/python-sfmanager}"
-
-DOCDIR="${PWD}/docs"
 HOT_TEMPLATES="${PWD}/deploy/heat"
 
 function prepare_buildenv {

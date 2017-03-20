@@ -35,4 +35,8 @@ To update the configuration repo:
    access_control_user
    gerritlinks_user
    resources_user
-   resources
+
+Available resources models
+==========================
+
+`Resources </docs/managesf/resources.html>`_ can be created or modified with the resources/ yaml files.

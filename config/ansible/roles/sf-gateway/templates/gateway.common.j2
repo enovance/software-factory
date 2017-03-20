@@ -64,6 +64,14 @@
     </LocationMatch>
 {% endif %}
 
+    Alias "/docs/managesf" "/usr/share/doc/managesf/"
+    Alias "/docs/sfmanager" "/usr/share/doc/python-sfmanager/"
+    Alias "/docs/" "/usr/share/doc/software-factory/"
+    <Directory "/usr/share/doc/">
+        Require all granted
+    </Directory>
+
+
     <IfModule mod_proxy.c>
         ProxyVia On
         ProxyRequests Off
