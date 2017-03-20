@@ -22,18 +22,6 @@ if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
 fi
 
 
-# Job logs Gearman processors
-LOG_GEARMAN_CLIENT_VERSION="d7d9d50ee2706608386c802246591a6c80a58a7f"
-LOG_GEARMAN_CLIENT_URL="https://raw.githubusercontent.com/openstack-infra/puppet-log_processor/${LOG_GEARMAN_CLIENT_VERSION}/files/log-gearman-client.py"
-LOG_GEARMAN_WORKER_VERSION="84c7e723128fab9da321ae1b0977e7d13923b36b"
-LOG_GEARMAN_WORKER_URL="https://raw.githubusercontent.com/openstack-infra/puppet-log_processor/${LOG_GEARMAN_WORKER_VERSION}/files/log-gearman-worker.py"
-
-URL_LIST="$URL_LIST $LOG_GEARMAN_CLIENT_URL $LOG_GEARMAN_WORKER_URL"
-if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
-    LOG_GEARMAN_CLIENT_URL="${SWIFT_CACHE}/log_gearman/log-gearman-client.py"
-    LOG_GEARMAN_WORKER_URL="${SWIFT_CACHE}/log_gearman/log-gearman-worker.py"
-fi
-
 # Elasticsearch
 if [ "${USE_SWIFT_CACHE}" == "yes" ]; then
     ELASTICSEARCH_EXTRA_VARS="elasticsearch_repo_url: \"http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/repomirror/elasticsearch-2.x/\""
